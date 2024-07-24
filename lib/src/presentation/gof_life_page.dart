@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:so_help/src/domain/game_of_life_engine.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+
+import '../domain/game_of_life_engine.dart';
 import '../domain/grid_data.dart';
 import 'widgets/grid_item_view.dart';
 
@@ -20,7 +22,7 @@ class _GOFPageState extends State<GOFPage> {
   int crossAxisCount = 0;
   int mainAxisCount = 0;
   double maxItemSize = 0;
-  List<GridData> data = [];
+  List<List<GridData>> data = [];
 
   bool isReady = false;
 
@@ -34,9 +36,8 @@ class _GOFPageState extends State<GOFPage> {
   }
 
   void initData() {
-    widget.engine.init(
-      size: MediaQuery.sizeOf(context),
-    );
+    _timer?.cancel();
+    widget.engine.init(size: MediaQuery.sizeOf(context), itemSize: 75);
     crossAxisCount = widget.engine.nbOfCols;
     mainAxisCount = widget.engine.nbOfRows;
     maxItemSize = widget.engine.maxItemSize;
@@ -48,26 +49,54 @@ class _GOFPageState extends State<GOFPage> {
   void next() {
     widget.engine.next();
     data = widget.engine.data;
-    print("updated");
     setState(() {});
+  }
+
+  Timer? _timer;
+
+  void start() {
+    _timer?.cancel();
+    _timer = null;
+
+    _timer = Timer.periodic(Durations.short1, (t) {
+      next();
+    });
+  }
+
+  void pause() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          FloatingActionButton(
+            onPressed: start,
+            child: const Icon(Icons.start),
+          ),
+          FloatingActionButton(
+            onPressed: pause,
+            child: const Icon(Icons.stop),
+          ),
           FloatingActionButton(
             onPressed: next,
             child: const Icon(Icons.next_plan),
           ),
           FloatingActionButton(
+            onPressed: initData,
             child: const Icon(Icons.restore),
-            onPressed: () {
-              initData();
-            },
           ),
         ],
       ),
@@ -75,15 +104,18 @@ class _GOFPageState extends State<GOFPage> {
         child: isReady == false
             ? const Text("xxx")
             : Wrap(
-                children: data
-                    .map((e) => SizedBox(
-                          height: maxItemSize,
-                          width: maxItemSize,
-                          child: GridItemView(
-                            data: e,
-                          ),
-                        ))
-                    .toList()),
+                children: [
+                  for (final x in data)
+                    for (final e in x)
+                      SizedBox(
+                        height: maxItemSize,
+                        width: maxItemSize,
+                        child: GridItemView(
+                          data: e,
+                        ),
+                      )
+                ],
+              ),
       ),
     );
   }

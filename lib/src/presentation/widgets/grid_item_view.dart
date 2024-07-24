@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:so_help/src/domain/grid_data.dart';
+
+import '../../domain/grid_data.dart';
 
 class GridItemView extends StatelessWidget {
   const GridItemView({
@@ -15,7 +16,7 @@ class GridItemView extends StatelessWidget {
       decoration: BoxDecoration(
         color: data.color,
       ),
-      child: Text("${data}"),
+      child: FittedBox(child: Text("${data}")),
     );
   }
 }
