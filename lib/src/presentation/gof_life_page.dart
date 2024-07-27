@@ -19,6 +19,9 @@ class GOFPage extends StatefulWidget {
 }
 
 class _GOFPageState extends State<GOFPage> {
+  ///
+  final generationDelay = Durations.short1;
+
   int crossAxisCount = 0;
   int mainAxisCount = 0;
   double maxItemSize = 0;
@@ -58,7 +61,7 @@ class _GOFPageState extends State<GOFPage> {
     _timer?.cancel();
     _timer = null;
 
-    _timer = Timer.periodic(Durations.short1, (t) {
+    _timer = Timer.periodic(generationDelay, (t) {
       next();
     });
   }
@@ -71,6 +74,7 @@ class _GOFPageState extends State<GOFPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    widget.engine.dispose();
     super.dispose();
   }
 
@@ -102,7 +106,7 @@ class _GOFPageState extends State<GOFPage> {
       ),
       body: Center(
         child: isReady == false
-            ? const Text("xxx")
+            ? const CircularProgressIndicator()
             : Wrap(
                 children: [
                   for (final x in data)
