@@ -40,7 +40,10 @@ class _GOFPageState extends State<GOFPage> {
 
   void initData() {
     _timer?.cancel();
-    widget.engine.init(size: MediaQuery.sizeOf(context), itemSize: 75);
+    widget.engine.init(
+      size: MediaQuery.sizeOf(context),
+      itemSize: 50,
+    );
     crossAxisCount = widget.engine.nbOfCols;
     mainAxisCount = widget.engine.nbOfRows;
     maxItemSize = widget.engine.maxItemSize;

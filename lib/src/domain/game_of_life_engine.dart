@@ -10,6 +10,7 @@ import 'grid_data.dart';
 ///** then it springs to life only in the case that it has 3 live neighbors
 ///
 class GameOfLifeEngine {
+  ///  [y->[x,x,x..],y->[x..],]
   final List<List<GridData>> _data = [];
   List<List<GridData>> get data => [..._data];
 
@@ -62,116 +63,62 @@ class GameOfLifeEngine {
     }
   }
 
-  //LAZY bypassing Range err 🤣🤣
   GridData? _topLeftItem(int x, int y) {
-    try {
-      // int cy = y == 0 ? _data.length - 1 : y - 1;
-      // int cx = x;
-      // return _data[cy][cx];
-      return _data[y - 1][x - 1];
-    } catch (e) {
-      return null;
-    }
+    int cy = y == 0 ? _data.length - 1 : y - 1;
+    int cx = x == 0 ? _data[y].length - 1 : x - 1;
+    return _data[cy][cx];
   }
 
   GridData? _topItem(int x, int y) {
-    try {
-      // int cy = y == 0 ? _data.length - 1 : y - 1;
-      // int cx = x;
-      // return _data[cy][cx];
-      return _data[y - 1][x];
-    } catch (e) {
-      return null;
-    }
+    int cy = y == 0 ? _data.length - 1 : y - 1;
+    return _data[cy][x];
   }
 
   GridData? _topRightItem(int x, int y) {
-    try {
-      // int cy = y == 0 ? _data.length - 1 : y - 1;
-      // int cx = x;
-      // return _data[cy][cx];
-      return _data[y - 1][x + 1];
-    } catch (e) {
-      return null;
-    }
+    int cy = y == 0 ? _data.length - 1 : y - 1;
+    int cx = x == _data[y].length - 1 ? 0 : x + 1;
+    return _data[cy][cx];
   }
 
   GridData? _rightItem(int x, int y) {
-    try {
-      // int cx = x;
-      // if (_data[y].isEmpty) return null;
-      // if (x + 1 >= _data[y].length) cx = 0;
-      // return _data[cx][y];
-      return _data[y][x + 1];
-    } catch (e) {
-      return null;
-    }
+    int cx = x == _data[y].length - 1 ? 0 : x + 1;
+    return _data[y][cx];
   }
 
   GridData? _bottomRightItem(int x, int y) {
-    try {
-      // int cy = y;
-      // if (data.isEmpty) return null;
-      // if (y + 1 >= _data.length) cy = 0;
-      // cy = y + 1;
-      // return _data[x][cy];
-      return _data[y + 1][x + 1];
-    } catch (e) {
-      return null;
-    }
+    int cy = y == data.length - 1 ? 0 : y + 1;
+    int cx = x == _data[y].length - 1 ? 0 : x + 1;
+    return _data[cy][cx];
   }
 
   GridData? _bottomItem(int x, int y) {
-    try {
-      // int cy = y;
-      // if (data.isEmpty) return null;
-      // if (y + 1 >= _data.length) cy = 0;
-      // cy = y + 1;
-      // return _data[x][cy];
-      return _data[y + 1][x];
-    } catch (e) {
-      return null;
-    }
+    if (data.isEmpty) return throw "no data";
+    int cy = y == data.length - 1 ? 0 : y + 1;
+
+    return _data[cy][x];
   }
 
   GridData? _bottomLeftItem(int x, int y) {
-    try {
-      // int cy = y;
-      // if (data.isEmpty) return null;
-      // if (y + 1 >= _data.length) cy = 0;
-      // cy = y + 1;
-      // return _data[x][cy];
-      return _data[y + 1][x - 1];
-    } catch (e) {
-      return null;
-    }
+    int cy = y == data.length - 1 ? 0 : y + 1;
+    int cx = x == 0 ? _data[y].length - 1 : x - 1;
+    return _data[cy][cx];
   }
 
   GridData? _leftItem(int x, int y) {
-    try {
-      // int cx = x;
-      // if (_data[y].isEmpty) return null;
-      // if (x == 0 && _data[y].isNotEmpty) cx = _data[y].length - 1;
-      // return _data[cx][y];
-      return _data[y][x - 1];
-    } catch (e) {
-      return null;
-    }
+    int cx = x == 0 ? _data[y].length - 1 : x - 1;
+    return _data[y][cx];
   }
 
   ///return should die, live, none=die🤔
   bool _updateLife(GridData c) {
-    const outBoundValue = false;
-    bool isTopLeftAlive = _topLeftItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isTopAlive = _topItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isTopRightAlive = _topRightItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isRightAlive = _rightItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isBottomRightAlive =
-        _bottomRightItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isBottomAlive = _bottomItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isBottomLeftAlive =
-        _bottomLeftItem(c.x, c.y)?.isAlive ?? outBoundValue;
-    bool isLeftAlive = _leftItem(c.x, c.y)?.isAlive ?? outBoundValue;
+    bool isTopLeftAlive = _topLeftItem(c.x, c.y)!.isAlive;
+    bool isTopAlive = _topItem(c.x, c.y)!.isAlive;
+    bool isTopRightAlive = _topRightItem(c.x, c.y)!.isAlive;
+    bool isRightAlive = _rightItem(c.x, c.y)!.isAlive;
+    bool isBottomRightAlive = _bottomRightItem(c.x, c.y)!.isAlive;
+    bool isBottomAlive = _bottomItem(c.x, c.y)!.isAlive;
+    bool isBottomLeftAlive = _bottomLeftItem(c.x, c.y)!.isAlive;
+    bool isLeftAlive = _leftItem(c.x, c.y)!.isAlive;
 
     final surroundLifeCount = [
       isTopLeftAlive,

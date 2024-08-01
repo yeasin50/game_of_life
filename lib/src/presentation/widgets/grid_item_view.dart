@@ -11,6 +11,7 @@ class GridItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context).colorScheme.surface;
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
