@@ -40,16 +40,20 @@ class _GOFPageState extends State<GOFPage> {
 
   void initData() {
     _timer?.cancel();
-    widget.engine.init(
+    widget.engine
+        .init(
       size: MediaQuery.sizeOf(context),
-      itemSize: 50,
-    );
-    crossAxisCount = widget.engine.nbOfCols;
-    mainAxisCount = widget.engine.nbOfRows;
-    maxItemSize = widget.engine.maxItemSize;
-    data = widget.engine.data;
-    isReady = true;
-    setState(() {});
+      itemSize: 25,
+    )
+        .then((_) {
+      crossAxisCount = widget.engine.nbOfCols;
+      mainAxisCount = widget.engine.nbOfRows;
+      maxItemSize = widget.engine.maxItemSize;
+      data = widget.engine.data;
+      isReady = true;
+      debugPrint("total grid ${widget.engine.totalCell}");
+      setState(() {});
+    });
   }
 
   void next() {

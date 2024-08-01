@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
+
 import 'grid_data.dart';
 
 ///* If the cell is alive,
@@ -14,6 +16,9 @@ class GameOfLifeEngine {
   final List<List<GridData>> _data = [];
   List<List<GridData>> get data => [..._data];
 
+  int get totalCell =>
+      data.fold(0, (previousValue, element) => previousValue + element.length);
+
   double _maxItemSize = 1;
   double get maxItemSize => _maxItemSize;
 
@@ -21,17 +26,28 @@ class GameOfLifeEngine {
   int get nbOfRows => data.isEmpty ? 0 : data.first.length;
 
   int? _widthCount, _heightCount;
-
-  void init({required Size size, double itemSize = 100}) {
+  Future<void> init({required Size size, double itemSize = 100}) async {
     _maxItemSize = itemSize;
-    final rand = math.Random();
     _widthCount ??= size.width ~/ itemSize;
     _heightCount ??= size.height ~/ itemSize;
-
     _data.clear();
-    for (int y = 0; y < _heightCount!; y++) {
+
+    final params = [_heightCount, _widthCount];
+    final result = await compute(_init, params);
+
+    _data.addAll(result);
+  }
+
+  Future<List<List<GridData>>> _init(List data) async {
+    final rand = math.Random();
+
+    int heightCount = data[0] as int;
+    int widthCount = data[1] as int;
+
+    List<List<GridData>> gridData = [];
+    for (int y = 0; y < heightCount; y++) {
       final rows = <GridData>[];
-      for (int x = 0; x < _widthCount!; x++) {
+      for (int x = 0; x < widthCount; x++) {
         final life = rand.nextBool();
         final item = GridData(
           x: x,
@@ -41,8 +57,10 @@ class GameOfLifeEngine {
         );
         rows.add(item);
       }
-      _data.add(rows);
+      gridData.add(rows);
     }
+
+    return gridData;
   }
 
   void dispose() {
