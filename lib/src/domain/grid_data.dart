@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'domain.dart';
+
 class GridData {
   const GridData({
     required this.x,
@@ -50,12 +52,5 @@ class GridData {
 extension GridExt on GridData {
   bool get isAlive => life >= .5;
 
-  Color get color {
-    return switch (life) {
-      0 => Colors.white,
-      _ => Colors.green
-      // Color.lerp(Colors.transparent, Colors.green, life)!
-          .withOpacity(math.min((generation + .1) / 10, 1))
-    };
-  }
+  Color get color => GameColorConfig.genColor(generation);
 }

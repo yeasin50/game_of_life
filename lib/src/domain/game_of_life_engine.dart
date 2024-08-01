@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -19,20 +18,10 @@ class GameOfLifeEngine {
   int get totalCell =>
       data.fold(0, (previousValue, element) => previousValue + element.length);
 
-  double _maxItemSize = 1;
-  double get maxItemSize => _maxItemSize;
-
-  int get nbOfCols => data.isEmpty ? 0 : _data.length;
-  int get nbOfRows => data.isEmpty ? 0 : data.first.length;
-
-  int? _widthCount, _heightCount;
-  Future<void> init({required Size size, double itemSize = 100}) async {
-    _maxItemSize = itemSize;
-    _widthCount ??= size.width ~/ itemSize;
-    _heightCount ??= size.height ~/ itemSize;
+  Future<void> init({int numberOfRows = 50, int numberOfCol = 50}) async {
     _data.clear();
 
-    final params = [_heightCount, _widthCount];
+    final params = [numberOfRows, numberOfCol];
     final result = await compute(_init, params);
 
     _data.addAll(result);
@@ -65,7 +54,6 @@ class GameOfLifeEngine {
 
   void dispose() {
     _data.clear();
-    _maxItemSize = 1;
   }
 
   void next() {
