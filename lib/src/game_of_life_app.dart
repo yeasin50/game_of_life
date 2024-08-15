@@ -20,7 +20,12 @@ class GameOfLifeApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: GOFPage(
-        engine: GameOfLifeEngine(),
+        engine: GameOfLifeEngine()
+          ..init(
+            numberOfCol: 50,
+            numberOfRows: 50,
+            generationGap: const Duration(milliseconds: 100),
+          ),
       ),
     );
   }
