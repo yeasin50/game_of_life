@@ -4,12 +4,13 @@ import 'package:game_of_life/src/presentation/widgets/gof_painter.dart';
 import '../domain/game_of_life_engine.dart';
 
 class GOFPage extends StatelessWidget {
-  const GOFPage({
-    super.key,
-    required this.engine,
-  });
+  const GOFPage._(this.engine);
 
   final GameOfLifeEngine engine;
+
+  static MaterialPageRoute route({required GameOfLifeEngine engine}) {
+    return MaterialPageRoute(builder: (context) => GOFPage._(engine));
+  }
 
   //
   @override

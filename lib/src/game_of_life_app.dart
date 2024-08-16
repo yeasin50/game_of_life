@@ -1,7 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-import 'domain/game_of_life_engine.dart';
-import 'presentation/gof_life_page.dart';
+import 'presentation/setup_overview_page.dart';
 
 /*
 If the cell is alive, then it stays alive if it has either 2 or 3 live neighbors
@@ -19,14 +20,13 @@ class GameOfLifeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: GOFPage(
-        engine: GameOfLifeEngine()
-          ..init(
-            numberOfCol: 50,
-            numberOfRows: 50,
-            generationGap: const Duration(milliseconds: 100),
-          ),
-      ),
+
+      /// mouse grad
+      scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
+        PointerDeviceKind.mouse,
+      }),
+
+      home: SetUpOverviewPage.test(),
     );
   }
 }
