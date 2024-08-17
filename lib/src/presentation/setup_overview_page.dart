@@ -1,9 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'dart:math' as math;
+
 import '../domain/domain.dart';
 import 'gof_life_page.dart';
+import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
 class SetUpOverviewPage extends StatefulWidget {
   const SetUpOverviewPage._({
@@ -56,141 +55,10 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: TwoDimensionalGridView(
-          diagonalDragBehavior: DiagonalDragBehavior.free,
-          cacheExtent: 500,
-          delegate: TwoDimensionalChildBuilderDelegate(
-            maxXIndex: 30,
-            maxYIndex: 30,
-            builder: (context, vicinity) {
-              return Container(
-                height: 200,
-                width: 200,
-                color: Colors.primaries[(vicinity.xIndex + vicinity.yIndex) % Colors.primaries.length],
-                alignment: Alignment.center,
-                child: Text(
-                  vicinity.toString(),
-                ),
-              );
-            },
-          ),
+        child: TwoDimensionalCustomPaintGridView(
+          gridSize: (widget.numberOfRows, widget.numberOfCol),
         ),
       ),
     );
-  }
-}
-
-class TwoDimensionalGridView extends TwoDimensionalScrollView {
-  const TwoDimensionalGridView({
-    super.key,
-    required super.delegate,
-    super.primary,
-    super.mainAxis = Axis.vertical,
-    super.verticalDetails = const ScrollableDetails.vertical(),
-    super.horizontalDetails = const ScrollableDetails.horizontal(),
-    super.cacheExtent,
-    super.diagonalDragBehavior = DiagonalDragBehavior.none,
-    super.dragStartBehavior = DragStartBehavior.start,
-    super.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
-    super.clipBehavior = Clip.hardEdge,
-  });
-
-  @override
-  Widget buildViewport(
-    BuildContext context,
-    ViewportOffset verticalOffset,
-    ViewportOffset horizontalOffset,
-  ) {
-    return TwoDimensionalGridViewPort(
-      verticalOffset: verticalOffset,
-      verticalAxisDirection: AxisDirection.down,
-      horizontalAxisDirection: AxisDirection.right,
-      horizontalOffset: horizontalOffset,
-      delegate: delegate,
-      mainAxis: mainAxis,
-    );
-  }
-}
-
-class TwoDimensionalGridViewPort extends TwoDimensionalViewport {
-  const TwoDimensionalGridViewPort({
-    super.key,
-    required super.verticalOffset,
-    required super.verticalAxisDirection,
-    required super.horizontalOffset,
-    required super.horizontalAxisDirection,
-    required super.delegate,
-    required super.mainAxis,
-  });
-
-  @override
-  RenderTwoDimensionalViewport createRenderObject(BuildContext context) {
-    return RenderTreeViewPostT(
-      horizontalOffset: horizontalOffset,
-      horizontalAxisDirection: horizontalAxisDirection,
-      verticalOffset: verticalOffset,
-      verticalAxisDirection: verticalAxisDirection,
-      delegate: delegate,
-      mainAxis: mainAxis,
-      childManager: context as TwoDimensionalChildManager,
-    );
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, covariant RenderTwoDimensionalViewport renderObject) {
-    super.updateRenderObject(context, renderObject);
-  }
-}
-
-class RenderTreeViewPostT extends RenderTwoDimensionalViewport {
-  RenderTreeViewPostT({
-    required super.horizontalOffset,
-    required super.horizontalAxisDirection,
-    required super.verticalOffset,
-    required super.verticalAxisDirection,
-    required super.delegate,
-    required super.mainAxis,
-    required super.childManager,
-  });
-
-  @override
-  void layoutChildSequence() async{
-    final double horizontalPixels = horizontalOffset.pixels;
-    final double verticalPixels = verticalOffset.pixels;
-
-    final viewPortWidth = viewportDimension.width + cacheExtent;
-    final viewPortHeight = viewportDimension.height + cacheExtent;
-
-    final TwoDimensionalChildBuilderDelegate builderDelegate = delegate as TwoDimensionalChildBuilderDelegate;
-
-    final int maxRowIndex = builderDelegate.maxYIndex!;
-    final int maxColIndex = builderDelegate.maxXIndex!;
-
-    final int leadingColumn = math.max((horizontalPixels / 200).floor(), 0);
-    final int leadingRow = math.max((verticalPixels / 200).floor(), 0);
-
-    final int trailingColumn = math.min((horizontalPixels + viewPortWidth / 200).ceil(), maxColIndex);
-    final int trailingRow = math.min((verticalPixels + viewPortHeight / 200).ceil(), maxRowIndex);
-
-    double xLayoutOffset = (leadingColumn * 200) - horizontalPixels;
-    for (int x = leadingColumn; x < trailingColumn; x++) {
-      double yLayoutOffset = (leadingRow * 200) - verticalPixels;
-      for (int y = leadingRow; y < trailingRow; y++) {
-        final ChildVicinity childVicinity = ChildVicinity(xIndex: x, yIndex: y);
-        final RenderBox child = buildOrObtainChildFor(childVicinity)!;
-        child.layout(constraints.loosen());
-
-        parentDataOf(child).layoutOffset = Offset(xLayoutOffset, yLayoutOffset);
-
-        yLayoutOffset += 200;
-      }
-      xLayoutOffset += 200;
-    }
-
-    final double verticalExtent = 200 * (maxRowIndex * 1.0);
-    verticalOffset.applyContentDimensions(0, (verticalExtent - viewportDimension.height).clamp(0, double.infinity));
-
-    final double horizontalExtent = 200 * (maxColIndex * 1);
-    horizontalOffset.applyContentDimensions(0, (horizontalExtent - viewportDimension.width).clamp(0, double.infinity));
   }
 }

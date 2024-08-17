@@ -20,6 +20,9 @@ class GameOfLifeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.grey.shade900,
+      ),
 
       /// mouse grad
       scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
