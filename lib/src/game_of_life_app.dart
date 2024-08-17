@@ -22,6 +22,13 @@ class GameOfLifeApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey.shade900,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey.shade800,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(150, 50),
+          ),
+        ),
       ),
 
       /// mouse grad

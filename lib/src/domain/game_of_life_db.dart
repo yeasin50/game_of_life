@@ -11,9 +11,19 @@ class GameOfLifeDataBase {
   int _currentGeneration = 0;
   int get currentGeneration => _currentGeneration;
 
-  int get totalCell => grids.fold(0, (previousValue, element) => previousValue + element.length);
+  int get totalCell => _grids.isEmpty ? 0 : grids.length * _grids.first.length;
 
-  Future<void> init({int numberOfRows = 50, int numberOfCol = 50}) async {
+  Future<void> init({
+    int numberOfRows = 50,
+    int numberOfCol = 50,
+    List<List<GridData>>? initData,
+  }) async {
+    if (initData != null && initData.isNotEmpty) {
+      _grids.addAll(initData);
+      _currentGeneration = 1;
+      return;
+    }
+
     final params = [numberOfRows, numberOfCol];
     final result = await compute(_init, params);
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/presentation/widgets/gof_painter.dart';
+import 'widgets/gof_painter.dart';
 
 import '../domain/game_of_life_engine.dart';
 
@@ -12,13 +12,11 @@ class GOFPage extends StatelessWidget {
     return MaterialPageRoute(builder: (context) => GOFPage._(engine));
   }
 
-  //
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: engine,
       builder: (context, child) => Scaffold(
-        backgroundColor: Colors.black,
         body: Row(
           children: [
             Expanded(
@@ -27,9 +25,13 @@ class GOFPage extends StatelessWidget {
                 child: Center(
                   child: engine.isReady == false
                       ? const CircularProgressIndicator()
-                      : CustomPaint(
-                          painter: GOFPainter(engine.data),
-                          size: Size.infinite,
+                      : InteractiveViewer(
+                          minScale: 1,
+                          maxScale: 100.0,
+                          child: CustomPaint(
+                            painter: GOFPainter(engine.data, true),
+                            size: Size.infinite,
+                          ),
                         ),
                 ),
               ),
@@ -37,21 +39,25 @@ class GOFPage extends StatelessWidget {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FloatingActionButton(
-                  onPressed: () => engine.startPeriodicGeneration(),
-                  child: const Icon(Icons.start),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: engine.isActive ? Colors.red : Colors.green,
+                  ),
+                  onPressed: () => engine.isActive ? engine.stopPeriodicGeneration() : engine.startPeriodicGeneration(),
+                  child: engine.isActive ? const Text("Stop") : const Text("Simulate"),
                 ),
-                FloatingActionButton(
-                  onPressed: () => engine.stopPeriodicGeneration(),
-                  child: const Icon(Icons.stop),
-                ),
-                FloatingActionButton(
+                const SizedBox(height: 16.0),
+                ElevatedButton(
                   onPressed: () => engine.nextGeneration(),
-                  child: const Icon(Icons.next_plan),
+                  child: const Text("Next Generation"),
                 ),
-                FloatingActionButton(
-                  onPressed: () => engine.clear(),
-                  child: const Icon(Icons.exit_to_app_sharp),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    engine.clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Exit"),
                 ),
               ],
             ),

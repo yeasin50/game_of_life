@@ -24,14 +24,21 @@ class GameOfLifeEngine extends ChangeNotifier {
   Duration get generationGap => _generationGap;
   Timer? _timer;
 
+  bool get isActive => _timer != null;
+
   Future<void> init({
     int numberOfRows = 50,
     int numberOfCol = 50,
     Duration generationGap = const Duration(milliseconds: 250),
+    List<List<GridData>>? initData,
   }) async {
     _generationGap = generationGap;
 
-    await database.init(numberOfCol: numberOfCol, numberOfRows: numberOfRows);
+    await database.init(
+      numberOfCol: numberOfCol,
+      numberOfRows: numberOfRows,
+      initData: initData,
+    );
     notifyListeners();
   }
 

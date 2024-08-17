@@ -1,15 +1,17 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../domain/domain.dart';
+import 'gof_painter.dart';
 
 class TwoDimensionalCustomPaintGridView extends StatefulWidget {
   const TwoDimensionalCustomPaintGridView({
     super.key,
     required this.gridSize,
+    required this.onGridDataChanged,
   });
 
   final (int xIndex, int yIndex) gridSize;
+  final Function(List<List<GridData>>) onGridDataChanged;
 
   @override
   State<TwoDimensionalCustomPaintGridView> createState() => _TwoDimensionalCustomPaintGridViewState();
@@ -21,9 +23,9 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
   @override
   void initState() {
     super.initState();
-    for (int y = 0; y < 105; y++) {
+    for (int y = 0; y < widget.gridSize.$2; y++) {
       final rows = <GridData>[];
-      for (int x = 0; x < 105; x++) {
+      for (int x = 0; x < widget.gridSize.$1; x++) {
         final item = GridData(x: x, y: y, life: 0);
         rows.add(item);
       }
@@ -47,6 +49,8 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
       data[tappedY][tappedX] = data[tappedY][tappedX].copyWith(
         life: data[tappedY][tappedX].life == 0.0 ? 1.0 : 0.0,
       );
+
+      widget.onGridDataChanged(data);
       setState(() {});
     }
   }
@@ -60,42 +64,9 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
         onTapDown: onTapDown,
         child: CustomPaint(
           size: Size.infinite,
-          painter: _GOFPainter(data),
+          painter: GOFPainter(data),
         ),
       ),
     );
-  }
-}
-
-class _GOFPainter extends CustomPainter {
-  const _GOFPainter(this.data);
-
-  final List<List<GridData>> data;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final itemWidth = size.width / data[0].length;
-    final itemHeight = size.height / data.length;
-    final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
-    for (int y = 0; y < data.length; y++) {
-      for (int x = 0; x < data[y].length; x++) {
-        final currentItem = data[y][x];
-        final rect = Rect.fromLTWH(
-          x * itemSize,
-          y * itemSize,
-          itemSize - 1,
-          itemSize - 1,
-        );
-        canvas.drawRect(
-          rect,
-          Paint()..color = currentItem.isAlive ? Colors.white : Colors.black,
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _GOFPainter oldDelegate) {
-    return listEquals(oldDelegate.data, data);
   }
 }

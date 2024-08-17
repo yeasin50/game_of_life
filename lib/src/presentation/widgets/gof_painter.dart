@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import '../../domain/grid_data.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.data);
+  const GOFPainter(this.data, [this.useColorizeGeneration = false]);
 
   final List<List<GridData>> data;
+  final bool useColorizeGeneration;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -19,13 +20,38 @@ class GOFPainter extends CustomPainter {
         final rect = Rect.fromLTWH(
           x * itemSize,
           y * itemSize,
-          itemSize,
-          itemSize,
+          itemSize - 1,
+          itemSize - 1,
         );
         canvas.drawRect(
           rect,
-          Paint()..color = currentItem.color,
+          Paint()
+            ..color = currentItem.isAlive
+                ? useColorizeGeneration
+                    ? currentItem.color
+                    : Colors.white
+                : Colors.black,
         );
+
+        //add text
+        if (useColorizeGeneration && currentItem.isAlive) {
+          final textSpan = TextSpan(
+            text: currentItem.toString(),
+            style: const TextStyle(color: Colors.black, fontSize: 2),
+          );
+          final textPainter = TextPainter(
+            text: textSpan,
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(
+              x * itemSize + (itemSize - textPainter.width) / 2,
+              y * itemSize + (itemSize - textPainter.height) / 2,
+            ),
+          );
+        }
       }
     }
   }
