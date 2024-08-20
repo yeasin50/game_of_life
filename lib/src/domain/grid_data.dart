@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 import 'domain.dart';
 
@@ -19,7 +18,9 @@ class GridData {
   final int generation;
 
   @override
-  String toString() => '$generation';
+  String toString() {
+    return 'GridData(x: $x, y: $y, life: $life, generation: $generation)';
+  }
 
   GridData copyWith({
     int? x,
@@ -39,10 +40,7 @@ class GridData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is GridData &&
-        other.x == x &&
-        other.y == y &&
-        other.life == life;
+    return other is GridData && other.x == x && other.y == y && other.life == life;
   }
 
   @override

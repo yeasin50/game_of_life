@@ -5,6 +5,7 @@ import 'grid_data.dart';
 import 'dart:math' as math;
 
 class GameOfLifeDataBase {
+  /// [y->[x,x,x..],y->[x..]]
   final List<List<GridData>> _grids = [];
   List<List<GridData>> get grids => [..._grids];
 
@@ -54,6 +55,12 @@ class GameOfLifeDataBase {
     }
 
     return gridData;
+  }
+
+  void updateCells(List<GridData> cells) {
+    for (final c in cells) {
+      _grids[c.y][c.x] = c;
+    }
   }
 
   void dispose() {
@@ -144,13 +151,18 @@ class GameOfLifeDataBase {
       isLeftAlive
     ].where((e) => e).length;
 
-    if (c.isAlive && //
-        (surroundLifeCount == 2 || surroundLifeCount == 3)) {
-      return c.isAlive;
-    } else if (c.isAlive == false && surroundLifeCount == 3) {
-      return true;
-    } else {
+    if (c.isAlive && (surroundLifeCount < 2)) {
       return false;
     }
+    if (c.isAlive && (surroundLifeCount == 2 || surroundLifeCount == 3)) {
+      return true;
+    }
+    if (c.isAlive && (surroundLifeCount > 3)) {
+      return false;
+    }
+    if (!c.isAlive && (surroundLifeCount == 3)) {
+      return true;
+    }
+    return false;
   }
 }

@@ -12,8 +12,8 @@ class SetUpOverviewPage extends StatefulWidget {
   });
 
   const SetUpOverviewPage.test({
-    this.numberOfRows = 150,
-    this.numberOfCol = 150,
+    this.numberOfRows = 50,
+    this.numberOfCol = 50,
     this.generationGap = const Duration(milliseconds: 250),
   });
 
@@ -42,6 +42,20 @@ class SetUpOverviewPage extends StatefulWidget {
 class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   List<List<GridData>> data = [];
 
+  @override
+  void initState() {
+    super.initState();
+    //todo: should be on isolate or use the engine
+    for (int y = 0; y < widget.numberOfRows; y++) {
+      final rows = <GridData>[];
+      for (int x = 0; x < widget.numberOfCol; x++) {
+        final item = GridData(x: x, y: y, life: 0);
+        rows.add(item);
+      }
+      data.add(rows);
+    }
+  }
+
   void navToGameBoard() {
     final engine = GameOfLifeEngine()
       ..init(
@@ -60,6 +74,26 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     setState(() {});
   }
 
+  final patterns = [
+    FiveCellPattern(),
+    GliderPattern(),
+  ];
+
+  CellPattern? selectedPattern;
+
+  (int y, int x) get midPosition => (data.length ~/ 2, data[0].length ~/ 2);
+
+  void onPatternSelected(CellPattern? value) {
+    if (value == null) return;
+    final cellData = value.data(midPosition.$1, midPosition.$2);
+    for (final cd in cellData) {
+      data[cd.y][cd.x] = cd;
+      print(cd);
+    }
+    selectedPattern = value;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +102,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
           children: [
             Expanded(
               child: TwoDimensionalCustomPaintGridView(
-                key: ValueKey(data.hashCode), //🤣
+                key: ValueKey("${data.hashCode} $selectedPattern"), //🤣
                 gridSize: (widget.numberOfRows, widget.numberOfCol),
                 onGridDataChanged: (p0) => data = p0,
               ),
@@ -76,6 +110,22 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                DropdownButton<CellPattern>(
+                  value: selectedPattern,
+                  items: patterns
+                      .map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e.name),
+                          ))
+                      .toList(),
+                  onChanged: onPatternSelected,
+                  selectedItemBuilder: (context) => patterns
+                      .map((e) => Text(
+                            e.name,
+                            style: const TextStyle(color: Colors.white),
+                          ))
+                      .toList(),
+                ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     shape: const StadiumBorder(),

@@ -42,6 +42,11 @@ class GameOfLifeEngine extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateCell(List<GridData> data) {
+    database.updateCells(data);
+    notifyListeners();
+  }
+
   void clear() {
     _timer?.cancel();
     _timer = null;
