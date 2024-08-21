@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/grid_data.dart';
+import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
   const GOFPainter(this.data, [this.useColorizeGeneration = false]);

@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'domain.dart';
-
 class GridData {
   const GridData({
     required this.x,
@@ -45,10 +41,6 @@ class GridData {
 
   @override
   int get hashCode => x.hashCode ^ y.hashCode ^ life.hashCode;
-}
 
-extension GridExt on GridData {
   bool get isAlive => life >= .5;
-
-  Color get color => GameColorConfig.genColor(generation);
 }

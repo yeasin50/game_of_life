@@ -1,37 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:game_of_life/src/infrastructure/game_provider.dart';
 
 import '../domain/domain.dart';
-import 'gof_life_page.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
 class SetUpOverviewPage extends StatefulWidget {
-  const SetUpOverviewPage._({
-    required this.numberOfRows,
-    required this.numberOfCol,
-    required this.generationGap,
-  });
+  const SetUpOverviewPage._();
 
-  const SetUpOverviewPage.test({
-    this.numberOfRows = 50,
-    this.numberOfCol = 50,
-    this.generationGap = const Duration(milliseconds: 250),
-  });
-
-  final int numberOfRows;
-  final int numberOfCol;
-  final Duration generationGap;
-
-  static MaterialPageRoute route({
-    required int numberOfRows,
-    required int numberOfCol,
-    required Duration generationGap,
-  }) {
+  static MaterialPageRoute route() {
     return MaterialPageRoute(
-      builder: (context) => SetUpOverviewPage._(
-        numberOfRows: numberOfRows,
-        numberOfCol: numberOfCol,
-        generationGap: generationGap,
-      ),
+      builder: (context) => const SetUpOverviewPage._(),
     );
   }
 
@@ -46,9 +24,9 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   void initState() {
     super.initState();
     //todo: should be on isolate or use the engine
-    for (int y = 0; y < widget.numberOfRows; y++) {
+    for (int y = 0; y < gameConfig.numberOfRows; y++) {
       final rows = <GridData>[];
-      for (int x = 0; x < widget.numberOfCol; x++) {
+      for (int x = 0; x < gameConfig.numberOfRows; x++) {
         final item = GridData(x: x, y: y, life: 0);
         rows.add(item);
       }
@@ -57,16 +35,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   }
 
   void navToGameBoard() {
-    final engine = GameOfLifeEngine()
-      ..init(
-        numberOfCol: widget.numberOfCol,
-        numberOfRows: widget.numberOfRows,
-        generationGap: widget.generationGap,
-        initData: data,
-      );
-
-    debugPrint("init data length ${data.length * data[0].length}");
-    Navigator.of(context).push(GOFPage.route(engine: engine));
+    // Navigator.of(context).push(GOFPage.route());
   }
 
   void clear() {
@@ -88,7 +57,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     final cellData = value.data(midPosition.$1, midPosition.$2);
     for (final cd in cellData) {
       data[cd.y][cd.x] = cd;
-      print(cd);
     }
     selectedPattern = value;
     setState(() {});
@@ -100,13 +68,13 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
       body: SafeArea(
         child: Row(
           children: [
-            Expanded(
-              child: TwoDimensionalCustomPaintGridView(
-                key: ValueKey("${data.hashCode} $selectedPattern"), //🤣
-                gridSize: (widget.numberOfRows, widget.numberOfCol),
-                onGridDataChanged: (p0) => data = p0,
-              ),
-            ),
+            // Expanded(
+            //   child: TwoDimensionalCustomPaintGridView(
+            //     key: ValueKey("${data.hashCode} $selectedPattern"), //🤣
+            //     gridSize: (gameConfig., widget.numberOfCol),
+            //     onGridDataChanged: (p0) => data = p0,
+            //   ),
+            // ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [

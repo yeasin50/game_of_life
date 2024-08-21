@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../infrastructure/game_provider.dart';
 import 'setup_overview_page.dart';
 
 /// - decide number of Rows and Columns
@@ -13,61 +14,74 @@ class GameBoardSetupPage extends StatefulWidget {
 }
 
 class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
-  int numberOfCol = 100;
-  int numberOfRows = 100;
-  int generationGap = 100;
-
   void navToOverViewPage() {
-    Navigator.of(context).push(SetUpOverviewPage.route(
-      generationGap: Duration(milliseconds: generationGap),
-      numberOfCol: numberOfCol,
-      numberOfRows: numberOfRows,
-    ));
+    Navigator.of(context).push(SetUpOverviewPage.route());
   }
 
   @override
   Widget build(BuildContext context) {
+    GameOfLifeInheritedWidget.of(context);
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _InputField(
-                    label: 'Number of Rows',
-                    onValueChange: (value) {
-                      numberOfRows = int.tryParse(value) ?? 50;
-                      setState(() {});
-                    },
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: InputFiledType.rows.filedSize.width + (2.5 * InputFiledType.cols.filedSize.width),
+                  height: InputFiledType.cols.filedSize.height + (InputFiledType.cols.filedSize.width * 2),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: _InputField(
+                          type: InputFiledType.animDelay,
+                          initialValue: gameConfig.generationGap.inMilliseconds.toString(),
+                          onValueChange: (value) {
+                            final number = int.tryParse(value) ?? 0;
+                            gameConfig.generationGap = Duration(milliseconds: number);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        bottom: InputFiledType.cols.filedSize.width + 10,
+                        child: _InputField(
+                          type: InputFiledType.cols,
+                          initialValue: gameConfig.numberOfRows.toString(),
+                          onValueChange: (value) {
+                            final number = int.tryParse(value) ?? 0;
+                            gameConfig.numberOfRows = number;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        left: InputFiledType.cols.filedSize.width + 10,
+                        bottom: 0,
+                        child: _InputField(
+                          initialValue: gameConfig.numberOfCol.toString(),
+                          type: InputFiledType.rows,
+                          onValueChange: (value) {
+                            final number = int.tryParse(value) ?? 0;
+                            gameConfig.numberOfCol = number;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  _InputField(
-                    label: 'Number of Columns',
-                    onValueChange: (value) {
-                      numberOfCol = int.tryParse(value) ?? 50;
-                      setState(() {});
-                    },
-                  ),
-                  _InputField(
-                    label: 'anim delay (in ms)',
-                    onValueChange: (value) {
-                      generationGap = int.tryParse(value) ?? 250;
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              Expanded(
-                child: GridOverViewBuilder(
-                  numberOFCol: numberOfCol,
-                  numberOfRow: numberOfRows,
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: gameConfig.isValid ? navToOverViewPage : null,
+                  child: const Text('Start Game'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -87,41 +101,68 @@ class GridOverViewBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: numberOFCol,
-      ),
-      itemCount: numberOFCol * numberOfRow,
-      itemBuilder: (context, index) {
-        return Placeholder(
-          child: Text("$index"),
-        );
-      },
+    return Stack(
+      children: [],
     );
   }
 }
 
+enum InputFiledType {
+  rows,
+  cols,
+  animDelay;
+}
+
+extension InputFiledTypeExt on InputFiledType {
+  String get label => switch (this) {
+        InputFiledType.rows => 'Rows',
+        InputFiledType.cols => 'Columns',
+        InputFiledType.animDelay => 'anim delay (in ms)',
+      };
+
+  Size get filedSize => switch (this) {
+        InputFiledType.rows => const Size(200, 84),
+        InputFiledType.cols => const Size(84, 200),
+        InputFiledType.animDelay => const Size(200, 100),
+      };
+}
+
 class _InputField extends StatelessWidget {
   const _InputField({
-    required this.label,
+    required this.type,
     required this.onValueChange,
+    required this.initialValue,
   });
 
-  final String label;
+  final InputFiledType type;
   final ValueChanged<String> onValueChange;
+  final String initialValue;
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 200),
+    return SizedBox(
+      key: ValueKey(type.label),
+      width: type.filedSize.width,
+      height: type.filedSize.height,
       child: TextFormField(
-        initialValue: '100',
+        expands: true,
+        textAlign: TextAlign.center,
+        textAlignVertical: TextAlignVertical.center,
+        maxLines: null,
+        initialValue: initialValue,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: type.label,
+          floatingLabelAlignment: FloatingLabelAlignment.center,
           border: const OutlineInputBorder(),
         ),
+        autovalidateMode: AutovalidateMode.always,
+        validator: (value) {
+          if (value == null || value.isEmpty) return 'Required field';
+          int number = int.tryParse(value) ?? 0;
+          if (number <= 0) return 'Value must be greater than 0';
+          return null;
+        },
         onChanged: (v) {
-          if (int.tryParse(v) == null) return;
           onValueChange(v);
         },
       ),

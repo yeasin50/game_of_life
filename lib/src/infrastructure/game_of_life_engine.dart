@@ -1,18 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:game_of_life/src/domain/game_of_life_db.dart';
+import 'game_of_life_db.dart';
 
-import 'grid_data.dart';
+import '../domain/grid_data.dart';
 
-///* If the cell is alive,
-///** then it stays alive if it has either 2 or 3 live neighbors
-///
-///* If the cell is dead,
-///** then it springs to life only in the case that it has 3 live neighbors
-///
 class GameOfLifeEngine extends ChangeNotifier {
-  final GameOfLifeDataBase database = GameOfLifeDataBase();
+  GameOfLifeEngine({required this.database});
+  final GameOfLifeDataBase database;
 
   ///  [y->[x,x,x..],y->[x..],]
   List<List<GridData>> get data => [...database.grids];
@@ -75,3 +70,9 @@ class GameOfLifeEngine extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+
+sealed class GameState {
+  const GameState();
+}
+

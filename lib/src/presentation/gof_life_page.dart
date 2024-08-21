@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/gof_painter.dart';
 
-import '../domain/game_of_life_engine.dart';
+import '../infrastructure/game_of_life_engine.dart';
 
 class GOFPage extends StatelessWidget {
   const GOFPage._(this.engine);
