@@ -1,78 +1,91 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'game_of_life_db.dart';
 
 import '../domain/grid_data.dart';
 
-class GameOfLifeEngine extends ChangeNotifier {
-  GameOfLifeEngine({required this.database});
-  final GameOfLifeDataBase database;
+/// Default generation gap is 250 milliseconds
+const _defaultGenerationDelay = Duration(milliseconds: 250);
 
-  ///  [y->[x,x,x..],y->[x..],]
-  List<List<GridData>> get data => [...database.grids];
+class GOFState {
+  const GOFState(this.data, this.generation);
 
-  int get totalCell => data.fold(0, (previousValue, element) => previousValue + element.length);
-  bool get isReady => data.isNotEmpty;
+  const GOFState.empty() : this(const [], 0);
 
-  Duration _generationGap = const Duration(milliseconds: 250);
-  Duration get generationGap => _generationGap;
+  final List<List<GridData>> data;
+  final int generation;
+}
+
+class GameOfLifeEngine {
+  GameOfLifeEngine({required this.cellDB});
+  final GameOfLifeDataBase cellDB;
+
+  late GOFState _gofState;
+
+  GOFState get gofState => _gofState;
+
+  late StreamController<GOFState> _dataController;
+  Stream<GOFState> get dataStream => _dataController.stream;
+
+  Duration? _generationGap;
+  Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
   Timer? _timer;
-
-  bool get isActive => _timer != null;
 
   Future<void> init({
     int numberOfRows = 50,
     int numberOfCol = 50,
-    Duration generationGap = const Duration(milliseconds: 250),
+    Duration generationGap = _defaultGenerationDelay,
     List<List<GridData>>? initData,
   }) async {
     _generationGap = generationGap;
+    _gofState = const GOFState.empty();
 
-    await database.init(
+    _dataController = StreamController<GOFState>.broadcast(
+      onListen: () => _dataController.add(_gofState),
+    );
+
+    final grids = await cellDB.init(
       numberOfCol: numberOfCol,
       numberOfRows: numberOfRows,
       initData: initData,
     );
-    notifyListeners();
+
+    _gofState = GOFState(grids, 0);
+    _dataController.add(_gofState);
   }
 
-  void updateCell(List<GridData> data) {
-    database.updateCells(data);
-    notifyListeners();
+  void replaceData(List<List<GridData>> data) {
+    _gofState = GOFState(data, 0);
+    _dataController.add(_gofState);
   }
 
-  void clear() {
+  Future<void> dispose() async {
+    _gofState = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
-    database.dispose();
-    _generationGap = const Duration(seconds: 1);
-    notifyListeners();
+    _generationGap = null;
+    await _dataController.close();
   }
 
-  void nextGeneration() {
-    database.nextGeneration();
-    notifyListeners();
+  Future<void> nextGeneration() async {
+    final result = await cellDB.nextGeneration(_gofState.data);
+    _gofState = GOFState(result, _gofState.generation + 1);
+    _dataController.add(_gofState);
   }
 
   /// if [delay] is null, it will be default value of [generationGap]
   void startPeriodicGeneration({Duration? delay}) {
     _timer?.cancel();
     _timer = null;
-    _timer = Timer.periodic(delay ?? generationGap, (t) {
-      nextGeneration();
+    _timer = Timer.periodic(delay ?? generationGap, (t) async {
+      await nextGeneration();
+      //todo: check if pattern has been locked, like repeat the same pattern
+      // if so cancel the timer
     });
   }
 
   void stopPeriodicGeneration() {
     _timer?.cancel();
     _timer = null;
-    notifyListeners();
   }
 }
-
-
-sealed class GameState {
-  const GameState();
-}
-

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../domain/domain.dart';
 import 'game_config.dart';
 import 'game_of_life_db.dart';
 import 'game_of_life_engine.dart';
@@ -10,16 +9,16 @@ extension GameProviderBuildContext on BuildContext {
 
   GameOfLifeEngine get gameEngine => gameProvider.engine;
   GameConfig get gameConfig => gameProvider.config;
-  GameOfLifeDataBase get database => gameProvider.engine.database;
-  List<List<GridData>> get gridData => gameProvider.engine.data;
+  GameOfLifeDataBase get database => gameProvider.engine.cellDB;
+  Stream<GOFState> get gameState => gameProvider.engine.dataStream;
 }
 
-extension GameState<T extends StatefulWidget> on State<T> {
+extension GameStateExt<T extends StatefulWidget> on State<T> {
   GameProvider get gameProvider => context.gameProvider;
   GameOfLifeEngine get gameEngine => context.gameEngine;
   GameConfig get gameConfig => context.gameConfig;
   GameOfLifeDataBase get database => context.database;
-  List<List<GridData>> get gridData => context.gridData;
+  Stream<GOFState> get gameState => context.gameState;
 }
 
 class GameProvider {
@@ -35,7 +34,7 @@ class GameProvider {
       generationGap: const Duration(milliseconds: 250),
     );
 
-    final engine = GameOfLifeEngine(database: GameOfLifeDataBase());
+    final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase());
 
     // await engine.init(); //should I 🤔, nope while I am using diff
     return GameProvider._(
@@ -47,7 +46,9 @@ class GameProvider {
   final GameOfLifeEngine engine;
   final GameConfig config;
 
-  void updateConfig(GameConfig newConfig) {}
+  void updateConfig(GameConfig newConfig) {
+    throw UnimplementedError();
+  }
 }
 
 @immutable

@@ -11,31 +11,22 @@ import 'dart:math' as math;
 ///** then it springs to life only in the case that it has 3 live neighbors
 ///
 class GameOfLifeDataBase {
+  //hu what can I call it, just a class -_xD
+
   /// [y->[x,x,x..],y->[x..]]
-  final List<List<GridData>> _grids = [];
-  List<List<GridData>> get grids => [..._grids];
-
-  int _currentGeneration = 0;
-  int get currentGeneration => _currentGeneration;
-
-  int get totalCell => _grids.isEmpty ? 0 : grids.length * _grids.first.length;
-
-  Future<void> init({
+  Future<List<List<GridData>>> init({
     int numberOfRows = 50,
     int numberOfCol = 50,
     List<List<GridData>>? initData,
   }) async {
     if (initData != null && initData.isNotEmpty) {
-      _grids.addAll(initData);
-      _currentGeneration = 1;
-      return;
+      return initData;
     }
 
     final params = [numberOfRows, numberOfCol];
     final result = await compute(_init, params);
 
-    _grids.addAll(result.toList());
-    _currentGeneration = 1;
+    return result;
   }
 
   Future<List<List<GridData>>> _init(List data) async {
@@ -63,80 +54,73 @@ class GameOfLifeDataBase {
     return gridData;
   }
 
-  void updateCells(List<GridData> cells) {
-    for (final c in cells) {
-      _grids[c.y][c.x] = c;
-    }
-  }
-
-  void dispose() {
-    _currentGeneration = 0;
-    _grids.clear();
-  }
-
   // Do I need to operate on isolate here?
-  void nextGeneration() {
-    _currentGeneration++;
-    for (int y = 0; y < _grids.length; y++) {
-      for (int x = 0; x < _grids[y].length; x++) {
-        final cItem = _grids[y][x];
-        final newLife = _updateLife(cItem);
-        _grids[y][x] = cItem.copyWith(
+  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid) async {
+    final currentState = [...grid];
+    for (int y = 0; y < currentState.length; y++) {
+      for (int x = 0; x < currentState[y].length; x++) {
+        final currentItem = currentState[y][x];
+        final newLife = _updateLife(c: currentItem, grids: currentState);
+        currentState[y][x] = currentItem.copyWith(
           life: newLife ? 1 : 0,
-          generation: newLife ? _grids[y][x].generation + 1 : 0,
+          generation: newLife ? currentState[y][x].generation + 1 : 0,
         );
       }
     }
-  }
-
-  GridData? _topLeftItem(int x, int y) {
-    int cy = y == 0 ? grids.length - 1 : y - 1;
-    int cx = x == 0 ? grids[y].length - 1 : x - 1;
-    return grids[cy][cx];
-  }
-
-  GridData? _topItem(int x, int y) {
-    int cy = y == 0 ? grids.length - 1 : y - 1;
-    return grids[cy][x];
-  }
-
-  GridData? _topRightItem(int x, int y) {
-    int cy = y == 0 ? grids.length - 1 : y - 1;
-    int cx = x == grids[y].length - 1 ? 0 : x + 1;
-    return grids[cy][cx];
-  }
-
-  GridData? _rightItem(int x, int y) {
-    int cx = x == grids[y].length - 1 ? 0 : x + 1;
-    return grids[y][cx];
-  }
-
-  GridData? _bottomRightItem(int x, int y) {
-    int cy = y == grids.length - 1 ? 0 : y + 1;
-    int cx = x == grids[y].length - 1 ? 0 : x + 1;
-    return grids[cy][cx];
-  }
-
-  GridData? _bottomItem(int x, int y) {
-    if (grids.isEmpty) return throw "no data";
-    int cy = y == grids.length - 1 ? 0 : y + 1;
-
-    return grids[cy][x];
-  }
-
-  GridData? _bottomLeftItem(int x, int y) {
-    int cy = y == grids.length - 1 ? 0 : y + 1;
-    int cx = x == 0 ? grids[y].length - 1 : x - 1;
-    return grids[cy][cx];
-  }
-
-  GridData? _leftItem(int x, int y) {
-    int cx = x == 0 ? grids[y].length - 1 : x - 1;
-    return grids[y][cx];
+    return currentState;
   }
 
   ///return should die, live, none=die🤔
-  bool _updateLife(GridData c) {
+  bool _updateLife({
+    required List<List<GridData>> grids,
+    required GridData c,
+  }) {
+    GridData? _topLeftItem(int x, int y) {
+      int cy = y == 0 ? grids.length - 1 : y - 1;
+      int cx = x == 0 ? grids[y].length - 1 : x - 1;
+      return grids[cy][cx];
+    }
+
+    GridData? _topItem(int x, int y) {
+      int cy = y == 0 ? grids.length - 1 : y - 1;
+      return grids[cy][x];
+    }
+
+    GridData? _topRightItem(int x, int y) {
+      int cy = y == 0 ? grids.length - 1 : y - 1;
+      int cx = x == grids[y].length - 1 ? 0 : x + 1;
+      return grids[cy][cx];
+    }
+
+    GridData? _rightItem(int x, int y) {
+      int cx = x == grids[y].length - 1 ? 0 : x + 1;
+      return grids[y][cx];
+    }
+
+    GridData? _bottomRightItem(int x, int y) {
+      int cy = y == grids.length - 1 ? 0 : y + 1;
+      int cx = x == grids[y].length - 1 ? 0 : x + 1;
+      return grids[cy][cx];
+    }
+
+    GridData? _bottomItem(int x, int y) {
+      if (grids.isEmpty) return throw "no data";
+      int cy = y == grids.length - 1 ? 0 : y + 1;
+
+      return grids[cy][x];
+    }
+
+    GridData? _bottomLeftItem(int x, int y) {
+      int cy = y == grids.length - 1 ? 0 : y + 1;
+      int cx = x == 0 ? grids[y].length - 1 : x - 1;
+      return grids[cy][cx];
+    }
+
+    GridData? _leftItem(int x, int y) {
+      int cx = x == 0 ? grids[y].length - 1 : x - 1;
+      return grids[y][cx];
+    }
+
     bool isTopLeftAlive = _topLeftItem(c.x, c.y)!.isAlive;
     bool isTopAlive = _topItem(c.x, c.y)!.isAlive;
     bool isTopRightAlive = _topRightItem(c.x, c.y)!.isAlive;

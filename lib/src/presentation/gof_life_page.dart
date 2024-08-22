@@ -1,69 +1,108 @@
 import 'package:flutter/material.dart';
-import 'widgets/gof_painter.dart';
 
 import '../infrastructure/game_of_life_engine.dart';
+import '../infrastructure/game_provider.dart';
+import 'widgets/gof_painter.dart';
 
-class GOFPage extends StatelessWidget {
-  const GOFPage._(this.engine);
+class GOFPage extends StatefulWidget {
+  const GOFPage._();
 
-  final GameOfLifeEngine engine;
+  static MaterialPageRoute route() {
+    return MaterialPageRoute(builder: (context) => const GOFPage._());
+  }
 
-  static MaterialPageRoute route({required GameOfLifeEngine engine}) {
-    return MaterialPageRoute(builder: (context) => GOFPage._(engine));
+  @override
+  State<GOFPage> createState() => _GOFPageState();
+}
+
+class _GOFPageState extends State<GOFPage> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<GOFState>(
+        stream: gameState,
+        initialData: gameEngine.gofState,
+        builder: (context, snapshot) {
+          final state = snapshot.data!;
+          return Scaffold(
+            appBar: AppBar(),
+            body: Column(
+              children: [
+                const ActionButtons(),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Center(
+                      child: state.data.isEmpty
+                          ? const CircularProgressIndicator()
+                          : InteractiveViewer(
+                              minScale: 1,
+                              maxScale: 100.0,
+                              child: CustomPaint(
+                                painter: GOFPainter(state.data, true),
+                                size: Size.infinite,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+}
+
+class ActionButtons extends StatefulWidget {
+  const ActionButtons({super.key});
+
+  @override
+  State<ActionButtons> createState() => _ActionButtonsState();
+}
+
+class _ActionButtonsState extends State<ActionButtons> {
+  bool isPlaying = false;
+
+  void onPlayPause() {
+    isPlaying = !isPlaying;
+    setState(() {});
+
+    if (isPlaying) {
+      gameEngine.startPeriodicGeneration();
+    } else {
+      gameEngine.stopPeriodicGeneration();
+    }
+  }
+
+  void onNextGen() async {
+    await gameEngine.nextGeneration();
+  }
+
+  void onExit() {
+    gameEngine.stopPeriodicGeneration();
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: engine,
-      builder: (context, child) => Scaffold(
-        body: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Center(
-                  child: engine.isReady == false
-                      ? const CircularProgressIndicator()
-                      : InteractiveViewer(
-                          minScale: 1,
-                          maxScale: 100.0,
-                          child: CustomPaint(
-                            painter: GOFPainter(engine.data, true),
-                            size: Size.infinite,
-                          ),
-                        ),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: engine.isActive ? Colors.red : Colors.green,
-                  ),
-                  onPressed: () => engine.isActive ? engine.stopPeriodicGeneration() : engine.startPeriodicGeneration(),
-                  child: engine.isActive ? const Text("Stop") : const Text("Simulate"),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () => engine.nextGeneration(),
-                  child: const Text("Next Generation"),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    engine.clear();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Exit"),
-                ),
-              ],
-            ),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: isPlaying ? Colors.red : Colors.green),
+          onPressed: onPlayPause,
+          child: isPlaying ? const Text("Stop") : const Text("Simulate"),
         ),
-      ),
+        const SizedBox(height: 16.0),
+        ElevatedButton(
+          onPressed: onNextGen,
+          child: const Text("Next Generation"),
+        ),
+        const SizedBox(height: 16.0),
+        ElevatedButton(
+          onPressed: onExit,
+          child: const Text("Exit"),
+        ),
+      ],
     );
   }
 }

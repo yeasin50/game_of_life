@@ -19,6 +19,12 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
   }
 
   @override
+  void dispose() {
+    gameEngine.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     GameOfLifeInheritedWidget.of(context);
     return Scaffold(

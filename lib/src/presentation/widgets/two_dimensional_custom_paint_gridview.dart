@@ -6,11 +6,11 @@ import 'gof_painter.dart';
 class TwoDimensionalCustomPaintGridView extends StatefulWidget {
   const TwoDimensionalCustomPaintGridView({
     super.key,
-    required this.gridSize,
+    required this.initialData,
     required this.onGridDataChanged,
   });
 
-  final (int xIndex, int yIndex) gridSize;
+  final List<List<GridData>> initialData;
   final Function(List<List<GridData>>) onGridDataChanged;
 
   @override
@@ -23,14 +23,8 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
   @override
   void initState() {
     super.initState();
-    for (int y = 0; y < widget.gridSize.$2; y++) {
-      final rows = <GridData>[];
-      for (int x = 0; x < widget.gridSize.$1; x++) {
-        final item = GridData(x: x, y: y, life: 0);
-        rows.add(item);
-      }
-      data.add(rows);
-    }
+
+    data.addAll(widget.initialData);
   }
 
   void onTapDown(TapDownDetails details) {

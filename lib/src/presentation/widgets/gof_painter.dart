@@ -37,7 +37,7 @@ class GOFPainter extends CustomPainter {
         //add text
         if (useColorizeGeneration && currentItem.isAlive) {
           final textSpan = TextSpan(
-            text: currentItem.toString(),
+            text: currentItem.generation.toString(),
             style: const TextStyle(color: Colors.black, fontSize: 2),
           );
           final textPainter = TextPainter(
