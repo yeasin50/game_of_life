@@ -20,7 +20,6 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
 
   @override
   void dispose() {
-    gameEngine.dispose();
     super.dispose();
   }
 

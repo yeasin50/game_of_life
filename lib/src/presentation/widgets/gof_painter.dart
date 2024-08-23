@@ -1,17 +1,17 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../../domain/grid_data.dart';
+import 'dart:math' as math;
+import '../../infrastructure/infrastructure.dart';
 import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.data, [this.useColorizeGeneration = false]);
+  const GOFPainter(this.state, [this.useColorizeGeneration = false]) : super(repaint: state);
 
-  final List<List<GridData>> data;
+  final ValueNotifier<GOFState> state;
   final bool useColorizeGeneration;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final data = state.value.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
@@ -38,7 +38,7 @@ class GOFPainter extends CustomPainter {
         if (useColorizeGeneration && currentItem.isAlive) {
           final textSpan = TextSpan(
             text: currentItem.generation.toString(),
-            style: const TextStyle(color: Colors.black, fontSize: 2),
+            style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
           );
           final textPainter = TextPainter(
             text: textSpan,
@@ -59,6 +59,6 @@ class GOFPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant GOFPainter oldDelegate) {
-    return listEquals(oldDelegate.data, data);
+    return false;
   }
 }

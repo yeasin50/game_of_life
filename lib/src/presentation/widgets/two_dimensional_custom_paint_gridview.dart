@@ -1,35 +1,24 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../domain/domain.dart';
+import '../../infrastructure/infrastructure.dart';
 import 'gof_painter.dart';
 
-class TwoDimensionalCustomPaintGridView extends StatefulWidget {
+class TwoDimensionalCustomPaintGridView extends StatelessWidget {
   const TwoDimensionalCustomPaintGridView({
     super.key,
-    required this.initialData,
+    required this.state,
     required this.onGridDataChanged,
   });
 
-  final List<List<GridData>> initialData;
+  final ValueNotifier<GOFState> state;
   final Function(List<List<GridData>>) onGridDataChanged;
 
-  @override
-  State<TwoDimensionalCustomPaintGridView> createState() => _TwoDimensionalCustomPaintGridViewState();
-}
-
-class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustomPaintGridView> {
-  List<List<GridData>> data = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    data.addAll(widget.initialData);
-  }
-
-  void onTapDown(TapDownDetails details) {
+  void onTapDown(BuildContext context, TapDownDetails details) {
     // Calculate the local position relative to the CustomPaint
     final localPosition = details.localPosition;
+
+    final data = [...state.value.data];
 
     final itemWidth =
         data[0].isNotEmpty ? context.size!.width / data[0].length : 0.0; // Handle potential division by zero
@@ -44,8 +33,7 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
         life: data[tappedY][tappedX].life == 0.0 ? 1.0 : 0.0,
       );
 
-      widget.onGridDataChanged(data);
-      setState(() {});
+      onGridDataChanged(data);
     }
   }
 
@@ -55,10 +43,10 @@ class _TwoDimensionalCustomPaintGridViewState extends State<TwoDimensionalCustom
       minScale: 1,
       maxScale: 100.0,
       child: GestureDetector(
-        onTapDown: onTapDown,
+        onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
         child: CustomPaint(
           size: Size.infinite,
-          painter: GOFPainter(data),
+          painter: GOFPainter(state),
         ),
       ),
     );

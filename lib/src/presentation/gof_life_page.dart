@@ -1,55 +1,44 @@
 import 'package:flutter/material.dart';
 
-import '../infrastructure/game_of_life_engine.dart';
 import '../infrastructure/game_provider.dart';
 import 'widgets/gof_painter.dart';
 
-class GOFPage extends StatefulWidget {
-  const GOFPage._();
+class GOFPage extends StatelessWidget {
+  const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
   static MaterialPageRoute route() {
     return MaterialPageRoute(builder: (context) => const GOFPage._());
   }
 
   @override
-  State<GOFPage> createState() => _GOFPageState();
-}
-
-class _GOFPageState extends State<GOFPage> {
-  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<GOFState>(
-        stream: gameState,
-        initialData: gameEngine.gofState,
-        builder: (context, snapshot) {
-          final state = snapshot.data!;
-          if (snapshot.data!.isLoading) return const Center(child: CircularProgressIndicator());
-          return Scaffold(
-            appBar: AppBar(),
-            body: Column(
-              children: [
-                const ActionButtons(),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Center(
-                      child: state.data.isEmpty
-                          ? const CircularProgressIndicator()
-                          : InteractiveViewer(
-                              minScale: 1,
-                              maxScale: 100.0,
-                              child: CustomPaint(
-                                painter: GOFPainter(state.data, true),
-                                size: Size.infinite,
-                              ),
-                            ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Game of Life')),
+      body: Column(
+        children: [
+          const ActionButtons(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: ValueListenableBuilder(
+                  valueListenable: context.gameEngine.gofStateNotifier,
+                  builder: (context, value, child) => InteractiveViewer(
+                    minScale: 1,
+                    maxScale: 100.0,
+                    child: CustomPaint(
+                      key: const ValueKey("simulation painter"),
+                      painter: GOFPainter(context.gameEngine.gofStateNotifier, true),
+                      size: Size.infinite,
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          );
-        });
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -78,10 +67,10 @@ class _ActionButtonsState extends State<ActionButtons> {
     await gameEngine.nextGeneration();
   }
 
-  void onExit() {
-    gameEngine.stopPeriodicGeneration();
-    Navigator.of(context).pop();
-  }
+  // void onExit() {
+  //   gameEngine.stopPeriodicGeneration();
+  //   Navigator.of(context).pop();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +88,6 @@ class _ActionButtonsState extends State<ActionButtons> {
           child: const Text("Next Generation"),
         ),
         const SizedBox(height: 16.0),
-        ElevatedButton(
-          onPressed: onExit,
-          child: const Text("Exit"),
-        ),
       ],
     );
   }

@@ -1,8 +1,18 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 
 import '../domain/grid_data.dart';
 
-import 'dart:math' as math;
+class GOFState {
+  const GOFState(this.data, this.generation, [this.isLoading = false]);
+
+  const GOFState.empty() : this(const [], 0, true);
+
+  final List<List<GridData>> data;
+  final int generation;
+  final bool isLoading;
+}
 
 ///* If the cell is alive,
 ///** then it stays alive if it has either 2 or 3 live neighbors
@@ -49,23 +59,8 @@ class GameOfLifeDataBase {
     return gridData;
   }
 
-  // Do I need to operate on isolate here?
-  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid) async {
-    final currentState = [...grid];
-    for (int y = 0; y < currentState.length; y++) {
-      for (int x = 0; x < currentState[y].length; x++) {
-        final currentItem = currentState[y][x];
-        final newLife = _updateLife(c: currentItem, grids: currentState);
-        currentState[y][x] = currentItem.copyWith(
-          life: newLife ? 1 : 0,
-          generation: newLife ? currentState[y][x].generation + 1 : 0,
-        );
-      }
-    }
-    return currentState;
-  }
-
   ///return should die, live, none=die🤔
+
   bool _updateLife({
     required List<List<GridData>> grids,
     required GridData c,
@@ -149,5 +144,26 @@ class GameOfLifeDataBase {
       return true;
     }
     return false;
+  }
+
+  // Do I need to operate on isolate here?
+  List<List<GridData>> _nextGeneration(List<List<GridData>> grid) {
+    final currentState = [...grid];
+    for (int y = 0; y < currentState.length; y++) {
+      for (int x = 0; x < currentState[y].length; x++) {
+        final currentItem = currentState[y][x];
+        final newLife = _updateLife(c: currentItem, grids: currentState);
+        currentState[y][x] = currentItem.copyWith(
+          life: newLife ? 1 : 0,
+          generation: newLife ? currentState[y][x].generation + 1 : 0,
+        );
+      }
+    }
+    return currentState;
+  }
+
+  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid) async {
+    final result = await compute(_nextGeneration, grid);
+    return result;
   }
 }

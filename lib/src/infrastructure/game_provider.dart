@@ -10,7 +10,6 @@ extension GameProviderBuildContext on BuildContext {
   GameOfLifeEngine get gameEngine => gameProvider.engine;
   GameConfig get gameConfig => gameProvider.config;
   GameOfLifeDataBase get database => gameProvider.engine.cellDB;
-  Stream<GOFState> get gameState => gameProvider.engine.dataStream;
 }
 
 extension GameStateExt<T extends StatefulWidget> on State<T> {
@@ -18,7 +17,6 @@ extension GameStateExt<T extends StatefulWidget> on State<T> {
   GameOfLifeEngine get gameEngine => context.gameEngine;
   GameConfig get gameConfig => context.gameConfig;
   GameOfLifeDataBase get database => context.database;
-  Stream<GOFState> get gameState => context.gameState;
 }
 
 class GameProvider {
@@ -29,14 +27,13 @@ class GameProvider {
 
   static Future<GameProvider> init() async {
     final GameConfig gameConfig = GameConfig(
-      numberOfCol: 50,
-      numberOfRows: 50,
+      numberOfCol: 4,
+      numberOfRows: 4,
       generationGap: const Duration(milliseconds: 250),
     );
 
     final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase());
 
-    // await engine.init(); //should I 🤔, nope while I am using diff
     return GameProvider._(
       engine: engine,
       config: gameConfig,

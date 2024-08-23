@@ -20,16 +20,21 @@ class SetUpOverviewPage extends StatefulWidget {
 }
 
 class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
+  bool isLoading = true;
   @override
   void initState() {
-    gameEngine.init(config: gameConfig);
     super.initState();
+    gameEngine.init(config: gameConfig).then((value) {
+      isLoading = false;
+      setState(() {});
+    });
   }
 
   void navToGameBoard() async {
     if (context.mounted) {
       await Navigator.of(context).push(GOFPage.route());
       gameEngine.stopPeriodicGeneration();
+      setState(() {});
     }
   }
 
@@ -41,18 +46,18 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   CellPattern? selectedPattern;
 
   void onPatternSelected(CellPattern? value) {
-    final currentData = gameEngine.gofState.data;
-    if (value == null || currentData.isEmpty) return;
-
-    (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
-
-    final cellData = value.data(midPosition.$1, midPosition.$2);
-    for (final cd in cellData) {
-      currentData[cd.y][cd.x] = cd;
-    }
-    gameEngine.replaceData(currentData);
-    selectedPattern = value;
-    setState(() {});
+//     final currentData = _tempGameState?.data ?? [];
+//     if (value == null || currentData.isEmpty) return;
+//
+//     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
+//
+//     final cellData = value.data(midPosition.$1, midPosition.$2);
+//     for (final cd in cellData) {
+//       currentData[cd.y][cd.x] = cd;
+//     }
+//     _tempGameState = GOFState(currentData, 0);
+//     selectedPattern = value;
+//     setState(() {});
   }
 
   @override
@@ -92,7 +97,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       backgroundColor: Colors.deepPurpleAccent,
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: navToGameBoard,
+                    onPressed: () => navToGameBoard(),
                     child: const Text("Start"),
                   ),
                   const SizedBox(height: 24),
@@ -114,20 +119,14 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
             Expanded(
               child: Container(
                 color: Colors.red,
-                child: StreamBuilder<GOFState>(
-                    stream: gameEngine.dataStream,
-                    initialData: const GOFState.empty(),
-                    builder: (context, snapshot) {
-                      final List<List<GridData>> data = [...snapshot.data?.data ?? []];
-                      if (data.isEmpty) return const SizedBox.shrink();
-                      if (snapshot.data!.isLoading) return const Center(child: CircularProgressIndicator());
-                      return TwoDimensionalCustomPaintGridView(
-                        initialData: data,
+                child: isLoading
+                    ? Container()
+                    : TwoDimensionalCustomPaintGridView(
+                        state: gameEngine.gofStateNotifier,
                         onGridDataChanged: (data) {
-                          gameEngine.replaceData(data);
+                          gameEngine.updateState(GOFState([...data], 0));
                         },
-                      );
-                    }),
+                      ),
               ),
             ),
           ],
