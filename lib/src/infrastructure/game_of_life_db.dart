@@ -17,12 +17,7 @@ class GameOfLifeDataBase {
   Future<List<List<GridData>>> init({
     int numberOfRows = 50,
     int numberOfCol = 50,
-    List<List<GridData>>? initData,
   }) async {
-    if (initData != null && initData.isNotEmpty) {
-      return initData;
-    }
-
     final params = [numberOfRows, numberOfCol];
     final result = await compute(_init, params);
 

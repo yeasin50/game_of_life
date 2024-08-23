@@ -22,7 +22,7 @@ class SetUpOverviewPage extends StatefulWidget {
 class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   @override
   void initState() {
-    gameEngine.init();
+    gameEngine.init(config: gameConfig);
     super.initState();
   }
 
@@ -116,11 +116,11 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                 color: Colors.red,
                 child: StreamBuilder<GOFState>(
                     stream: gameEngine.dataStream,
-                    initialData: GOFState.empty(),
+                    initialData: const GOFState.empty(),
                     builder: (context, snapshot) {
                       final List<List<GridData>> data = [...snapshot.data?.data ?? []];
                       if (data.isEmpty) return const SizedBox.shrink();
-
+                      if (snapshot.data!.isLoading) return const Center(child: CircularProgressIndicator());
                       return TwoDimensionalCustomPaintGridView(
                         initialData: data,
                         onGridDataChanged: (data) {

@@ -23,6 +23,7 @@ class _GOFPageState extends State<GOFPage> {
         initialData: gameEngine.gofState,
         builder: (context, snapshot) {
           final state = snapshot.data!;
+          if (snapshot.data!.isLoading) return const Center(child: CircularProgressIndicator());
           return Scaffold(
             appBar: AppBar(),
             body: Column(

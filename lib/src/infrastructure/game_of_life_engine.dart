@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:game_of_life/src/infrastructure/game_config.dart';
+
 import 'game_of_life_db.dart';
 
 import '../domain/grid_data.dart';
@@ -8,12 +10,13 @@ import '../domain/grid_data.dart';
 const _defaultGenerationDelay = Duration(milliseconds: 250);
 
 class GOFState {
-  const GOFState(this.data, this.generation);
+  const GOFState(this.data, this.generation, [this.isLoading = false]);
 
-  const GOFState.empty() : this(const [], 0);
+  const GOFState.empty() : this(const [], 0, true);
 
   final List<List<GridData>> data;
   final int generation;
+  final bool isLoading;
 }
 
 class GameOfLifeEngine {
@@ -31,13 +34,8 @@ class GameOfLifeEngine {
   Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
   Timer? _timer;
 
-  Future<void> init({
-    int numberOfRows = 50,
-    int numberOfCol = 50,
-    Duration generationGap = _defaultGenerationDelay,
-    List<List<GridData>>? initData,
-  }) async {
-    _generationGap = generationGap;
+  Future<void> init({required GameConfig config}) async {
+    _generationGap = config.generationGap;
     _gofState = const GOFState.empty();
 
     _dataController = StreamController<GOFState>.broadcast(
@@ -45,9 +43,8 @@ class GameOfLifeEngine {
     );
 
     final grids = await cellDB.init(
-      numberOfCol: numberOfCol,
-      numberOfRows: numberOfRows,
-      initData: initData,
+      numberOfCol: config.numberOfCol,
+      numberOfRows: config.numberOfRows,
     );
 
     _gofState = GOFState(grids, 0);
