@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:game_of_life/src/infrastructure/game_of_life_db.dart';
 
 import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
-import '../infrastructure/infrastructure.dart';
 import 'gof_life_page.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
@@ -117,16 +117,20 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
               ),
             ),
             Expanded(
-              child: Container(
-                color: Colors.red,
-                child: isLoading
-                    ? Container()
-                    : TwoDimensionalCustomPaintGridView(
-                        state: gameEngine.gofStateNotifier,
-                        onGridDataChanged: (data) {
-                          gameEngine.updateState(GOFState([...data], 0));
-                        },
-                      ),
+              child: ValueListenableBuilder(
+                valueListenable: gameProvider.engine.gofStateNotifier,
+                builder: (context, value, child) => Container(
+                  color: Colors.red,
+                  child: isLoading
+                      ? Container()
+                      : TwoDimensionalCustomPaintGridView(
+                          state: value,
+                          onGridDataChanged: (p0) {
+                            gameEngine.gofStateNotifier.update(GOFState(p0, 0));
+                            setState(() {});
+                          },
+                        ),
+                ),
               ),
             ),
           ],

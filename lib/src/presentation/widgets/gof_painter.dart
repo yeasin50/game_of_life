@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import '../../domain/domain.dart';
 import '../../infrastructure/infrastructure.dart';
 import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.state, [this.useColorizeGeneration = false]) : super(repaint: state);
+  const GOFPainter(this.state, [this.useColorizeGeneration = false]);
 
-  final ValueNotifier<GOFState> state;
+  final GOFState state;
   final bool useColorizeGeneration;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final data = state.value.data;
+    final data = state.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
@@ -29,7 +30,13 @@ class GOFPainter extends CustomPainter {
           Paint()
             ..color = currentItem.isAlive
                 ? useColorizeGeneration
-                    ? currentItem.color
+                    ? () {
+                        return switch (currentItem.generation) {
+                          0 => Colors.black,
+                          >= 36 => Colors.white,
+                          _ => HSLColor.fromAHSL(1, currentItem.generation * 10.0, 1, .5).toColor(),
+                        };
+                      }()
                     : Colors.white
                 : Colors.black,
         );
@@ -59,6 +66,6 @@ class GOFPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant GOFPainter oldDelegate) {
-    return false;
+    return true;
   }
 }

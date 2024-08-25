@@ -12,6 +12,33 @@ class GOFState {
   final List<List<GridData>> data;
   final int generation;
   final bool isLoading;
+
+  GOFState copyWith({
+    List<List<GridData>>? data,
+    int? generation,
+    bool? isLoading,
+  }) {
+    return GOFState(
+      data ?? this.data,
+      generation ?? this.generation,
+      isLoading ?? this.isLoading,
+    );
+  }
+}
+
+class GameStateValueNotifier<GOFState> extends ValueNotifier<GOFState> {
+  GameStateValueNotifier(super.state);
+
+  void update(GOFState state) {
+    value = state;
+    notifyListeners();
+  }
+
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+  }
 }
 
 ///* If the cell is alive,

@@ -11,14 +11,14 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
     required this.onGridDataChanged,
   });
 
-  final ValueNotifier<GOFState> state;
+  final GOFState state;
   final Function(List<List<GridData>>) onGridDataChanged;
 
   void onTapDown(BuildContext context, TapDownDetails details) {
     // Calculate the local position relative to the CustomPaint
     final localPosition = details.localPosition;
 
-    final data = [...state.value.data];
+    final data = [...state.data];
 
     final itemWidth =
         data[0].isNotEmpty ? context.size!.width / data[0].length : 0.0; // Handle potential division by zero
@@ -45,6 +45,7 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
       child: GestureDetector(
         onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
         child: CustomPaint(
+          key: const ValueKey("simulation user painter"),
           size: Size.infinite,
           painter: GOFPainter(state),
         ),

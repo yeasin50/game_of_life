@@ -32,15 +32,5 @@ class GridData {
     );
   }
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is GridData && other.x == x && other.y == y && other.life == life;
-  }
-
-  @override
-  int get hashCode => x.hashCode ^ y.hashCode ^ life.hashCode;
-
   bool get isAlive => life >= .5;
 }

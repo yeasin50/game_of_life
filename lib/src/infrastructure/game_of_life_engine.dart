@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/game_config.dart';
-
+import 'game_config.dart';
 import 'game_of_life_db.dart';
 
 /// Default generation gap is 250 milliseconds
@@ -13,10 +11,10 @@ class GameOfLifeEngine {
 
   final GameOfLifeDataBase cellDB;
 
-  late ValueNotifier<GOFState> _gofState;
+  late GameStateValueNotifier _gofState;
 
-  ValueNotifier<GOFState> get gofStateNotifier => _gofState;
-  GOFState get gofState => _gofState.value;
+  GameStateValueNotifier get gofStateNotifier => _gofState;
+  // GOFState get gofState => _gofState;
 
   Duration? _generationGap;
   Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
@@ -24,17 +22,13 @@ class GameOfLifeEngine {
 
   Future<void> init({required GameConfig config}) async {
     _generationGap = config.generationGap;
-    _gofState = ValueNotifier<GOFState>(const GOFState.empty());
+    _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
       numberOfCol: config.numberOfCol,
       numberOfRows: config.numberOfRows,
     );
-    _gofState.value = GOFState(grids, 0);
-  }
-
-  void updateState(GOFState newState) {
-    _gofState.value = newState;
+    _gofState.update(GOFState(grids, 0));
   }
 
   Future<void> kill() async {
@@ -47,8 +41,8 @@ class GameOfLifeEngine {
   bool isOnPeriodicProgress = false;
 
   Future<void> nextGeneration() async {
-    final result = await cellDB.nextGeneration(gofState.data);
-    _gofState.value = GOFState([...result], gofState.generation + 1);
+    final result = await cellDB.nextGeneration(_gofState.value.data);
+    _gofState.update(GOFState(result, _gofState.value.generation + 1));
     isOnPeriodicProgress = false;
   }
 
