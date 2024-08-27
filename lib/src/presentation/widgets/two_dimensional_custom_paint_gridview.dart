@@ -18,7 +18,7 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
     // Calculate the local position relative to the CustomPaint
     final localPosition = details.localPosition;
 
-    final data = [...state.data];
+    final data = [...state.data.map((e) => [...e])];
 
     final itemWidth =
         data[0].isNotEmpty ? context.size!.width / data[0].length : 0.0; // Handle potential division by zero

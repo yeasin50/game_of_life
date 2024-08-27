@@ -27,13 +27,12 @@ class _GOFPageState extends State<GOFPage> {
                 padding: const EdgeInsets.all(24.0),
                 child: Center(
                   child: ValueListenableBuilder(
-                      valueListenable: gameEngine.gofStateNotifier,
+                      valueListenable: gameEngine.stateNotifier,
                       builder: (context, value, child) {
                         return InteractiveViewer(
                           minScale: 1,
                           maxScale: 100.0,
                           child: CustomPaint(
-                            key: const ValueKey("simulation painterx"),
                             painter: GOFPainter(value, true),
                             size: Size.infinite,
                           ),

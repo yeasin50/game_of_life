@@ -11,10 +11,10 @@ class GameOfLifeEngine {
 
   final GameOfLifeDataBase cellDB;
 
-  late GameStateValueNotifier _gofState;
+  late GameStateValueNotifier<GOFState> _gofState;
+  GameStateValueNotifier<GOFState> get stateNotifier => _gofState;
 
-  GameStateValueNotifier get gofStateNotifier => _gofState;
-  // GOFState get gofState => _gofState;
+  GOFState get gofState => _gofState.value;
 
   Duration? _generationGap;
   Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
@@ -44,6 +44,10 @@ class GameOfLifeEngine {
     final result = await cellDB.nextGeneration(_gofState.value.data);
     _gofState.update(GOFState(result, _gofState.value.generation + 1));
     isOnPeriodicProgress = false;
+  }
+
+  void updateState(GOFState state) {
+    _gofState.update(state);
   }
 
   /// if [delay] is null, it will be default value of [generationGap]
