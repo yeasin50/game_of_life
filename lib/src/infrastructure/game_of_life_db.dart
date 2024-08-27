@@ -34,7 +34,6 @@ class GameStateValueNotifier<GOFState> extends ValueNotifier<GOFState> {
     notifyListeners();
   }
 
-
   @override
   void notifyListeners() {
     super.notifyListeners();

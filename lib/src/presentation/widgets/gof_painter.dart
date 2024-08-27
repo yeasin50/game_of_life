@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../../domain/domain.dart';
 import '../../infrastructure/infrastructure.dart';
-import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
   const GOFPainter(this.state, [this.useColorizeGeneration = false]);
