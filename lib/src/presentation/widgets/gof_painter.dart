@@ -1,16 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../../domain/grid_data.dart';
+import 'dart:math' as math;
+import '../../infrastructure/infrastructure.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.data, [this.useColorizeGeneration = false]);
+  const GOFPainter(this.notifier, [this.useColorizeGeneration = false]) : super(repaint: notifier);
 
-  final List<List<GridData>> data;
+  final GameStateValueNotifier<GOFState> notifier;
   final bool useColorizeGeneration;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final data = notifier.value.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
@@ -28,7 +28,13 @@ class GOFPainter extends CustomPainter {
           Paint()
             ..color = currentItem.isAlive
                 ? useColorizeGeneration
-                    ? currentItem.color
+                    ? () {
+                        return switch (currentItem.generation) {
+                          0 => Colors.black,
+                          >= 36 => Colors.white,
+                          _ => HSLColor.fromAHSL(1, currentItem.generation * 10.0, 1, .5).toColor(),
+                        };
+                      }()
                     : Colors.white
                 : Colors.black,
         );
@@ -36,8 +42,8 @@ class GOFPainter extends CustomPainter {
         //add text
         if (useColorizeGeneration && currentItem.isAlive) {
           final textSpan = TextSpan(
-            text: currentItem.toString(),
-            style: const TextStyle(color: Colors.black, fontSize: 2),
+            text: currentItem.generation.toString(),
+            style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
           );
           final textPainter = TextPainter(
             text: textSpan,
@@ -57,7 +63,5 @@ class GOFPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant GOFPainter oldDelegate) {
-    return listEquals(oldDelegate.data, data);
-  }
+  bool shouldRepaint(covariant GOFPainter oldDelegate) => false;
 }

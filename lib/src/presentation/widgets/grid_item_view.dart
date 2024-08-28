@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/grid_data.dart';
+import '../utils/grid_data_extension.dart';
 
 class GridItemView extends StatelessWidget {
   const GridItemView({
