@@ -24,9 +24,11 @@ class GOFPage extends StatelessWidget {
                 child: InteractiveViewer(
                   minScale: 1,
                   maxScale: 100.0,
-                  child: CustomPaint(
-                    painter: GOFPainter(context.gameEngine.stateNotifier, true),
-                    size: Size.infinite,
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: GOFPainter(context.gameEngine.stateNotifier, true),
+                      size: Size.infinite,
+                    ),
                   ),
                 ),
               ),
