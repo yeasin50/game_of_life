@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/game_of_life_db.dart';
 
 import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
@@ -74,6 +73,18 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  ValueListenableBuilder(
+                    valueListenable: gameEngine.stateNotifier,
+                    builder: (context, value, child) => Material(
+                      shape: const StadiumBorder(),
+                      color: Colors.deepPurpleAccent.withAlpha(20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
                   DropdownButton<CellPattern>(
                     value: selectedPattern,
                     items: patterns
@@ -90,26 +101,25 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                             ))
                         .toList(),
                   ),
+                  const SizedBox(width: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
-                      fixedSize: const Size(150, 50),
                       backgroundColor: Colors.deepPurpleAccent,
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () => navToGameBoard(),
                     child: const Text("Start"),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(width: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
-                      fixedSize: const Size(100, 50),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.redAccent.withAlpha(100),
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
-                      throw UnimplementedError();
+                       gameEngine.killCells();
                     },
                     child: const Text("clear"),
                   ),

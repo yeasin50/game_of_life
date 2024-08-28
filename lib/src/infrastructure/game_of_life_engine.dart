@@ -31,11 +31,20 @@ class GameOfLifeEngine {
     _gofState.update(GOFState(grids, 0));
   }
 
-  Future<void> kill() async {
+  Future<void> dispose() async {
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
     _generationGap = null;
+  }
+
+  void killCells() async {
+    final grids = await cellDB.init(
+      numberOfCol: gofState.data[0].length,
+      numberOfRows: gofState.data.length,
+      cellInitialState: false,
+    );
+    _gofState.update(GOFState(grids, 0));
   }
 
   bool isOnPeriodicProgress = false;
