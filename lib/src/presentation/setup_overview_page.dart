@@ -44,19 +44,12 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
 
   CellPattern? selectedPattern;
 
-  void onPatternSelected(CellPattern? value) {
-//     final currentData = _tempGameState?.data ?? [];
-//     if (value == null || currentData.isEmpty) return;
-//
-//     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
-//
-//     final cellData = value.data(midPosition.$1, midPosition.$2);
-//     for (final cd in cellData) {
-//       currentData[cd.y][cd.x] = cd;
-//     }
-//     _tempGameState = GOFState(currentData, 0);
-//     selectedPattern = value;
-//     setState(() {});
+  void onPatternSelected(CellPattern? value) async {
+    if (value == null) return;
+    await gameEngine.killCells();
+    gameEngine.addPattern(value);
+    selectedPattern = value;
+    setState(() {});
   }
 
   @override
@@ -80,7 +73,9 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       color: Colors.deepPurpleAccent.withAlpha(20),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),
+                        child: value.data.isNotEmpty
+                            ? Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]")
+                            : const SizedBox.shrink(),
                       ),
                     ),
                   ),
@@ -119,7 +114,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
-                       gameEngine.killCells();
+                      gameEngine.killCells();
                     },
                     child: const Text("clear"),
                   ),

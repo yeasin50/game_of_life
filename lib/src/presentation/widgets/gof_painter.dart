@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_of_life/src/presentation/utils/grid_data_extension.dart';
 import 'dart:math' as math;
 import '../../infrastructure/infrastructure.dart';
 
@@ -28,13 +29,7 @@ class GOFPainter extends CustomPainter {
           Paint()
             ..color = currentItem.isAlive
                 ? useColorizeGeneration
-                    ? () {
-                        return switch (currentItem.generation) {
-                          0 => Colors.black,
-                          >= 36 => Colors.white,
-                          _ => HSLColor.fromAHSL(1, currentItem.generation * 10.0, 1, .5).toColor(),
-                        };
-                      }()
+                    ? currentItem.color
                     : Colors.white
                 : Colors.black,
         );

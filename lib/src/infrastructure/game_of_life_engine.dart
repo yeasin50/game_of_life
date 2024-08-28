@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../domain/domain.dart';
 import 'game_config.dart';
 import 'game_of_life_db.dart';
 
@@ -20,6 +21,8 @@ class GameOfLifeEngine {
   Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
   Timer? _timer;
 
+  bool _isReady = false;
+  bool get isReady => _isReady;
   Future<void> init({required GameConfig config}) async {
     _generationGap = config.generationGap;
     _gofState = GameStateValueNotifier(const GOFState.empty());
@@ -29,6 +32,7 @@ class GameOfLifeEngine {
       numberOfRows: config.numberOfRows,
     );
     _gofState.update(GOFState(grids, 0));
+    _isReady = true;
   }
 
   Future<void> dispose() async {
@@ -38,7 +42,7 @@ class GameOfLifeEngine {
     _generationGap = null;
   }
 
-  void killCells() async {
+  Future<void> killCells() async {
     final grids = await cellDB.init(
       numberOfCol: gofState.data[0].length,
       numberOfRows: gofState.data.length,
@@ -78,5 +82,22 @@ class GameOfLifeEngine {
     _timer?.cancel();
     _timer = null;
     isOnPeriodicProgress = false;
+  }
+
+  void addPattern(CellPattern pattern) async {
+    final currentData = [...gofState.data];
+
+    /// todo: check with max pattern size
+    if (currentData.isEmpty || currentData.length < 5 || currentData[0].length < 5) return;
+
+    (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
+
+    final patternData = pattern.data(midPosition.$1, midPosition.$2);
+
+    for (final c in patternData) {
+      currentData[c.y][c.x] = c;
+    }
+
+    _gofState.update(GOFState(currentData, 0));
   }
 }
