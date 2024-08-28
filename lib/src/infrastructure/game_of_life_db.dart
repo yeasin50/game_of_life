@@ -53,8 +53,9 @@ class GameOfLifeDataBase {
   Future<List<List<GridData>>> init({
     int numberOfRows = 50,
     int numberOfCol = 50,
+    bool? cellInitialState,
   }) async {
-    final params = [numberOfRows, numberOfCol];
+    final params = [numberOfRows, numberOfCol, cellInitialState];
     final result = await compute(_init, params);
 
     return result;
@@ -65,6 +66,7 @@ class GameOfLifeDataBase {
 
     int heightCount = data[0] as int;
     int widthCount = data[1] as int;
+    bool? cellInitialState = data[2] as bool?;
 
     List<List<GridData>> gridData = [];
     for (int y = 0; y < heightCount; y++) {
@@ -74,8 +76,8 @@ class GameOfLifeDataBase {
         final item = GridData(
           x: x,
           y: y,
-          life: life ? 1 : 0,
-          generation: life ? 1 : 0,
+          life: cellInitialState ?? life ? 1 : 0,
+          generation: cellInitialState ?? life ? 1 : 0,
         );
         rows.add(item);
       }

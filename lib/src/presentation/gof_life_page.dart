@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../infrastructure/game_provider.dart';
 import 'widgets/gof_painter.dart';
@@ -83,9 +84,20 @@ class _ActionButtonsState extends State<ActionButtons> {
         const SizedBox(height: 16.0),
         ElevatedButton(
           onPressed: onNextGen,
-          child: const Text("Next Generation"),
+          child: const Text("Next Generation "),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(width: 16.0),
+        ValueListenableBuilder(
+          valueListenable: gameEngine.stateNotifier,
+          builder: (context, value, child) => Material(
+            shape: const StadiumBorder(),
+            color: Colors.deepPurpleAccent.withAlpha(20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),
+            ),
+          ),
+        )
       ],
     );
   }
