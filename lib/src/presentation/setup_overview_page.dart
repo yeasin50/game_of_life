@@ -117,18 +117,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
               ),
             ),
             Expanded(
-              child: Container(
-                color: Colors.red,
-                child: isLoading
-                    ? Container()
-                    : TwoDimensionalCustomPaintGridView(
-                        state: gameEngine.gofState,
-                        onGridDataChanged: (p0) {
-                          gameEngine.updateState(GOFState(p0, 0));
-                          setState(() {});
-                        },
-                      ),
-              ),
+              child: isLoading ? Container() : const TwoDimensionalCustomPaintGridView(),
             ),
           ],
         ),
