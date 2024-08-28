@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:game_of_life/src/infrastructure/game_provider.dart';
 import 'dart:math' as math;
-import '../../domain/domain.dart';
-import '../../infrastructure/infrastructure.dart';
 import 'gof_painter.dart';
 
 class TwoDimensionalCustomPaintGridView extends StatelessWidget {
   const TwoDimensionalCustomPaintGridView({
     super.key,
-    required this.state,
-    required this.onGridDataChanged,
   });
-
-  final GOFState state;
-  final Function(List<List<GridData>>) onGridDataChanged;
 
   void onTapDown(BuildContext context, TapDownDetails details) {
     // Calculate the local position relative to the CustomPaint
     final localPosition = details.localPosition;
-
-    final data = [...state.data.map((e) => [...e])];
+    final state = context.gameEngine.gofState;
+    final data = [...state.data];
 
     final itemWidth =
         data[0].isNotEmpty ? context.size!.width / data[0].length : 0.0; // Handle potential division by zero
@@ -29,11 +23,13 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
     final tappedY = (localPosition.dy / itemSize).floor();
     debugPrint('$tappedX, $tappedY');
     if (tappedX >= 0 && tappedX < data[0].length && tappedY >= 0 && tappedY < data.length) {
+      bool isDead = data[tappedY][tappedX].life == 0.0;
       data[tappedY][tappedX] = data[tappedY][tappedX].copyWith(
-        life: data[tappedY][tappedX].life == 0.0 ? 1.0 : 0.0,
+        life: isDead ? 1.0 : 0.0,
+        generation: isDead ? 1 : 0,
       );
 
-      onGridDataChanged(data);
+      context.gameEngine.updateState(state.copyWith(data: data));
     }
   }
 
@@ -47,7 +43,7 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
         child: CustomPaint(
           key: const ValueKey("simulation user painter"),
           size: Size.infinite,
-          painter: GOFPainter(state),
+          painter: GOFPainter(context.gameEngine.stateNotifier, true),
         ),
       ),
     );

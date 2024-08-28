@@ -3,18 +3,13 @@ import 'package:flutter/material.dart';
 import '../infrastructure/game_provider.dart';
 import 'widgets/gof_painter.dart';
 
-class GOFPage extends StatefulWidget {
+class GOFPage extends StatelessWidget {
   const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
   static MaterialPageRoute route() {
     return MaterialPageRoute(builder: (context) => const GOFPage._());
   }
 
-  @override
-  State<GOFPage> createState() => _GOFPageState();
-}
-
-class _GOFPageState extends State<GOFPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,21 +19,18 @@ class _GOFPageState extends State<GOFPage> {
           const ActionButtons(),
           Expanded(
             child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Center(
-                  child: ValueListenableBuilder(
-                      valueListenable: gameEngine.stateNotifier,
-                      builder: (context, value, child) {
-                        return InteractiveViewer(
-                          minScale: 1,
-                          maxScale: 100.0,
-                          child: CustomPaint(
-                            painter: GOFPainter(value, true),
-                            size: Size.infinite,
-                          ),
-                        );
-                      }),
-                )),
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: InteractiveViewer(
+                  minScale: 1,
+                  maxScale: 100.0,
+                  child: CustomPaint(
+                    painter: GOFPainter(context.gameEngine.stateNotifier, true),
+                    size: Size.infinite,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
