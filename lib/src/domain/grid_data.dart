@@ -15,7 +15,7 @@ class GridData {
 
   @override
   String toString() {
-    return 'GridData(x: $x, y: $y, life: $life, generation: $generation)';
+    return 'x:$x, y:$y,l:$life';
   }
 
   GridData copyWith({

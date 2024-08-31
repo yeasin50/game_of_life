@@ -93,60 +93,49 @@ class GameOfLifeDataBase {
     required List<List<GridData>> grids,
     required GridData c,
   }) {
-    GridData? _topLeftItem(int x, int y) {
-      int cy = y == 0 ? grids.length - 1 : y - 1;
-      int cx = x == 0 ? grids[y].length - 1 : x - 1;
-      return grids[cy][cx];
-    }
+    bool isTopLeftAlive = () {
+      int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
+      int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
+      return grids[cy][cx].isAlive;
+    }();
 
-    GridData? _topItem(int x, int y) {
-      int cy = y == 0 ? grids.length - 1 : y - 1;
-      return grids[cy][x];
-    }
+    bool isTopAlive = () {
+      int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
+      return grids[cy][c.x].isAlive;
+    }();
 
-    GridData? _topRightItem(int x, int y) {
-      int cy = y == 0 ? grids.length - 1 : y - 1;
-      int cx = x == grids[y].length - 1 ? 0 : x + 1;
-      return grids[cy][cx];
-    }
+    bool isTopRightAlive = () {
+      int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
+      int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
+      return grids[cy][cx].isAlive;
+    }();
 
-    GridData? _rightItem(int x, int y) {
-      int cx = x == grids[y].length - 1 ? 0 : x + 1;
-      return grids[y][cx];
-    }
+    bool isRightAlive = () {
+      int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
+      return grids[c.y][cx].isAlive;
+    }();
 
-    GridData? _bottomRightItem(int x, int y) {
-      int cy = y == grids.length - 1 ? 0 : y + 1;
-      int cx = x == grids[y].length - 1 ? 0 : x + 1;
-      return grids[cy][cx];
-    }
+    bool isBottomRightAlive = () {
+      int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
+      int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
+      return grids[cy][cx].isAlive;
+    }();
 
-    GridData? _bottomItem(int x, int y) {
-      if (grids.isEmpty) return throw "no data";
-      int cy = y == grids.length - 1 ? 0 : y + 1;
+    bool isBottomAlive = () {
+      int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
+      return grids[cy][c.x].isAlive;
+    }();
 
-      return grids[cy][x];
-    }
+    bool isBottomLeftAlive = () {
+      int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
+      int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
+      return grids[cy][cx].isAlive;
+    }();
 
-    GridData? _bottomLeftItem(int x, int y) {
-      int cy = y == grids.length - 1 ? 0 : y + 1;
-      int cx = x == 0 ? grids[y].length - 1 : x - 1;
-      return grids[cy][cx];
-    }
-
-    GridData? _leftItem(int x, int y) {
-      int cx = x == 0 ? grids[y].length - 1 : x - 1;
-      return grids[y][cx];
-    }
-
-    bool isTopLeftAlive = _topLeftItem(c.x, c.y)!.isAlive;
-    bool isTopAlive = _topItem(c.x, c.y)!.isAlive;
-    bool isTopRightAlive = _topRightItem(c.x, c.y)!.isAlive;
-    bool isRightAlive = _rightItem(c.x, c.y)!.isAlive;
-    bool isBottomRightAlive = _bottomRightItem(c.x, c.y)!.isAlive;
-    bool isBottomAlive = _bottomItem(c.x, c.y)!.isAlive;
-    bool isBottomLeftAlive = _bottomLeftItem(c.x, c.y)!.isAlive;
-    bool isLeftAlive = _leftItem(c.x, c.y)!.isAlive;
+    bool isLeftAlive = () {
+      int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
+      return grids[c.y][cx].isAlive;
+    }();
 
     final surroundLifeCount = [
       isTopLeftAlive,
@@ -157,41 +146,61 @@ class GameOfLifeDataBase {
       isBottomAlive,
       isBottomRightAlive,
       isLeftAlive
-    ].where((e) => e).length;
+    ];
 
-    if (c.isAlive && (surroundLifeCount < 2)) {
-      return false;
-    }
-    if (c.isAlive && (surroundLifeCount == 2 || surroundLifeCount == 3)) {
-      return true;
-    }
-    if (c.isAlive && (surroundLifeCount > 3)) {
-      return false;
-    }
-    if (!c.isAlive && (surroundLifeCount == 3)) {
-      return true;
-    }
-    return false;
+    ///! Am I doing something wrong here?
+    return switch (surroundLifeCount.where((e) => e).length) {
+      3 => true,
+      2 => c.isAlive,
+      < 2 => false,
+      > 3 => false,
+      _ => false,
+    };
   }
 
-  // Do I need to operate on isolate here?
   List<List<GridData>> _nextGeneration(List<List<GridData>> grid) {
-    final currentState = [...grid];
-    for (int y = 0; y < currentState.length; y++) {
-      for (int x = 0; x < currentState[y].length; x++) {
-        final currentItem = currentState[y][x];
-        final newLife = _updateLife(c: currentItem, grids: currentState);
-        currentState[y][x] = currentItem.copyWith(
+    final updateList = [
+      ...grid.map((e) => [...e])
+    ];
+
+    for (int y = 0; y < grid.length; y++) {
+      for (int x = 0; x < grid[y].length; x++) {
+        final newLife = _updateLife(c: grid[y][x], grids: [...grid]);
+        updateList[y][x] = grid[y][x].copyWith(
           life: newLife ? 1 : 0,
-          generation: newLife ? currentState[y][x].generation + 1 : 0,
+          generation: newLife ? grid[y][x].generation + 1 : 0,
         );
       }
     }
-    return currentState;
+
+    return updateList;
   }
 
   Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid) async {
     final result = await compute(_nextGeneration, grid);
     return result;
+  }
+
+  static String twoDString(List<List<GridData>> grid) {
+    StringBuffer sb = StringBuffer();
+    for (int y = 0; y < grid.length; y++) {
+      for (int x = 0; x < grid[y].length; x++) {
+        sb.write(grid[y][x].isAlive ? '1 ' : '. ');
+      }
+      sb.write('\n');
+    }
+    return sb.toString();
+  }
+
+  static List<List<GridData>> fromDigit(List<List<double>> data) {
+    List<List<GridData>> grid = [];
+    for (int y = 0; y < data.length; y++) {
+      List<GridData> row = [];
+      for (int x = 0; x < data[y].length; x++) {
+        row.add(GridData(x: x, y: y, life: data[y][x]));
+      }
+      grid.add(row);
+    }
+    return grid;
   }
 }

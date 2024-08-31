@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../infrastructure/game_provider.dart';
 import 'widgets/gof_painter.dart';

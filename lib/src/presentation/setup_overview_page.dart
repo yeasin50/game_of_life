@@ -115,6 +115,8 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     ),
                     onPressed: () {
                       gameEngine.killCells();
+                      selectedPattern = null;
+                      setState(() {});
                     },
                     child: const Text("clear"),
                   ),
