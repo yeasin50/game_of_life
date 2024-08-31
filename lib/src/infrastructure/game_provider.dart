@@ -27,8 +27,8 @@ class GameProvider {
 
   static Future<GameProvider> init() async {
     final GameConfig gameConfig = GameConfig(
-      numberOfCol: 25,
-      numberOfRows: 25,
+      numberOfCol: 50,
+      numberOfRows: 50,
       generationGap: const Duration(milliseconds: 250),
     );
 

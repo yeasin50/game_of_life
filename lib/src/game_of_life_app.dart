@@ -31,7 +31,7 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.grey.shade800,
+        backgroundColor: Colors.deepPurpleAccent,
         foregroundColor: Colors.white,
         minimumSize: const Size(150, 50),
       ),

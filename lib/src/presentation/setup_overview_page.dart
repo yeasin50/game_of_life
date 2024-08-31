@@ -5,6 +5,7 @@ import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
+/// select initial pattern to show
 class SetUpOverviewPage extends StatefulWidget {
   const SetUpOverviewPage._();
 
@@ -63,36 +64,17 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  ValueListenableBuilder(
-                    valueListenable: gameEngine.stateNotifier,
-                    builder: (context, value, child) => Material(
-                      shape: const StadiumBorder(),
-                      color: Colors.deepPurpleAccent.withAlpha(20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: value.data.isNotEmpty
-                            ? Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]")
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-                  ),
                   const SizedBox(width: 16),
-                  DropdownButton<CellPattern>(
-                    value: selectedPattern,
-                    items: patterns
-                        .map((e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e.name),
-                            ))
-                        .toList(),
-                    onChanged: onPatternSelected,
-                    selectedItemBuilder: (context) => patterns
-                        .map((e) => Center(
-                              child: Text(
-                                e.name,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ))
+                  Wrap(
+                    spacing: 6,
+                    children: patterns
+                        .map(
+                          (e) => ActionChip(
+                            backgroundColor: selectedPattern == e ? Colors.pink : null,
+                            label: Text(e.name),
+                            onPressed: () => onPatternSelected(e),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(width: 16),
@@ -105,7 +87,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     onPressed: () => navToGameBoard(),
                     child: const Text("Start"),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
@@ -117,7 +99,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       selectedPattern = null;
                       setState(() {});
                     },
-                    child: const Text("clear"),
+                    child: const Text("Clear"),
                   ),
                 ],
               ),

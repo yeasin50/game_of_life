@@ -55,7 +55,9 @@ class GameOfLifeEngine {
 
   Future<void> nextGeneration() async {
     final result = await cellDB.nextGeneration(_gofState.value.data);
-    _gofState.update(GOFState(result, _gofState.value.generation + 1));
+    _gofState.update(
+      GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid),
+    );
     isOnPeriodicProgress = false;
   }
 

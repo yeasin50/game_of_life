@@ -5,23 +5,28 @@ import 'package:flutter/foundation.dart';
 import '../domain/grid_data.dart';
 
 class GOFState {
-  const GOFState(this.data, this.generation, [this.isLoading = false]);
+  const GOFState(
+    this.data,
+    this.generation, {
+    this.colorizeGrid = true,
+  });
 
-  const GOFState.empty() : this(const [], 0, true);
+  const GOFState.empty() : this(const [], 0);
 
   final List<List<GridData>> data;
   final int generation;
-  final bool isLoading;
+  final bool colorizeGrid;
 
   GOFState copyWith({
     List<List<GridData>>? data,
     int? generation,
     bool? isLoading,
+    bool? colorizeGrid,
   }) {
     return GOFState(
       data ?? this.data,
       generation ?? this.generation,
-      isLoading ?? this.isLoading,
+      colorizeGrid: colorizeGrid ?? this.colorizeGrid,
     );
   }
 }

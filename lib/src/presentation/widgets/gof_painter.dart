@@ -4,10 +4,9 @@ import 'dart:math' as math;
 import '../../infrastructure/infrastructure.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.notifier, [this.useColorizeGeneration = false]) : super(repaint: notifier);
+  const GOFPainter(this.notifier) : super(repaint: notifier);
 
   final GameStateValueNotifier<GOFState> notifier;
-  final bool useColorizeGeneration;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -28,14 +27,14 @@ class GOFPainter extends CustomPainter {
           rect,
           Paint()
             ..color = currentItem.isAlive
-                ? useColorizeGeneration
+                ? notifier.value.colorizeGrid
                     ? currentItem.color
                     : Colors.white
                 : Colors.black,
         );
 
         //add text
-        if (useColorizeGeneration && currentItem.isAlive) {
+        if (notifier.value.colorizeGrid && currentItem.isAlive) {
           final textSpan = TextSpan(
             text: currentItem.generation.toString(),
             style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
