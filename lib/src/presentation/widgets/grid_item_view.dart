@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/grid_data.dart';
+import '../utils/grid_data_extension.dart';
 
 class GridItemView extends StatelessWidget {
   const GridItemView({
@@ -11,6 +12,7 @@ class GridItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context).colorScheme.surface;
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(

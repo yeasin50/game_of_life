@@ -1,27 +1,69 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-import 'domain/game_of_life_engine.dart';
-import 'presentation/gof_life_page.dart';
+import 'infrastructure/game_provider.dart';
+import 'presentation/setup_page.dart';
 
-/*
-If the cell is alive, then it stays alive if it has either 2 or 3 live neighbors
-If the cell is dead, then it springs to life only in the case that it has 3 live neighbors
-*/
-///* Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-///* Any live cell with two or three live neighbours lives on to the next generation.
-///* Any live cell with more than three live neighbours dies, as if by overpopulation.
-///* Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction
-///
-class GameOfLifeApp extends StatelessWidget {
+class GameOfLifeApp extends StatefulWidget {
   const GameOfLifeApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: GOFPage(
-        engine: GameOfLifeEngine(),
+  State<GameOfLifeApp> createState() => _GameOfLifeAppState();
+}
+
+class _GameOfLifeAppState extends State<GameOfLifeApp> {
+  late final gameFutureProvider = GameProvider.init();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  final theme = ThemeData.dark().copyWith(
+    scaffoldBackgroundColor: Colors.grey.shade900,
+    hintColor: Colors.white,
+    primaryTextTheme: const TextTheme(
+      bodyMedium: TextStyle(color: Colors.white),
+    ),
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(color: Colors.white),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey.shade800,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(150, 50),
       ),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<GameProvider>(
+      future: gameFutureProvider,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Theme(
+            data: theme,
+            child: const Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text("Game of Life..."),
+            ),
+          );
+        }
+        return GameOfLifeInheritedWidget(
+          provider: snapshot.data!,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: theme,
+            scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
+              PointerDeviceKind.mouse,
+            }),
+            home: const GameBoardSetupPage(),
+          ),
+        );
+      },
     );
   }
 }

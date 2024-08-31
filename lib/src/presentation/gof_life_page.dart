@@ -1,126 +1,110 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import '../domain/game_of_life_engine.dart';
-import '../domain/grid_data.dart';
-import 'widgets/grid_item_view.dart';
+import '../infrastructure/game_provider.dart';
+import 'widgets/gof_painter.dart';
 
-class GOFPage extends StatefulWidget {
-  const GOFPage({
-    super.key,
-    required this.engine,
-  });
+class GOFPage extends StatelessWidget {
+  const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
-  final GameOfLifeEngine engine;
-
-  @override
-  State<GOFPage> createState() => _GOFPageState();
-}
-
-class _GOFPageState extends State<GOFPage> {
-  ///
-  final generationDelay = Durations.short1;
-
-  int crossAxisCount = 0;
-  int mainAxisCount = 0;
-  double maxItemSize = 0;
-  List<List<GridData>> data = [];
-
-  bool isReady = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initData();
-    });
+  static MaterialPageRoute route() {
+    return MaterialPageRoute(builder: (context) => const GOFPage._());
   }
 
-  void initData() {
-    _timer?.cancel();
-    widget.engine.init(size: MediaQuery.sizeOf(context), itemSize: 75);
-    crossAxisCount = widget.engine.nbOfCols;
-    mainAxisCount = widget.engine.nbOfRows;
-    maxItemSize = widget.engine.maxItemSize;
-    data = widget.engine.data;
-    isReady = true;
-    setState(() {});
-  }
-
-  void next() {
-    widget.engine.next();
-    data = widget.engine.data;
-    setState(() {});
-  }
-
-  Timer? _timer;
-
-  void start() {
-    _timer?.cancel();
-    _timer = null;
-
-    _timer = Timer.periodic(generationDelay, (t) {
-      next();
-    });
-  }
-
-  void pause() {
-    _timer?.cancel();
-    _timer = null;
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    widget.engine.dispose();
-    super.dispose();
-  }
-
-  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
+      appBar: AppBar(title: const Text('Game of Life')),
+      body: Column(
         children: [
-          FloatingActionButton(
-            onPressed: start,
-            child: const Icon(Icons.start),
-          ),
-          FloatingActionButton(
-            onPressed: pause,
-            child: const Icon(Icons.stop),
-          ),
-          FloatingActionButton(
-            onPressed: next,
-            child: const Icon(Icons.next_plan),
-          ),
-          FloatingActionButton(
-            onPressed: initData,
-            child: const Icon(Icons.restore),
+          const ActionButtons(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: InteractiveViewer(
+                  minScale: 1,
+                  maxScale: 100.0,
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: GOFPainter(
+                        context.gameEngine.stateNotifier,
+                        true,
+                      ),
+                      size: Size.infinite,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      body: Center(
-        child: isReady == false
-            ? const CircularProgressIndicator()
-            : Wrap(
-                children: [
-                  for (final x in data)
-                    for (final e in x)
-                      SizedBox(
-                        height: maxItemSize,
-                        width: maxItemSize,
-                        child: GridItemView(
-                          data: e,
-                        ),
-                      )
-                ],
-              ),
-      ),
+    );
+  }
+}
+
+class ActionButtons extends StatefulWidget {
+  const ActionButtons({super.key, this.showGenerationOnPlay});
+
+  final ValueChanged? showGenerationOnPlay;
+  @override
+  State<ActionButtons> createState() => _ActionButtonsState();
+}
+
+class _ActionButtonsState extends State<ActionButtons> {
+  bool isPlaying = false;
+
+  void onPlayPause() {
+    isPlaying = !isPlaying;
+    setState(() {});
+
+    if (isPlaying) {
+      gameEngine.startPeriodicGeneration();
+    } else {
+      gameEngine.stopPeriodicGeneration();
+    }
+  }
+
+  void onNextGen() async {
+    await gameEngine.nextGeneration();
+  }
+
+  bool showGeneration = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: isPlaying ? Colors.red : Colors.green),
+          onPressed: onPlayPause,
+          child: isPlaying ? const Text("Stop") : const Text("Simulate"),
+        ),
+        const SizedBox(height: 16.0),
+        ElevatedButton(
+          onPressed: onNextGen,
+          child: const Text("Next Generation "),
+        ),
+        const SizedBox(width: 16.0),
+        ValueListenableBuilder(
+          valueListenable: gameEngine.stateNotifier,
+          builder: (context, value, child) => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: showGeneration ? Colors.blue.withAlpha(70) : Colors.transparent,
+            ),
+            onPressed: () {
+              showGeneration = !showGeneration;
+              widget.showGenerationOnPlay?.call(showGeneration);
+              setState(() {});
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),
+            ),
+          ),
+        )
+      ],
     );
   }
 }

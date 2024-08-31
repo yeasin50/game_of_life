@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'dart:math' as math;
-
 class GridData {
   const GridData({
     required this.x,
@@ -17,7 +14,9 @@ class GridData {
   final int generation;
 
   @override
-  String toString() => '$generation';
+  String toString() {
+    return 'x:$x, y:$y,l:$life';
+  }
 
   GridData copyWith({
     int? x,
@@ -33,29 +32,5 @@ class GridData {
     );
   }
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is GridData &&
-        other.x == x &&
-        other.y == y &&
-        other.life == life;
-  }
-
-  @override
-  int get hashCode => x.hashCode ^ y.hashCode ^ life.hashCode;
-}
-
-extension GridExt on GridData {
   bool get isAlive => life >= .5;
-
-  Color get color {
-    return switch (life) {
-      0 => Colors.white,
-      _ => Colors.green
-      // Color.lerp(Colors.transparent, Colors.green, life)!
-          .withOpacity(math.min((generation + .1) / 10, 1))
-    };
-  }
 }
