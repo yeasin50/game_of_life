@@ -43,7 +43,7 @@ class GameProvider {
   final GameOfLifeEngine engine;
   final GameConfig config;
 
-  void updateConfig(GameConfig newConfig) {
+  void show(GameConfig newConfig) {
     throw UnimplementedError();
   }
 }

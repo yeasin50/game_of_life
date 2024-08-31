@@ -180,27 +180,4 @@ class GameOfLifeDataBase {
     final result = await compute(_nextGeneration, grid);
     return result;
   }
-
-  static String twoDString(List<List<GridData>> grid) {
-    StringBuffer sb = StringBuffer();
-    for (int y = 0; y < grid.length; y++) {
-      for (int x = 0; x < grid[y].length; x++) {
-        sb.write(grid[y][x].isAlive ? '1 ' : '. ');
-      }
-      sb.write('\n');
-    }
-    return sb.toString();
-  }
-
-  static List<List<GridData>> fromDigit(List<List<double>> data) {
-    List<List<GridData>> grid = [];
-    for (int y = 0; y < data.length; y++) {
-      List<GridData> row = [];
-      for (int x = 0; x < data[y].length; x++) {
-        row.add(GridData(x: x, y: y, life: data[y][x]));
-      }
-      grid.add(row);
-    }
-    return grid;
-  }
 }

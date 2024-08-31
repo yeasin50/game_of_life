@@ -26,7 +26,10 @@ class GOFPage extends StatelessWidget {
                   maxScale: 100.0,
                   child: RepaintBoundary(
                     child: CustomPaint(
-                      painter: GOFPainter(context.gameEngine.stateNotifier, true),
+                      painter: GOFPainter(
+                        context.gameEngine.stateNotifier,
+                        true,
+                      ),
                       size: Size.infinite,
                     ),
                   ),
@@ -41,8 +44,9 @@ class GOFPage extends StatelessWidget {
 }
 
 class ActionButtons extends StatefulWidget {
-  const ActionButtons({super.key});
+  const ActionButtons({super.key, this.showGenerationOnPlay});
 
+  final ValueChanged? showGenerationOnPlay;
   @override
   State<ActionButtons> createState() => _ActionButtonsState();
 }
@@ -65,10 +69,7 @@ class _ActionButtonsState extends State<ActionButtons> {
     await gameEngine.nextGeneration();
   }
 
-  // void onExit() {
-  //   gameEngine.stopPeriodicGeneration();
-  //   Navigator.of(context).pop();
-  // }
+  bool showGeneration = true;
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +89,15 @@ class _ActionButtonsState extends State<ActionButtons> {
         const SizedBox(width: 16.0),
         ValueListenableBuilder(
           valueListenable: gameEngine.stateNotifier,
-          builder: (context, value, child) => Material(
-            shape: const StadiumBorder(),
-            color: Colors.deepPurpleAccent.withAlpha(20),
+          builder: (context, value, child) => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: showGeneration ? Colors.blue.withAlpha(70) : Colors.transparent,
+            ),
+            onPressed: () {
+              showGeneration = !showGeneration;
+              widget.showGenerationOnPlay?.call(showGeneration);
+              setState(() {});
+            },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),

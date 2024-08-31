@@ -91,8 +91,10 @@ class GameOfLifeEngine {
     if (currentData.isEmpty || currentData.length < 5 || currentData[0].length < 5) return;
 
     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
-
-    final patternData = pattern.data(midPosition.$1, midPosition.$2);
+    final patternData = pattern.setPosition(
+      x: midPosition.$2,
+      y: midPosition.$1,
+    );
 
     for (final c in patternData) {
       currentData[c.y][c.x] = c;

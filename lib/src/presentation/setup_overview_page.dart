@@ -37,10 +37,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
-  final patterns = [
-    FiveCellPattern(),
-    GliderPattern(),
-  ];
+  final patterns = [FiveCellPattern(), GliderPattern(), LightWeightSpaceShip(), MiddleWeightSpaceShip()];
 
   CellPattern? selectedPattern;
 
@@ -90,9 +87,11 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                         .toList(),
                     onChanged: onPatternSelected,
                     selectedItemBuilder: (context) => patterns
-                        .map((e) => Text(
-                              e.name,
-                              style: const TextStyle(color: Colors.white),
+                        .map((e) => Center(
+                              child: Text(
+                                e.name,
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ))
                         .toList(),
                   ),
