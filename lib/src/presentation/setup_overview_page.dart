@@ -38,7 +38,13 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
-  final patterns = [FiveCellPattern(), GliderPattern(), LightWeightSpaceShip(), MiddleWeightSpaceShip()];
+  final patterns = [
+    FiveCellPattern(),
+    GliderPattern(),
+    LightWeightSpaceShip(),
+    MiddleWeightSpaceShip(),
+    GosperGliderGun(),
+  ];
 
   CellPattern? selectedPattern;
 

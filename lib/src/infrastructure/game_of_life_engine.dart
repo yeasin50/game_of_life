@@ -30,6 +30,7 @@ class GameOfLifeEngine {
     final grids = await cellDB.init(
       numberOfCol: config.numberOfCol,
       numberOfRows: config.numberOfRows,
+      cellInitialState: false,
     );
     _gofState.update(GOFState(grids, 0));
     _isReady = true;
@@ -94,8 +95,9 @@ class GameOfLifeEngine {
 
     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
     final patternData = pattern.setPosition(
-      x: midPosition.$2,
-      y: midPosition.$1,
+      //FIXME:: consider the pattern size ; CenterOffset-(patternSize/2)
+      x: 1,
+      y: 1,
     );
 
     for (final c in patternData) {
