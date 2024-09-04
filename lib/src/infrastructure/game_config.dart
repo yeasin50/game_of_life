@@ -1,8 +1,11 @@
+/// Default generation gap is 250 milliseconds
+const _defaultGenerationDelay = Duration(milliseconds: 250);
+
 class GameConfig {
   GameConfig({
     required this.numberOfCol,
     required this.numberOfRows,
-    required this.generationGap,
+    this.generationGap = _defaultGenerationDelay,
     required this.clipOnBorder,
   });
 

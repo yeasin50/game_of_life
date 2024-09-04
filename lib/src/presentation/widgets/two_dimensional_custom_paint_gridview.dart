@@ -56,7 +56,10 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
                 child: CustomPaint(
                   size: Size(paintWidth, paintHeight),
                   key: const ValueKey("simulation user painter"),
-                  painter: GOFPainter(context.gameEngine.stateNotifier),
+                  painter: GOFPainter(
+                    context.gameEngine.stateNotifier,
+                    showBorder: context.gameConfig.clipOnBorder,
+                  ),
                 ),
               ),
             ),

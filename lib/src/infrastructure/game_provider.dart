@@ -34,7 +34,7 @@ class GameProvider {
       clipOnBorder: true,
     );
 
-    final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase());
+    final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase(), config: gameConfig);
 
     return GameProvider._(
       engine: engine,

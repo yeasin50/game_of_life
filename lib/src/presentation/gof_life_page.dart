@@ -37,11 +37,15 @@ class GOFPage extends StatelessWidget {
                   return InteractiveViewer(
                     minScale: 1,
                     maxScale: 100.0,
-                    clipBehavior: Clip.none,
-                    child: RepaintBoundary(
-                      child: CustomPaint(
-                        painter: GOFPainter(context.gameEngine.stateNotifier),
-                        size: Size(paintWidth, paintHeight),
+                    child: Center(
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          painter: GOFPainter(
+                            context.gameEngine.stateNotifier,
+                            showBorder: context.gameConfig.clipOnBorder,
+                          ),
+                          size: Size(paintWidth, paintHeight),
+                        ),
                       ),
                     ),
                   );
@@ -85,8 +89,8 @@ class _ActionButtonsState extends State<ActionButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
+    return Wrap(
+      alignment: WrapAlignment.center,
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: isPlaying ? Colors.red : Colors.green),
@@ -112,7 +116,7 @@ class _ActionButtonsState extends State<ActionButtons> {
                   gameEngine.updateState(value.copyWith(colorizeGrid: showGeneration));
                   setState(() {});
                 },
-                label: const Icon(Icons.color_lens),
+                label: Icon(!showGeneration ? Icons.visibility_off_outlined : Icons.visibility_outlined),
               ),
               Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]")
             ],

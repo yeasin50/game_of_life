@@ -1,12 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:game_of_life/src/presentation/utils/grid_data_extension.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
 import '../../infrastructure/infrastructure.dart';
+import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.notifier) : super(repaint: notifier);
+  const GOFPainter(
+    this.notifier, {
+    this.showBorder = false,
+  }) : super(repaint: notifier);
 
   final GameStateValueNotifier<GOFState> notifier;
+  final bool showBorder;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -14,6 +20,7 @@ class GOFPainter extends CustomPainter {
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
     for (int y = 0; y < data.length; y++) {
       for (int x = 0; x < data[y].length; x++) {
         final currentItem = data[y][x];
@@ -53,6 +60,15 @@ class GOFPainter extends CustomPainter {
           );
         }
       }
+    }
+
+    if (showBorder) {
+      canvas.drawRect(
+        Rect.fromLTRB(0, 0, itemSize * data.first.length, itemSize * data.length),
+        Paint()
+          ..color = Colors.green
+          ..style = PaintingStyle.stroke,
+      );
     }
   }
 

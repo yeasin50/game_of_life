@@ -1,14 +1,11 @@
 import 'dart:async';
 
-import '../domain/domain.dart';
-import 'game_config.dart';
-import 'game_of_life_db.dart';
+import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
-/// Default generation gap is 250 milliseconds
-const _defaultGenerationDelay = Duration(milliseconds: 250);
+import '../domain/domain.dart';
 
 class GameOfLifeEngine {
-  GameOfLifeEngine({required this.cellDB});
+  GameOfLifeEngine({required this.cellDB, required this.config});
 
   final GameOfLifeDataBase cellDB;
 
@@ -17,20 +14,23 @@ class GameOfLifeEngine {
 
   GOFState get gofState => _gofState.value;
 
-  Duration? _generationGap;
-  Duration get generationGap => _generationGap ?? _defaultGenerationDelay;
+  GameConfig config;
+
+  Duration get generationGap => config.generationGap;
   Timer? _timer;
 
   bool _isReady = false;
   bool get isReady => _isReady;
-  Future<void> init({required GameConfig config}) async {
-    _generationGap = config.generationGap;
+  Future<void> init({
+    required GameConfig config,
+  }) async {
+    this.config = config;
     _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
       numberOfCol: config.numberOfCol,
       numberOfRows: config.numberOfRows,
-      cellInitialState: false,
+      cellInitialState: false, //todo generate percentage ratio initial alive cell
     );
     _gofState.update(GOFState(grids, 0));
     _isReady = true;
@@ -40,7 +40,6 @@ class GameOfLifeEngine {
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
-    _generationGap = null;
   }
 
   Future<void> killCells() async {
@@ -55,7 +54,7 @@ class GameOfLifeEngine {
   bool isOnPeriodicProgress = false;
 
   Future<void> nextGeneration() async {
-    final result = await cellDB.nextGeneration(_gofState.value.data);
+    final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
     _gofState.update(
       GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid),
     );
@@ -67,10 +66,10 @@ class GameOfLifeEngine {
   }
 
   /// if [delay] is null, it will be default value of [generationGap]
-  void startPeriodicGeneration({Duration? delay}) {
+  void startPeriodicGeneration() {
     _timer?.cancel();
     _timer = null;
-    _timer = Timer.periodic(delay ?? generationGap, (t) async {
+    _timer = Timer.periodic(generationGap, (t) async {
       if (isOnPeriodicProgress) return;
 
       isOnPeriodicProgress = true;
