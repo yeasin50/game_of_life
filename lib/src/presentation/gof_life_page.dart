@@ -13,7 +13,10 @@ class GOFPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Game of Life')),
+      appBar: AppBar(
+        title: const Text('Game of Life'),
+        centerTitle: true,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
