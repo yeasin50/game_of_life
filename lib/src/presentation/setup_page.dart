@@ -25,7 +25,6 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    GameOfLifeInheritedWidget.of(context);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -63,6 +62,16 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
                     onValueChange: (value) {
                       final number = int.tryParse(value) ?? 0;
                       gameConfig.generationGap = Duration(milliseconds: number);
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: gameConfig.clipOnBorder,
+                    title: const Text("Clip on border"),
+                    onChanged: (value) async {
+                      gameConfig.clipOnBorder = value;
                       setState(() {});
                     },
                   ),

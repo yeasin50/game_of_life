@@ -30,6 +30,7 @@ class GameProvider {
       numberOfCol: 50,
       numberOfRows: 50,
       generationGap: const Duration(milliseconds: 250),
+      clipOnBorder: true,
     );
 
     final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase());

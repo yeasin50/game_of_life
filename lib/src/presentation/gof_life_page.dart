@@ -69,7 +69,7 @@ class _ActionButtonsState extends State<ActionButtons> {
     await gameEngine.nextGeneration();
   }
 
-  bool showGeneration = true;
+  bool showGeneration = false;
 
   @override
   Widget build(BuildContext context) {

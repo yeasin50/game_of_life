@@ -8,7 +8,7 @@ class GOFState {
   const GOFState(
     this.data,
     this.generation, {
-    this.colorizeGrid = true,
+    this.colorizeGrid = false,
   });
 
   const GOFState.empty() : this(const [], 0);

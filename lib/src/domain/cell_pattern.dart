@@ -49,8 +49,6 @@ abstract class CellPattern {
       setB.$3 + setB.$1.first.length, setB.$3
     ].reduce(math.max);
 
-    debugPrint("maxW $right");
-    math.max;
     final bottom = math.max(
       setA.$2 + setA.$1.length,
       setB.$2 + setB.$1.length,
