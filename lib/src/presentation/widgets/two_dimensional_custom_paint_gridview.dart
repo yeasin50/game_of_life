@@ -35,19 +35,34 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InteractiveViewer(
-      minScale: 1,
-      maxScale: 100.0,
-      child: GestureDetector(
-        onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
-        child: RepaintBoundary(
-          child: CustomPaint(
-            key: const ValueKey("simulation user painter"),
-            size: Size.infinite,
-            painter: GOFPainter(context.gameEngine.stateNotifier),
+    final gameState = context.gameEngine.gofState;
+    assert(gameState.data.isNotEmpty, "Game data shouldn't be empty");
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth = constraints.maxWidth / gameState.data.first.length;
+        final itemHeight = constraints.maxHeight / gameState.data.length;
+        final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
+        final (paintWidth, paintHeight) = (gameState.data.first.length * itemSize, gameState.data.length * itemSize);
+
+        return InteractiveViewer(
+          minScale: 1,
+          maxScale: 100.0,
+          child: Center(
+            child: GestureDetector(
+              onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  size: Size(paintWidth, paintHeight),
+                  key: const ValueKey("simulation user painter"),
+                  painter: GOFPainter(context.gameEngine.stateNotifier),
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

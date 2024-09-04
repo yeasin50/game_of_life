@@ -67,21 +67,15 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
+              child: Wrap(
+                spacing: 6,
                 children: [
-                  const SizedBox(width: 16),
-                  Wrap(
-                    spacing: 6,
-                    children: patterns
-                        .map(
-                          (e) => ActionChip(
-                            backgroundColor: selectedPattern == e ? Colors.pink : null,
-                            label: Text(e.name),
-                            onPressed: () => onPatternSelected(e),
-                          ),
-                        )
-                        .toList(),
+                  ...patterns.map(
+                    (e) => ActionChip(
+                      backgroundColor: selectedPattern == e ? Colors.pink : null,
+                      label: Text(e.name),
+                      onPressed: () => onPatternSelected(e),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
@@ -111,7 +105,12 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
               ),
             ),
             Expanded(
-              child: isLoading ? Container() : const TwoDimensionalCustomPaintGridView(),
+              child: isLoading
+                  ? Container()
+                  : const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TwoDimensionalCustomPaintGridView(),
+                    ),
             ),
           ],
         ),

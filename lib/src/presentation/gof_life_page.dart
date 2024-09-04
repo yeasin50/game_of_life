@@ -15,6 +15,7 @@ class GOFPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Game of Life')),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
             padding: EdgeInsets.all(24.0),
@@ -23,20 +24,31 @@ class GOFPage extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24),
-              child: Center(
-                child: InteractiveViewer(
-                  minScale: 1,
-                  maxScale: 100.0,
-                  child: RepaintBoundary(
-                    child: CustomPaint(
-                      painter: GOFPainter(context.gameEngine.stateNotifier),
-                      size: Size.infinite,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final itemWidth = constraints.maxWidth / context.gameState.data.first.length;
+                  final itemHeight = constraints.maxHeight / context.gameState.data.length;
+                  final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
+                  final (paintWidth, paintHeight) = (
+                    context.gameState.data.first.length * itemSize,
+                    context.gameState.data.length * itemSize,
+                  );
+                  return InteractiveViewer(
+                    minScale: 1,
+                    maxScale: 100.0,
+                    clipBehavior: Clip.none,
+                    child: RepaintBoundary(
+                      child: CustomPaint(
+                        painter: GOFPainter(context.gameEngine.stateNotifier),
+                        size: Size(paintWidth, paintHeight),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
-          ),
+          )
         ],
       ),
     );

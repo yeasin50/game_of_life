@@ -10,6 +10,7 @@ extension GameProviderBuildContext on BuildContext {
   GameOfLifeEngine get gameEngine => gameProvider.engine;
   GameConfig get gameConfig => gameProvider.config;
   GameOfLifeDataBase get database => gameProvider.engine.cellDB;
+  GOFState get gameState => gameEngine.gofState;
 }
 
 extension GameStateExt<T extends StatefulWidget> on State<T> {
