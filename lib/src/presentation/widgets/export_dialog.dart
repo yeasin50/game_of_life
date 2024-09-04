@@ -44,15 +44,14 @@ class MyCellPattern implements CellPattern {
                         isClassFormat = !isClassFormat;
                         setState(() {});
                       },
-                      label: const Text("Change format"),
+                      label: Text(isClassFormat ? "Data only" : "Class format"),
                     ),
                     TextButton.icon(
                       onPressed: () {
-                        ///
                         Clipboard.setData(ClipboardData(text: isClassFormat ? classFormat : textData));
                       },
-                      icon: Icon(Icons.copy),
-                      label: Text("Copy"),
+                      icon: const Icon(Icons.copy),
+                      label: const Text("Copy"),
                     ),
                   ],
                 );
