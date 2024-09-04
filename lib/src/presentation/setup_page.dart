@@ -121,6 +121,7 @@ class _InputField extends StatelessWidget {
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
       initialValue: initialValue,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: type.label,
         border: const OutlineInputBorder(),
