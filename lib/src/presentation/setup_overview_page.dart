@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
+import 'widgets/export_dialog.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
 /// select initial pattern to show
@@ -68,7 +69,9 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Wrap(
-                spacing: 6,
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
                 children: [
                   ...patterns.map(
                     (e) => ActionChip(
@@ -101,6 +104,8 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     },
                     child: const Text("Clear"),
                   ),
+                  const SizedBox(width: 16),
+                  const ExportGameData(),
                 ],
               ),
             ),

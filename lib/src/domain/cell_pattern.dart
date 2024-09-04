@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import 'domain.dart';
 
 import "dart:math" as math;
@@ -27,15 +25,32 @@ abstract class CellPattern {
     return grid;
   }
 
-  static String printData(List<List<GridData>> grid) {
+  /// if [exportMode] is true,  it can generate value that can be reuse on [fromDigit]
+  /// [exportMode] is false when we like to print on console
+  ///
+  static String printData(List<List<GridData>> grid, [bool exportMode = false]) {
     StringBuffer sb = StringBuffer();
     for (int y = 0; y < grid.length; y++) {
+      if (exportMode) sb.write("\n  [");
       for (int x = 0; x < grid[y].length; x++) {
-        sb.write(grid[y][x].isAlive ? '1 ' : '. ');
+        String str;
+        if (exportMode) {
+          str = grid[y][x].isAlive ? ' 1' : ' 0';
+          str = (x < grid[y].length - 1) ? str = "$str," : str;
+        } else {
+          str = grid[y][x].isAlive ? '1 ' : '. ';
+        }
+
+        sb.write(str);
       }
-      sb.write('\n');
+      if (exportMode) {
+        sb.write(" ],");
+      } else {
+        sb.write('\n');
+      }
     }
-    return sb.toString();
+
+    return exportMode ? "[${sb.toString()}\n]" : "\n${sb.toString()}";
   }
 
   static List<List<int>> mergeDigit(
