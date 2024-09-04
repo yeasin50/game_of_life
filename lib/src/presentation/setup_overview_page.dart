@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
+import 'widgets/export_dialog.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
+/// select initial pattern to show
 class SetUpOverviewPage extends StatefulWidget {
   const SetUpOverviewPage._();
 
@@ -37,7 +39,13 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
-  final patterns = [FiveCellPattern(), GliderPattern(), LightWeightSpaceShip(), MiddleWeightSpaceShip()];
+  final patterns = [
+    FiveCellPattern(),
+    GliderPattern(),
+    LightWeightSpaceShip(),
+    MiddleWeightSpaceShip(),
+    GosperGliderGun(),
+  ];
 
   CellPattern? selectedPattern;
 
@@ -60,40 +68,17 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
                 children: [
-                  ValueListenableBuilder(
-                    valueListenable: gameEngine.stateNotifier,
-                    builder: (context, value, child) => Material(
-                      shape: const StadiumBorder(),
-                      color: Colors.deepPurpleAccent.withAlpha(20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: value.data.isNotEmpty
-                            ? Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]")
-                            : const SizedBox.shrink(),
-                      ),
+                  ...patterns.map(
+                    (e) => ActionChip(
+                      backgroundColor: selectedPattern == e ? Colors.pink : null,
+                      label: Text(e.name),
+                      onPressed: () => onPatternSelected(e),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  DropdownButton<CellPattern>(
-                    value: selectedPattern,
-                    items: patterns
-                        .map((e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e.name),
-                            ))
-                        .toList(),
-                    onChanged: onPatternSelected,
-                    selectedItemBuilder: (context) => patterns
-                        .map((e) => Center(
-                              child: Text(
-                                e.name,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ))
-                        .toList(),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
@@ -105,7 +90,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     onPressed: () => navToGameBoard(),
                     child: const Text("Start"),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
@@ -117,13 +102,20 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       selectedPattern = null;
                       setState(() {});
                     },
-                    child: const Text("clear"),
+                    child: const Text("Clear"),
                   ),
+                  const SizedBox(width: 16),
+                  const ExportGameData(),
                 ],
               ),
             ),
             Expanded(
-              child: isLoading ? Container() : const TwoDimensionalCustomPaintGridView(),
+              child: isLoading
+                  ? Container()
+                  : const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TwoDimensionalCustomPaintGridView(),
+                    ),
             ),
           ],
         ),

@@ -1,5 +1,14 @@
 import 'domain.dart';
 
+import "dart:math" as math;
+
+extension CellPatternExt on CellPattern {
+  /// Set position from top left
+  List<GridData> setPosition({required int y, required int x}) {
+    return data.map((e) => e.copyWith(x: e.x + x, y: e.y + y)).toList();
+  }
+}
+
 abstract class CellPattern {
   List<GridData> get data;
   String get name;
@@ -16,15 +25,79 @@ abstract class CellPattern {
     return grid;
   }
 
-  static String printData(List<List<GridData>> grid) {
+  /// if [exportMode] is true,  it can generate value that can be reuse on [fromDigit]
+  /// [exportMode] is false when we like to print on console
+  ///
+  static String printData(List<List<GridData>> grid, [bool exportMode = false]) {
     StringBuffer sb = StringBuffer();
     for (int y = 0; y < grid.length; y++) {
+      if (exportMode) sb.write("\n  [");
       for (int x = 0; x < grid[y].length; x++) {
-        sb.write(grid[y][x].isAlive ? '1 ' : '. ');
+        String str;
+        if (exportMode) {
+          str = grid[y][x].isAlive ? ' 1' : ' 0';
+          str = (x < grid[y].length - 1) ? str = "$str," : str;
+        } else {
+          str = grid[y][x].isAlive ? '1 ' : '. ';
+        }
+
+        sb.write(str);
       }
-      sb.write('\n');
+      if (exportMode) {
+        sb.write(" ],");
+      } else {
+        sb.write('\n');
+      }
     }
-    return sb.toString();
+
+    return exportMode ? "[${sb.toString()}\n]" : "\n${sb.toString()}";
+  }
+
+  static List<List<int>> mergeDigit(
+    (List<List<int>> grids, int y, int x) setA,
+    (List<List<int>> grids, int y, int x) setB,
+  ) {
+    final left = math.min(setA.$3, setB.$3);
+    final top = math.min(setA.$2, setB.$2);
+    final right = [
+      setA.$3 + setA.$1.first.length, setA.$3, //
+      setB.$3 + setB.$1.first.length, setB.$3
+    ].reduce(math.max);
+
+    final bottom = math.max(
+      setA.$2 + setA.$1.length,
+      setB.$2 + setB.$1.length,
+    );
+
+    List<List<int>> resultSet = [];
+
+    for (int y = 0; y < bottom; y++) {
+      final rows = <int>[];
+      for (int x = 0; x < right; x++) {
+        final aValue = () {
+          return y >= setA.$2 &&
+                  y < setA.$2 + setA.$1.length && //
+                  x >= setA.$3 &&
+                  x < setA.$3 + setA.$1.first.length
+              ? setA.$1[y - setA.$2][x - setA.$3]
+              : 0;
+        }();
+
+        final bValue = () {
+          return y >= setB.$2 &&
+                  y < setB.$2 + setB.$1.length && //
+                  x >= setB.$3 &&
+                  x < setB.$3 + setB.$1.first.length
+              ? setB.$1[y - setB.$2][x - setB.$3]
+              : 0;
+        }();
+
+        rows.add(aValue | bValue);
+      }
+      resultSet.add(rows);
+    }
+
+    return resultSet;
   }
 }
 
@@ -87,11 +160,4 @@ class MiddleWeightSpaceShip implements CellPattern {
 
   @override
   String get name => "MWSS";
-}
-
-extension CellPatternExt on CellPattern {
-  /// Set position from top left
-  List<GridData> setPosition({required int y, required int x}) {
-    return data.map((e) => e.copyWith(x: e.x + x, y: e.y + y)).toList();
-  }
 }

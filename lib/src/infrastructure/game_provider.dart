@@ -10,6 +10,7 @@ extension GameProviderBuildContext on BuildContext {
   GameOfLifeEngine get gameEngine => gameProvider.engine;
   GameConfig get gameConfig => gameProvider.config;
   GameOfLifeDataBase get database => gameProvider.engine.cellDB;
+  GOFState get gameState => gameEngine.gofState;
 }
 
 extension GameStateExt<T extends StatefulWidget> on State<T> {
@@ -27,12 +28,13 @@ class GameProvider {
 
   static Future<GameProvider> init() async {
     final GameConfig gameConfig = GameConfig(
-      numberOfCol: 25,
-      numberOfRows: 25,
+      numberOfCol: 50,
+      numberOfRows: 50,
       generationGap: const Duration(milliseconds: 250),
+      clipOnBorder: true,
     );
 
-    final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase());
+    final engine = GameOfLifeEngine(cellDB: GameOfLifeDataBase(), config: gameConfig);
 
     return GameProvider._(
       engine: engine,

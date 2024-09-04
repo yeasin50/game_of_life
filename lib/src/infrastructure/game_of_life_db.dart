@@ -5,23 +5,28 @@ import 'package:flutter/foundation.dart';
 import '../domain/grid_data.dart';
 
 class GOFState {
-  const GOFState(this.data, this.generation, [this.isLoading = false]);
+  const GOFState(
+    this.data,
+    this.generation, {
+    this.colorizeGrid = false,
+  });
 
-  const GOFState.empty() : this(const [], 0, true);
+  const GOFState.empty() : this(const [], 0);
 
   final List<List<GridData>> data;
   final int generation;
-  final bool isLoading;
+  final bool colorizeGrid;
 
   GOFState copyWith({
     List<List<GridData>>? data,
     int? generation,
     bool? isLoading,
+    bool? colorizeGrid,
   }) {
     return GOFState(
       data ?? this.data,
       generation ?? this.generation,
-      isLoading ?? this.isLoading,
+      colorizeGrid: colorizeGrid ?? this.colorizeGrid,
     );
   }
 }
@@ -87,52 +92,65 @@ class GameOfLifeDataBase {
     return gridData;
   }
 
-  ///return should die, live, none=die🤔
-
+  ///return should die, live, none=>
+  ///
+  /// if [clip] is true, the outer layer won't be consider.
+  /// means if the current grid is on 0 index it wont consider neighbor of last list item and
+  /// will return false. same for last item.
+  ///
   bool _updateLife({
     required List<List<GridData>> grids,
     required GridData c,
+    required bool clip,
   }) {
     bool isTopLeftAlive = () {
+      if (clip && c.y == 0 || c.x == 0) return false;
       int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
       int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
       return grids[cy][cx].isAlive;
     }();
 
     bool isTopAlive = () {
+      if (clip && c.y == 0) return false;
       int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
       return grids[cy][c.x].isAlive;
     }();
 
     bool isTopRightAlive = () {
+      if (clip && c.y == 0 || c.x == grids[c.y].length - 1) return false;
       int cy = c.y == 0 ? grids.length - 1 : c.y - 1;
       int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
       return grids[cy][cx].isAlive;
     }();
 
     bool isRightAlive = () {
+      if (clip && c.x == grids[c.y].length - 1) return false;
       int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
       return grids[c.y][cx].isAlive;
     }();
 
     bool isBottomRightAlive = () {
+      if (clip && c.y == grids.length - 1 || c.x == grids[c.y].length - 1) return false;
       int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
       int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
       return grids[cy][cx].isAlive;
     }();
 
     bool isBottomAlive = () {
+      if (clip && c.y == grids.length - 1) return false;
       int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
       return grids[cy][c.x].isAlive;
     }();
 
     bool isBottomLeftAlive = () {
+      if (clip && c.y == grids.length - 1 || c.x == 0) return false;
       int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
       int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
       return grids[cy][cx].isAlive;
     }();
 
     bool isLeftAlive = () {
+      if (clip && c.x == 0) return false;
       int cx = c.x == 0 ? grids[c.y].length - 1 : c.x - 1;
       return grids[c.y][cx].isAlive;
     }();
@@ -158,14 +176,17 @@ class GameOfLifeDataBase {
     };
   }
 
-  List<List<GridData>> _nextGeneration(List<List<GridData>> grid) {
-    final updateList = [
+  List<List<GridData>> _nextGeneration(List data) {
+    final List<List<GridData>> grid = data.first;
+    final clipBorder = data.last;
+
+    final List<List<GridData>> updateList = [
       ...grid.map((e) => [...e])
     ];
 
     for (int y = 0; y < grid.length; y++) {
       for (int x = 0; x < grid[y].length; x++) {
-        final newLife = _updateLife(c: grid[y][x], grids: [...grid]);
+        final newLife = _updateLife(c: grid[y][x], grids: [...grid], clip: clipBorder);
         updateList[y][x] = grid[y][x].copyWith(
           life: newLife ? 1 : 0,
           generation: newLife ? grid[y][x].generation + 1 : 0,
@@ -176,8 +197,8 @@ class GameOfLifeDataBase {
     return updateList;
   }
 
-  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid) async {
-    final result = await compute(_nextGeneration, grid);
+  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid, {bool clipBorder = false}) async {
+    final result = await compute(_nextGeneration, [grid, clipBorder]);
     return result;
   }
 }

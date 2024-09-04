@@ -15,28 +15,44 @@ class GOFPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Game of Life')),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const ActionButtons(),
+          const Padding(
+            padding: EdgeInsets.all(24.0),
+            child: ActionButtons(),
+          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: InteractiveViewer(
-                  minScale: 1,
-                  maxScale: 100.0,
-                  child: RepaintBoundary(
-                    child: CustomPaint(
-                      painter: GOFPainter(
-                        context.gameEngine.stateNotifier,
-                        true,
+              padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final itemWidth = constraints.maxWidth / context.gameState.data.first.length;
+                  final itemHeight = constraints.maxHeight / context.gameState.data.length;
+                  final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
+                  final (paintWidth, paintHeight) = (
+                    context.gameState.data.first.length * itemSize,
+                    context.gameState.data.length * itemSize,
+                  );
+                  return InteractiveViewer(
+                    minScale: 1,
+                    maxScale: 100.0,
+                    child: Center(
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          painter: GOFPainter(
+                            context.gameEngine.stateNotifier,
+                            showBorder: context.gameConfig.clipOnBorder,
+                          ),
+                          size: Size(paintWidth, paintHeight),
+                        ),
                       ),
-                      size: Size.infinite,
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
-          ),
+          )
         ],
       ),
     );
@@ -69,19 +85,19 @@ class _ActionButtonsState extends State<ActionButtons> {
     await gameEngine.nextGeneration();
   }
 
-  bool showGeneration = true;
+  bool showGeneration = false;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
+    return Wrap(
+      alignment: WrapAlignment.center,
       children: [
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: isPlaying ? Colors.red : Colors.green),
           onPressed: onPlayPause,
           child: isPlaying ? const Text("Stop") : const Text("Simulate"),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(width: 16.0),
         ElevatedButton(
           onPressed: onNextGen,
           child: const Text("Next Generation "),
@@ -89,19 +105,21 @@ class _ActionButtonsState extends State<ActionButtons> {
         const SizedBox(width: 16.0),
         ValueListenableBuilder(
           valueListenable: gameEngine.stateNotifier,
-          builder: (context, value, child) => ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: showGeneration ? Colors.blue.withAlpha(70) : Colors.transparent,
-            ),
-            onPressed: () {
-              showGeneration = !showGeneration;
-              widget.showGenerationOnPlay?.call(showGeneration);
-              setState(() {});
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]"),
-            ),
+          builder: (context, value, child) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ActionChip(
+                shape: const CircleBorder(),
+                backgroundColor: showGeneration ? Colors.deepPurpleAccent : Colors.transparent,
+                onPressed: () {
+                  showGeneration = !showGeneration;
+                  gameEngine.updateState(value.copyWith(colorizeGrid: showGeneration));
+                  setState(() {});
+                },
+                label: Icon(!showGeneration ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+              ),
+              Text("Gen: ${value.generation} [${value.data.length}x${value.data[0].length}]")
+            ],
           ),
         )
       ],

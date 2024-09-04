@@ -1,13 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:game_of_life/src/presentation/utils/grid_data_extension.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
 import '../../infrastructure/infrastructure.dart';
+import '../utils/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
-  const GOFPainter(this.notifier, [this.useColorizeGeneration = false]) : super(repaint: notifier);
+  const GOFPainter(
+    this.notifier, {
+    this.showBorder = false,
+  }) : super(repaint: notifier);
 
   final GameStateValueNotifier<GOFState> notifier;
-  final bool useColorizeGeneration;
+  final bool showBorder;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -15,6 +20,7 @@ class GOFPainter extends CustomPainter {
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
     for (int y = 0; y < data.length; y++) {
       for (int x = 0; x < data[y].length; x++) {
         final currentItem = data[y][x];
@@ -28,14 +34,14 @@ class GOFPainter extends CustomPainter {
           rect,
           Paint()
             ..color = currentItem.isAlive
-                ? useColorizeGeneration
+                ? notifier.value.colorizeGrid
                     ? currentItem.color
                     : Colors.white
                 : Colors.black,
         );
 
         //add text
-        if (useColorizeGeneration && currentItem.isAlive) {
+        if (notifier.value.colorizeGrid && currentItem.isAlive) {
           final textSpan = TextSpan(
             text: currentItem.generation.toString(),
             style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
@@ -54,6 +60,15 @@ class GOFPainter extends CustomPainter {
           );
         }
       }
+    }
+
+    if (showBorder) {
+      canvas.drawRect(
+        Rect.fromLTRB(0, 0, itemSize * data.first.length, itemSize * data.length),
+        Paint()
+          ..color = Colors.green
+          ..style = PaintingStyle.stroke,
+      );
     }
   }
 
