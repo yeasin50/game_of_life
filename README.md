@@ -10,7 +10,11 @@ for more search tag `SaveBangladeshStudent`
 
 - If the cell is dead, then it springs to life only in the case that it has 3 live neighbors
 
-## Game issue
+
+![](https://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif)
+
+
+## Game issue:Fixed
 
 > In order to understand a, tried another method, now it is the same and two more issue 😐  
 > Canceled StreamController can't add event even with broadcast, then moved to ValueNotifier, seems having same. I wonder should I move to ChangeNotifier again
