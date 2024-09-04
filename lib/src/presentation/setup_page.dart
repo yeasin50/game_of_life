@@ -25,6 +25,7 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -36,6 +37,18 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Text(
+                    "Conway's Game of Life",
+                    textAlign: TextAlign.center,
+                    style: textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    "https://github.com/yeasin50/game_of_life",
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 48),
                   _InputField(
                     type: InputFiledType.cols,
                     initialValue: gameConfig.numberOfRows.toString(),

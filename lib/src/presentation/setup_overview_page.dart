@@ -60,7 +60,10 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Initial life cell")),
+      appBar: AppBar(
+        title: const Text("Draw Living Cell"),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,44 +71,52 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
+              child: Column(
                 children: [
-                  ...patterns.map(
-                    (e) => ActionChip(
-                      backgroundColor: selectedPattern == e ? Colors.pink : null,
-                      label: Text(e.name),
-                      onPressed: () => onPatternSelected(e),
-                    ),
+                  Wrap(
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: Colors.deepPurpleAccent,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => navToGameBoard(),
+                        child: const Text("Start"),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: Colors.redAccent.withAlpha(100),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          gameEngine.killCells();
+                          selectedPattern = null;
+                          setState(() {});
+                        },
+                        child: const Text("Clear"),
+                      ),
+                      const SizedBox(width: 16),
+                      const ExportGameData(),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(),
-                      backgroundColor: Colors.deepPurpleAccent,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () => navToGameBoard(),
-                    child: const Text("Start"),
+                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      ...patterns.map(
+                        (e) => ActionChip(
+                          backgroundColor: selectedPattern == e ? Colors.pink : null,
+                          label: Text(e.name),
+                          onPressed: () => onPatternSelected(e),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(),
-                      backgroundColor: Colors.redAccent.withAlpha(100),
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      gameEngine.killCells();
-                      selectedPattern = null;
-                      setState(() {});
-                    },
-                    child: const Text("Clear"),
-                  ),
-                  const SizedBox(width: 16),
-                  const ExportGameData(),
                 ],
               ),
             ),
