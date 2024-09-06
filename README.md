@@ -10,9 +10,7 @@ for more search tag `SaveBangladeshStudent`
 
 - If the cell is dead, then it springs to life only in the case that it has 3 live neighbors
 
-
 ![](https://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif)
-
 
 ## Game issue:Fixed
 

@@ -45,6 +45,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     LightWeightSpaceShip(),
     MiddleWeightSpaceShip(),
     GosperGliderGun(),
+    NewGun(),
   ];
 
   CellPattern? selectedPattern;
