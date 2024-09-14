@@ -10,11 +10,74 @@ for more search tag `SaveBangladeshStudent`
 
 - If the cell is dead, then it springs to life only in the case that it has 3 live neighbors
 
-
 ![](https://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif)
 
+<details>
+ 
+<summary> User flow</summary>
 
-## Game issue:Fixed
+```puml
+@startuml gameOfLife
+actor User
 
-> In order to understand a, tried another method, now it is the same and two more issue 😐  
-> Canceled StreamController can't add event even with broadcast, then moved to ValueNotifier, seems having same. I wonder should I move to ChangeNotifier again
+User --> (Home)
+
+(Home) --> (PreModel)
+(Home) --> (CustomPattern)
+
+
+
+note left of (PreModel)
+ List of defined models
+ - auto fill form
+ - can increase the grid size
+
+end note
+
+(PreModel) --> (FiveCellPattern)
+
+note bottom of (FiveCellPattern)
+- min space: [4x4]
+- clip: none
+end note
+
+(PreModel) --> (Glider)
+
+note bottom of (Glider)
+- min space: [4x4]
+- clip: none
+end note
+
+(PreModel) --> (LightWeightSpaceShip)
+
+note bottom of (LightWeightSpaceShip)
+- min space: [5x6]
+- clip: none
+end note
+
+(PreModel) --> (MiddleWeightSpaceShip)
+
+note bottom of (MiddleWeightSpaceShip)
+- min space: [7x7]
+- clip: none
+end note
+
+
+(CustomPattern) --> (UserForm)
+
+
+note right of (UserForm)
+
+- user can insert a predefine at a giver offset
+
+end note
+
+
+(PreModel) --> Simulate
+(UserForm) --> Simulate
+
+
+@enduml
+```
+
+</details>

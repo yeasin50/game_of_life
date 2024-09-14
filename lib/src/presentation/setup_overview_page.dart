@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../domain/cell_pattern.dart';
+import '../infrastructure/game_config.dart';
 
-import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
 import 'widgets/export_dialog.dart';
@@ -8,11 +9,20 @@ import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
 /// select initial pattern to show
 class SetUpOverviewPage extends StatefulWidget {
-  const SetUpOverviewPage._();
+  const SetUpOverviewPage._(
+    this.config,
+    this.pattern,
+  );
 
-  static MaterialPageRoute route() {
+  final GameConfig config;
+  final CellPattern? pattern;
+
+  static MaterialPageRoute route({
+    required GameConfig config,
+    CellPattern? selectedPattern,
+  }) {
     return MaterialPageRoute(
-      builder: (context) => const SetUpOverviewPage._(),
+      builder: (context) => SetUpOverviewPage._(config, selectedPattern),
     );
   }
 
@@ -26,7 +36,10 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   void initState() {
     super.initState();
     gameEngine.init(config: gameConfig).then((value) {
+      if (widget.pattern != null) gameEngine.addPattern(widget.pattern!);
+
       isLoading = false;
+
       setState(() {});
     });
   }
@@ -37,24 +50,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
       gameEngine.stopPeriodicGeneration();
       setState(() {});
     }
-  }
-
-  final patterns = [
-    FiveCellPattern(),
-    GliderPattern(),
-    LightWeightSpaceShip(),
-    MiddleWeightSpaceShip(),
-    GosperGliderGun(),
-  ];
-
-  CellPattern? selectedPattern;
-
-  void onPatternSelected(CellPattern? value) async {
-    if (value == null) return;
-    await gameEngine.killCells();
-    gameEngine.addPattern(value);
-    selectedPattern = value;
-    setState(() {});
   }
 
   @override
@@ -92,8 +87,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          gameEngine.killCells();
-                          selectedPattern = null;
                           setState(() {});
                         },
                         child: const Text("Clear"),
@@ -103,20 +96,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      ...patterns.map(
-                        (e) => ActionChip(
-                          backgroundColor: selectedPattern == e ? Colors.pink : null,
-                          label: Text(e.name),
-                          onPressed: () => onPatternSelected(e),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

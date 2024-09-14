@@ -13,6 +13,20 @@ abstract class CellPattern {
   List<GridData> get data;
   String get name;
 
+  (int y, int x) get minSpace;
+
+  bool? get clip;
+
+  ///where should I put it
+  static List<CellPattern> get all => [
+        FiveCellPattern(),
+        GliderPattern(),
+        LightWeightSpaceShip(),
+        MiddleWeightSpaceShip(),
+        GosperGliderGun(),
+        NewGun(),
+      ];
+
   static List<List<GridData>> fromDigit(List<List<double>> data) {
     List<List<GridData>> grid = [];
     for (int y = 0; y < data.length; y++) {
@@ -103,6 +117,9 @@ abstract class CellPattern {
 
 class FiveCellPattern implements CellPattern {
   @override
+  (int y, int x) get minSpace => (4, 4);
+
+  @override
   List<GridData> get data => CellPattern.fromDigit(
         [
           [0, 1, 0],
@@ -113,9 +130,15 @@ class FiveCellPattern implements CellPattern {
 
   @override
   String get name => "Five Cell";
+
+  @override
+  bool? get clip => false;
 }
 
 class GliderPattern implements CellPattern {
+  @override
+  (int y, int x) get minSpace => (4, 4);
+
   @override
   List<GridData> get data => CellPattern.fromDigit(
         [
@@ -127,10 +150,16 @@ class GliderPattern implements CellPattern {
 
   @override
   String get name => "Glider";
+
+  @override
+  bool? get clip => false;
 }
 
 /// LightWeightSpaceShip
 class LightWeightSpaceShip implements CellPattern {
+  @override
+  (int y, int x) get minSpace => (6, 5);
+
   @override
   List<GridData> get data => CellPattern.fromDigit(
         [
@@ -143,10 +172,16 @@ class LightWeightSpaceShip implements CellPattern {
 
   @override
   String get name => "LWSS";
+
+  @override
+  bool? get clip => false;
 }
 
 /// LightWeightSpaceShip
 class MiddleWeightSpaceShip implements CellPattern {
+  @override
+  (int y, int x) get minSpace => (7, 7);
+
   @override
   List<GridData> get data => CellPattern.fromDigit(
         [
@@ -160,4 +195,7 @@ class MiddleWeightSpaceShip implements CellPattern {
 
   @override
   String get name => "MWSS";
+
+  @override
+  bool? get clip => false;
 }
