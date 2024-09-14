@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
 import 'widgets/export_dialog.dart';
@@ -39,25 +38,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
-  final patterns = [
-    FiveCellPattern(),
-    GliderPattern(),
-    LightWeightSpaceShip(),
-    MiddleWeightSpaceShip(),
-    GosperGliderGun(),
-    NewGun(),
-  ];
-
-  CellPattern? selectedPattern;
-
-  void onPatternSelected(CellPattern? value) async {
-    if (value == null) return;
-    await gameEngine.killCells();
-    gameEngine.addPattern(value);
-    selectedPattern = value;
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,8 +73,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          gameEngine.killCells();
-                          selectedPattern = null;
                           setState(() {});
                         },
                         child: const Text("Clear"),
@@ -104,20 +82,6 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      ...patterns.map(
-                        (e) => ActionChip(
-                          backgroundColor: selectedPattern == e ? Colors.pink : null,
-                          label: Text(e.name),
-                          onPressed: () => onPatternSelected(e),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

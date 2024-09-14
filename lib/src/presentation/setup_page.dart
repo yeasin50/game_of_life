@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'widgets/pattern_selection_view.dart';
 
+import '../domain/cell_pattern.dart';
+import '../domain/domain.dart';
 import '../infrastructure/game_provider.dart';
 import 'setup_overview_page.dart';
 
@@ -13,15 +16,23 @@ class GameBoardSetupPage extends StatefulWidget {
   State<GameBoardSetupPage> createState() => _GameBoardSetupPageState();
 }
 
-class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
-  void navToOverViewPage() {
-    Navigator.of(context).push(SetUpOverviewPage.route());
-  }
+class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTickerProviderStateMixin {
+  late AnimationController controller = AnimationController(vsync: this, duration: Durations.medium1);
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
   }
+
+  CellPattern? selectedPattern;
+
+  void onPatternSelected(CellPattern? value) async {
+    selectedPattern = value;
+    setState(() {});
+  }
+
+  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +46,6 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
               constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     "Conway's Game of Life",
@@ -49,49 +59,66 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
                     style: textTheme.bodySmall,
                   ),
                   const SizedBox(height: 48),
-                  _InputField(
-                    type: InputFiledType.cols,
-                    initialValue: gameConfig.numberOfRows.toString(),
-                    onValueChange: (value) {
-                      final number = int.tryParse(value) ?? 0;
-                      gameConfig.numberOfRows = number;
-                      setState(() {});
-                    },
+                  SizedBox(
+                    height: 300,
+                    child: AnimatedSwitcher(
+                      duration: Durations.medium3,
+                      child: currentIndex == 1
+                          ? GameTileConfigView(selectedPattern: selectedPattern)
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                PatternSelectionView(
+                                  onChanged: onPatternSelected,
+                                  selectedPattern: selectedPattern,
+                                ),
+                                const SizedBox(height: 24),
+                                Expanded(
+                                  child: Placeholder(),
+                                )
+                              ],
+                            ),
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  _InputField(
-                    initialValue: gameConfig.numberOfCol.toString(),
-                    type: InputFiledType.rows,
-                    onValueChange: (value) {
-                      final number = int.tryParse(value) ?? 0;
-                      gameConfig.numberOfCol = number;
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  _InputField(
-                    type: InputFiledType.animDelay,
-                    initialValue: gameConfig.generationGap.inMilliseconds.toString(),
-                    onValueChange: (value) {
-                      final number = int.tryParse(value) ?? 0;
-                      gameConfig.generationGap = Duration(milliseconds: number);
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  SwitchListTile(
-                    controlAffinity: ListTileControlAffinity.leading,
-                    value: gameConfig.clipOnBorder,
-                    title: const Text("Clip on border"),
-                    onChanged: (value) async {
-                      gameConfig.clipOnBorder = value;
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: 64),
-                  ElevatedButton(
-                    onPressed: gameConfig.isValid ? navToOverViewPage : null,
-                    child: const Text('Start Game'),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 48),
+                      Stack(
+                        children: [
+                          AnimatedAlign(
+                            duration: Durations.short3,
+                            alignment: currentIndex == 0 ? Alignment.center : Alignment.centerLeft,
+                            child: IconButton.outlined(
+                              onPressed: () {
+                                controller.reverse();
+                                currentIndex = 0;
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.arrow_back_ios_new),
+                            ),
+                          ),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (currentIndex == 0) {
+                                  currentIndex = 1;
+                                  controller.forward();
+                                  setState(() {});
+                                } else if (currentIndex == 1) {
+                                  Navigator.of(context).push(SetUpOverviewPage.route());
+                                } else {
+                                  throw UnimplementedError();
+                                }
+                              },
+                              child: Text(currentIndex == 0 ? "Continue" : 'Start Game'),
+                            ),
+                          ),
+                          const SizedBox(),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -99,6 +126,74 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class GameTileConfigView extends StatefulWidget {
+  const GameTileConfigView({
+    super.key,
+    required this.selectedPattern,
+  });
+  final CellPattern? selectedPattern;
+
+  @override
+  State<GameTileConfigView> createState() => _GameTileConfigViewState();
+}
+
+class _GameTileConfigViewState extends State<GameTileConfigView> {
+  late final TextEditingController nbColumnController;
+  late final TextEditingController nbRowController;
+  late final TextEditingController animationDelayController;
+
+  int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 50;
+  int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
+
+  @override
+  void initState() {
+    super.initState();
+    nbColumnController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfCol.toString()));
+    nbRowController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfRows.toString()));
+    animationDelayController = TextEditingController.fromValue(//
+        TextEditingValue(text: gameConfig.generationGap.inMilliseconds.toString()));
+  }
+
+  @override
+  void dispose() {
+    nbColumnController.dispose();
+    nbRowController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _InputField(
+          type: InputFiledType.cols,
+          controller: nbColumnController,
+        ),
+        const SizedBox(height: 24),
+        _InputField(
+          type: InputFiledType.rows,
+          controller: nbRowController,
+        ),
+        const SizedBox(height: 24),
+        _InputField(
+          type: InputFiledType.animDelay,
+          controller: animationDelayController,
+        ),
+        const SizedBox(height: 16),
+        SwitchListTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          value: gameConfig.clipOnBorder,
+          title: const Text("Clip on border"),
+          onChanged: (value) async {
+            gameConfig.clipOnBorder = value;
+            setState(() {});
+          },
+        ),
+      ],
     );
   }
 }
@@ -120,34 +215,29 @@ extension InputFiledTypeExt on InputFiledType {
 class _InputField extends StatelessWidget {
   const _InputField({
     required this.type,
-    required this.onValueChange,
-    required this.initialValue,
+    required this.controller,
   });
 
   final InputFiledType type;
-  final ValueChanged<String> onValueChange;
-  final String initialValue;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
-      initialValue: initialValue,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: type.label,
         border: const OutlineInputBorder(),
       ),
       autovalidateMode: AutovalidateMode.always,
+      controller: controller,
       validator: (value) {
         if (value == null || value.isEmpty) return 'Required field';
         int number = int.tryParse(value) ?? 0;
         if (number <= 0) return 'Value must be greater than 0';
         return null;
-      },
-      onChanged: (v) {
-        onValueChange(v);
       },
     );
   }

@@ -47,4 +47,7 @@ class GosperGliderGun implements CellPattern {
 
   @override
   String get name => "Gosper glider gun";
+
+  @override
+  (int, int) get minSpace => (30, 30);
 }

@@ -4,6 +4,8 @@ import 'domain.dart';
 ///
 class NewGun extends CellPattern {
   @override
+  (int y, int x) get minSpace => (20, 50);
+  @override
   List<GridData> get data {
     List<List<int>> result = [];
 
