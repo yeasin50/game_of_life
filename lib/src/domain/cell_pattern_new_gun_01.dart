@@ -4,7 +4,7 @@ import 'domain.dart';
 ///
 class NewGun extends CellPattern {
   @override
-  (int y, int x) get minSpace => (20, 50);
+  (int y, int x) get minSpace => (20, 49);
   @override
   List<GridData> get data {
     List<List<int>> result = [];
@@ -73,4 +73,7 @@ class NewGun extends CellPattern {
 
   @override
   String get name => "New gun 1";
+
+  @override
+  bool? get clip => true;
 }

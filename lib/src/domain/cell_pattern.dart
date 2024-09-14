@@ -15,6 +15,8 @@ abstract class CellPattern {
 
   (int y, int x) get minSpace;
 
+  bool? get clip;
+
   ///where should I put it
   static List<CellPattern> get all => [
         FiveCellPattern(),
@@ -128,6 +130,9 @@ class FiveCellPattern implements CellPattern {
 
   @override
   String get name => "Five Cell";
+
+  @override
+  bool? get clip => false;
 }
 
 class GliderPattern implements CellPattern {
@@ -145,6 +150,9 @@ class GliderPattern implements CellPattern {
 
   @override
   String get name => "Glider";
+
+  @override
+  bool? get clip => false;
 }
 
 /// LightWeightSpaceShip
@@ -164,6 +172,9 @@ class LightWeightSpaceShip implements CellPattern {
 
   @override
   String get name => "LWSS";
+
+  @override
+  bool? get clip => false;
 }
 
 /// LightWeightSpaceShip
@@ -184,4 +195,7 @@ class MiddleWeightSpaceShip implements CellPattern {
 
   @override
   String get name => "MWSS";
+
+  @override
+  bool? get clip => false;
 }

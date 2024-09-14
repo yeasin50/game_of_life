@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../domain/cell_pattern.dart';
+import '../infrastructure/game_config.dart';
 
 import '../infrastructure/game_provider.dart';
 import 'gof_life_page.dart';
@@ -7,11 +9,20 @@ import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
 /// select initial pattern to show
 class SetUpOverviewPage extends StatefulWidget {
-  const SetUpOverviewPage._();
+  const SetUpOverviewPage._(
+    this.config,
+    this.pattern,
+  );
 
-  static MaterialPageRoute route() {
+  final GameConfig config;
+  final CellPattern? pattern;
+
+  static MaterialPageRoute route({
+    required GameConfig config,
+    CellPattern? selectedPattern,
+  }) {
     return MaterialPageRoute(
-      builder: (context) => const SetUpOverviewPage._(),
+      builder: (context) => SetUpOverviewPage._(config, selectedPattern),
     );
   }
 
@@ -25,7 +36,10 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   void initState() {
     super.initState();
     gameEngine.init(config: gameConfig).then((value) {
+      if (widget.pattern != null) gameEngine.addPattern(widget.pattern!);
+
       isLoading = false;
+
       setState(() {});
     });
   }

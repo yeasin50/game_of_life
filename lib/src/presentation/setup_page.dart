@@ -29,6 +29,7 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
 
   void onPatternSelected(CellPattern? value) async {
     selectedPattern = value;
+    gameConfig.clipOnBorder = value?.clip ?? false;
     setState(() {});
   }
 
@@ -74,9 +75,7 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                                   selectedPattern: selectedPattern,
                                 ),
                                 const SizedBox(height: 24),
-                                Expanded(
-                                  child: Placeholder(),
-                                )
+                                const Expanded(child: Placeholder())
                               ],
                             ),
                     ),
@@ -107,7 +106,12 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                                   controller.forward();
                                   setState(() {});
                                 } else if (currentIndex == 1) {
-                                  Navigator.of(context).push(SetUpOverviewPage.route());
+                                  Navigator.of(context).push(
+                                    SetUpOverviewPage.route(
+                                      selectedPattern: selectedPattern,
+                                      config: gameConfig, //!ignore for now
+                                    ),
+                                  );
                                 } else {
                                   throw UnimplementedError();
                                 }
@@ -148,6 +152,7 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
 
   int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 50;
   int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
+  Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
 
   @override
   void initState() {
@@ -156,6 +161,10 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
     nbRowController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfRows.toString()));
     animationDelayController = TextEditingController.fromValue(//
         TextEditingValue(text: gameConfig.generationGap.inMilliseconds.toString()));
+
+    nbColumnController.addListener(() => gameConfig.numberOfCol = getNBColumn);
+    nbRowController.addListener(() => gameConfig.numberOfRows = getNBRow);
+    animationDelayController.addListener(() => gameConfig.generationGap = generationGap);
   }
 
   @override
@@ -171,10 +180,12 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
       children: [
         _InputField(
           type: InputFiledType.cols,
+          minValue: widget.selectedPattern?.minSpace.$2 ?? 3,
           controller: nbColumnController,
         ),
         const SizedBox(height: 24),
         _InputField(
+          minValue: widget.selectedPattern?.minSpace.$1 ?? 3,
           type: InputFiledType.rows,
           controller: nbRowController,
         ),
@@ -182,16 +193,19 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
         _InputField(
           type: InputFiledType.animDelay,
           controller: animationDelayController,
+          minValue: 0,
         ),
         const SizedBox(height: 16),
         SwitchListTile(
           controlAffinity: ListTileControlAffinity.leading,
           value: gameConfig.clipOnBorder,
           title: const Text("Clip on border"),
-          onChanged: (value) async {
-            gameConfig.clipOnBorder = value;
-            setState(() {});
-          },
+          onChanged: widget.selectedPattern == null
+              ? (value) async {
+                  gameConfig.clipOnBorder = value;
+                  setState(() {});
+                }
+              : null,
         ),
       ],
     );
@@ -216,10 +230,12 @@ class _InputField extends StatelessWidget {
   const _InputField({
     required this.type,
     required this.controller,
+    required this.minValue,
   });
 
   final InputFiledType type;
   final TextEditingController controller;
+  final int minValue;
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +252,8 @@ class _InputField extends StatelessWidget {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Required field';
         int number = int.tryParse(value) ?? 0;
-        if (number <= 0) return 'Value must be greater than 0';
+
+        if (number <= minValue) return 'Value must be greater than  $minValue';
         return null;
       },
     );

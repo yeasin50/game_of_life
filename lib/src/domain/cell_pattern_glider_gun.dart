@@ -50,4 +50,7 @@ class GosperGliderGun implements CellPattern {
 
   @override
   (int, int) get minSpace => (30, 30);
+
+  @override
+  bool? get clip => true;
 }
