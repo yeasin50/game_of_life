@@ -36,7 +36,7 @@ class GOFPainter extends CustomPainter {
             ..color = currentItem.isAlive
                 ? notifier.value.colorizeGrid
                     ? currentItem.color
-                    : Colors.white
+                    : const Color(0xFF39ff14)
                 : Colors.black,
         );
 
@@ -66,8 +66,9 @@ class GOFPainter extends CustomPainter {
       canvas.drawRect(
         Rect.fromLTRB(0, 0, itemSize * data.first.length, itemSize * data.length),
         Paint()
-          ..color = Colors.green
-          ..style = PaintingStyle.stroke,
+          ..color = Colors.redAccent
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = .5,
       );
     }
   }

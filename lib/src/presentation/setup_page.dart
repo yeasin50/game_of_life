@@ -19,6 +19,8 @@ class GameBoardSetupPage extends StatefulWidget {
 class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTickerProviderStateMixin {
   late AnimationController controller = AnimationController(vsync: this, duration: Durations.medium1);
 
+  late final formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     controller.dispose();
@@ -65,7 +67,10 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                     child: AnimatedSwitcher(
                       duration: Durations.medium3,
                       child: currentIndex == 1
-                          ? GameTileConfigView(selectedPattern: selectedPattern)
+                          ? Form(
+                              key: formKey,
+                              child: GameTileConfigView(selectedPattern: selectedPattern),
+                            )
                           : Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -106,6 +111,9 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                                   controller.forward();
                                   setState(() {});
                                 } else if (currentIndex == 1) {
+                                  if (formKey.currentState?.validate() == false) {
+                                    return;
+                                  }
                                   Navigator.of(context).push(
                                     SetUpOverviewPage.route(
                                       selectedPattern: selectedPattern,

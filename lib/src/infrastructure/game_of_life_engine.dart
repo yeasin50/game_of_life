@@ -93,10 +93,10 @@ class GameOfLifeEngine {
     if (currentData.isEmpty || currentData.length < 5 || currentData[0].length < 5) return;
 
     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
+    bool isLargeModel = pattern is GosperGliderGun || pattern is NewGun;
     final patternData = pattern.setPosition(
-      //FIXME:: consider the pattern size ; CenterOffset-(patternSize/2)
-      x: 1,
-      y: 1,
+      x: isLargeModel ? 1 : midPosition.$2,
+      y: isLargeModel ? 1 : midPosition.$1,
     );
 
     for (final c in patternData) {
