@@ -1,3 +1,4 @@
+import 'cell_patterns/m1.dart';
 import 'domain.dart';
 
 import "dart:math" as math;
@@ -25,6 +26,7 @@ abstract class CellPattern {
         MiddleWeightSpaceShip(),
         GosperGliderGun(),
         NewGun(),
+        // MyCellPattern(),
       ];
 
   static List<List<GridData>> fromDigit(List<List<double>> data) {

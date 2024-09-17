@@ -71,17 +71,9 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                               key: formKey,
                               child: GameTileConfigView(selectedPattern: selectedPattern),
                             )
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                PatternSelectionView(
-                                  onChanged: onPatternSelected,
-                                  selectedPattern: selectedPattern,
-                                ),
-                                const SizedBox(height: 24),
-                                const Expanded(child: Placeholder())
-                              ],
+                          : PatternSelectionView(
+                              onChanged: onPatternSelected,
+                              selectedPattern: selectedPattern,
                             ),
                     ),
                   ),

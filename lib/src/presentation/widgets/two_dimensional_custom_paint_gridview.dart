@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_of_life/src/infrastructure/game_provider.dart';
+import 'package:game_of_life/src/presentation/widgets/gof_life_guideline_paint.dart';
 import 'dart:math' as math;
 import 'gof_painter.dart';
 
@@ -54,8 +55,10 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
               onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
               child: RepaintBoundary(
                 child: CustomPaint(
+                  isComplex: true,
                   size: Size(paintWidth, paintHeight),
                   key: const ValueKey("simulation user painter"),
+                  foregroundPainter: GuideLinePainter(separator: 5, itemSize: itemSize),
                   painter: GOFPainter(
                     context.gameEngine.stateNotifier,
                     showBorder: context.gameConfig.clipOnBorder,

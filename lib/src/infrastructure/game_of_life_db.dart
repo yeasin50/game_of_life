@@ -170,8 +170,6 @@ class GameOfLifeDataBase {
     return switch (surroundLifeCount.where((e) => e).length) {
       3 => true,
       2 => c.isAlive,
-      < 2 => false,
-      > 3 => false,
       _ => false,
     };
   }
