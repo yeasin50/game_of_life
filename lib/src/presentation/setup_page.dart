@@ -33,6 +33,14 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
     selectedPattern = value;
     gameConfig.clipOnBorder = value?.clip ?? false;
     setState(() {});
+    if (value != null) {
+      if (gameConfig.numberOfCol < value.minSpace.$2) {
+        gameConfig.numberOfCol = value.minSpace.$2 + 2;
+      }
+      if (gameConfig.numberOfRows < value.minSpace.$1) {
+        gameConfig.numberOfRows = value.minSpace.$1 + 2;
+      }
+    }
   }
 
   int currentIndex = 0;

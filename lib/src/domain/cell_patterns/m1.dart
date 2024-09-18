@@ -1,6 +1,6 @@
 import '../domain.dart';
 
-class MyCellPattern implements CellPattern {
+class M1CellPattern implements CellPattern {
   @override
   List<GridData> get data => CellPattern.fromDigit([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -36,11 +36,11 @@ class MyCellPattern implements CellPattern {
       ]).expand((e) => e).toList();
 
   @override
-  String get name => "MyCellPattern";
+  String get name => "M1";
 
   @override
   bool? get clip => false;
 
   @override
-  (int, int) get minSpace => (32, 32);
+  (int, int) get minSpace => (36, 36);
 }

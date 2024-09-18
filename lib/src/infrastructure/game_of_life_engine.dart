@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:game_of_life/src/domain/cell_patterns/cell_patterns.dart';
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
+import '../domain/cell_patterns/m1.dart';
 import '../domain/domain.dart';
 
 class GameOfLifeEngine {
@@ -93,10 +95,11 @@ class GameOfLifeEngine {
     if (currentData.isEmpty || currentData.length < 5 || currentData[0].length < 5) return;
 
     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
-    bool isLargeModel = pattern is GosperGliderGun || pattern is NewGun;
+    bool startOnTop = pattern is NewGun;
+
     final patternData = pattern.setPosition(
-      x: isLargeModel ? 1 : midPosition.$2,
-      y: isLargeModel ? 1 : midPosition.$1,
+      x: startOnTop ? 1 : midPosition.$2 - pattern.midPoint.$2,
+      y: startOnTop ? 3 : midPosition.$1 - pattern.midPoint.$1,
     );
 
     for (final c in patternData) {
