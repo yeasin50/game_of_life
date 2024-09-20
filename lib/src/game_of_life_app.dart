@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'infrastructure/game_provider.dart';
-import 'presentation/setup_page.dart';
+import 'presentation/game_setup/setup_page.dart';
 
 class GameOfLifeApp extends StatefulWidget {
   const GameOfLifeApp({super.key});

@@ -14,9 +14,9 @@ class GuideLinePainter extends CustomPainter {
       final linePainter = Paint()
         ..color = const Color.fromARGB(255, 122, 144, 154)
         ..strokeWidth = .2;
-
+      final dividerGap = (itemSize * .1);
       for (int y = separator; y < size.width; y += separator) {
-        final x = itemSize * y.toDouble() - .5;
+        final x = itemSize * y.toDouble() - dividerGap;
         canvas.drawLine(
           Offset(x, 0),
           Offset(x, size.height),

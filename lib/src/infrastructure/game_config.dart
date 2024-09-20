@@ -19,5 +19,12 @@ class GameConfig {
   /// if false, the borderSide will calculate the opposite cell
   bool clipOnBorder;
 
-  bool get isValid => numberOfCol > 0 && numberOfRows > 0 && generationGap.inMilliseconds > 0;
+  /// maintain the pixel clarity `logicalSize` on simulation play ground,
+  ///
+  /// if we have large number of grids, reduce the value
+  ///
+  /// ! expensive
+  double paintClarity = 1.0;
+
+  bool get isValid => numberOfCol > 0 && numberOfRows > 0 && generationGap.inMilliseconds > -1;
 }

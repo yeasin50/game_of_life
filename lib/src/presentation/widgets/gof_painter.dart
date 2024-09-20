@@ -21,14 +21,16 @@ class GOFPainter extends CustomPainter {
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
 
+    final dividerGap = (itemSize * .1);
+
     for (int y = 0; y < data.length; y++) {
       for (int x = 0; x < data[y].length; x++) {
         final currentItem = data[y][x];
         final rect = Rect.fromLTWH(
           x * itemSize,
           y * itemSize,
-          itemSize - 1,
-          itemSize - 1,
+          itemSize - dividerGap,
+          itemSize - dividerGap,
         );
         canvas.drawRect(
           rect,

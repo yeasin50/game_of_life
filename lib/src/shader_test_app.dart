@@ -28,8 +28,10 @@ class _ShaderTestAppState extends State<ShaderTestApp> {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasError) {
           return Directionality(
             textDirection: TextDirection.ltr,
-            child: Text(
-              snapshot.error.toString(),
+            child: SingleChildScrollView(
+              child: Text(
+                snapshot.error.toString(),
+              ),
             ),
           );
         }
@@ -94,19 +96,13 @@ class GofShaderPaint extends CustomPainter {
     shader.setFloat(7, itemSize);
 
     Color liveColor = Colors.green;
-    Color deadColor = Colors.transparent;
+    Color deadColor = const Color.fromARGB(255, 0, 238, 255);
 
-    for (int i = 8; i < 8 + (100 * 3); i += 3) {
-      if (i.isEven) {
-        shader.setFloat(i, deadColor.red.toDouble() / 255);
-        shader.setFloat(i + 1, deadColor.green.toDouble() / 255);
-        shader.setFloat(i + 2, deadColor.blue.toDouble() / 255);
-      } else {
-        shader.setFloat(i, liveColor.red.toDouble() / 255);
-        shader.setFloat(i + 1, liveColor.green.toDouble() / 255);
-        shader.setFloat(i + 2, liveColor.blue.toDouble() / 255);
-      }
+    for (int i = 8; i < (8 + (2 * 5)); i += 3) {
+      shader.setFloat(i, i.isEven ? 0.0 : 1.0);
+      shader.setFloat(i, i.isEven ? 0.0 : 1.0);
     }
+
     canvas.drawRect(
       Rect.fromLTRB(0, 0, size.width, size.height),
       Paint()..shader = shader,

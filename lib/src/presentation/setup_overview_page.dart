@@ -3,7 +3,7 @@ import '../domain/cell_pattern.dart';
 import '../infrastructure/game_config.dart';
 
 import '../infrastructure/game_provider.dart';
-import 'gof_life_page.dart';
+import 'simulation/gof_life_page.dart';
 import 'widgets/export_dialog.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
