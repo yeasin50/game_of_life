@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
 import '../../infrastructure/game_provider.dart';
-import '../utils/widget_to_image.dart';
-import '../widgets/gof_painter.dart';
+import '../../infrastructure/widget_to_image.dart';
 import 'game_play_action_view.dart';
 
 class GOFPage extends StatelessWidget {
@@ -42,7 +40,6 @@ class GOFPage extends StatelessWidget {
                     context.gameState.data.first.length * itemSize,
                     context.gameState.data.length * itemSize,
                   );
-                  print(context.gameConfig.paintClarity);
                   return InteractiveViewer(
                     minScale: 1,
                     maxScale: 100.0,
@@ -71,32 +68,17 @@ class PaintWidgetBuilder extends StatefulWidget {
   State<PaintWidgetBuilder> createState() => _PaintWidgetBuilderState();
 }
 
-class _PaintWidgetBuilderState extends State<PaintWidgetBuilder> {
-  Size? canvasSize;
-  Uint8List? imageData, prevImageData;
+class _PaintWidgetBuilderState extends State<PaintWidgetBuilder> with GameOfLifeSimulationMixin {
+  Widget? child;
 
   void refreshPaint() async {
-    imageData = await createImageFromWidget(
-        context,
-        CustomPaint(
-          painter: GOFPainter(
-            gameEngine.stateNotifier,
-            showBorder: gameConfig.clipOnBorder,
-          ),
-          size: widget.size,
-        ));
-
+    child = await buildImage(context);
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    scheduleMicrotask(() {
-      canvasSize = context.size;
-      refreshPaint();
-      gameEngine.stateNotifier.addListener(refreshPaint);
-    });
   }
 
   @override
@@ -107,13 +89,6 @@ class _PaintWidgetBuilderState extends State<PaintWidgetBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return imageData == null
-        ? const CircularProgressIndicator()
-        : Image(
-            image: MemoryImage(
-              imageData!,
-            ),
-            gaplessPlayback: true,
-          );
+    return child == null ? const CircularProgressIndicator() : child!;
   }
 }
