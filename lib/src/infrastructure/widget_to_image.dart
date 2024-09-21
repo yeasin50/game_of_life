@@ -3,36 +3,40 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:game_of_life/src/infrastructure/game_provider.dart';
+import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../presentation/widgets/gof_painter.dart';
 
-mixin GameOfLifeSimulationMixin {
+class GameOfLifeSimulationCanvas {
   Size? _canvasSize;
-  void init(Size size) {
+  late BuildContext _context; // how can I skip it
+
+  void setCanvas(BuildContext context, Size size) {
+    _context = context;
     _canvasSize = size;
   }
 
-  Future<Widget> buildImage(BuildContext context) async {
+  Future<ui.Image> buildImage(GameStateValueNotifier<GOFState> notifier, GameConfig config) async {
     if (_canvasSize == null) {
       throw Exception("Canvas size must be initialized before loading images");
     }
-    ui.Image? image = await createImageFromWidget(
-      context,
+    ui.Image? image = await _createImageFromWidget(
+      _context,
       RepaintBoundary(
         child: CustomPaint(
             painter: GOFPainter(
-              context.gameEngine.stateNotifier,
-              showBorder: context.gameConfig.clipOnBorder,
+              notifier,
+              showBorder: config.clipOnBorder,
             ),
             size: _canvasSize!),
       ),
     );
 
-    return RawImage(image: image);
+    return image!;
   }
 }
 
-Future<ui.Image?> createImageFromWidget(
+Future<ui.Image?> _createImageFromWidget(
   BuildContext context,
   Widget widget, {
   Size? logicalSize,
@@ -80,7 +84,6 @@ Future<ui.Image?> createImageFromWidget(
     ..flushPaint();
 
   final image = await repaintBoundary.toImage(pixelRatio: imageSize.width / logicalSize.width);
-  // final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
   return image;
 }

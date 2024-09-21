@@ -10,7 +10,9 @@ class GOFPainter extends CustomPainter {
     this.notifier, {
     this.showBorder = false,
   }) : super(repaint: notifier);
+  
 
+  ///TODO: change to dataOnly
   final GameStateValueNotifier<GOFState> notifier;
   final bool showBorder;
 

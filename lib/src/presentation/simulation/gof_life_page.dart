@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../infrastructure/game_provider.dart';
@@ -40,12 +38,31 @@ class GOFPage extends StatelessWidget {
                     context.gameState.data.first.length * itemSize,
                     context.gameState.data.length * itemSize,
                   );
+
+                  final canvasSize = Size(paintWidth, paintHeight) * context.gameConfig.paintClarity;
+
+                  context.gameEngine.setCanvas(context, canvasSize);
+
                   return InteractiveViewer(
                     minScale: 1,
                     maxScale: 100.0,
                     child: Center(
-                      child: PaintWidgetBuilder(
-                        size: Size(paintWidth, paintHeight) * context.gameConfig.paintClarity,
+                      child: ListenableBuilder(
+                        listenable: context.gameEngine.stateNotifier,
+                        builder: (context, child) {
+                          final canvasImage = context.gameState.canvas;
+                          return SizedBox.fromSize(
+                            key: const ValueKey("gameOfLife_canvas"),
+                            size: canvasSize,
+                            child: canvasImage == null
+                                ? const CircularProgressIndicator()
+                                : RawImage(
+                                    height: canvasSize.height,
+                                    width: canvasSize.width,
+                                    image: canvasImage,
+                                  ),
+                          );
+                        },
                       ),
                     ),
                   );
@@ -56,39 +73,5 @@ class GOFPage extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class PaintWidgetBuilder extends StatefulWidget {
-  const PaintWidgetBuilder({super.key, required this.size});
-
-  final Size size;
-
-  @override
-  State<PaintWidgetBuilder> createState() => _PaintWidgetBuilderState();
-}
-
-class _PaintWidgetBuilderState extends State<PaintWidgetBuilder> with GameOfLifeSimulationMixin {
-  Widget? child;
-
-  void refreshPaint() async {
-    child = await buildImage(context);
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    gameEngine.stateNotifier.removeListener(refreshPaint);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return child == null ? const CircularProgressIndicator() : child!;
   }
 }

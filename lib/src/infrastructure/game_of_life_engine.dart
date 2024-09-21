@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:game_of_life/src/domain/cell_patterns/cell_patterns.dart';
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
-import '../domain/cell_patterns/m1.dart';
 import '../domain/domain.dart';
+import 'widget_to_image.dart';
 
-class GameOfLifeEngine {
+class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   GameOfLifeEngine({required this.cellDB, required this.config});
 
   final GameOfLifeDataBase cellDB;
@@ -23,6 +22,7 @@ class GameOfLifeEngine {
 
   bool _isReady = false;
   bool get isReady => _isReady;
+
   Future<void> init({
     required GameConfig config,
   }) async {
@@ -36,6 +36,12 @@ class GameOfLifeEngine {
     );
     _gofState.update(GOFState(grids, 0));
     _isReady = true;
+  }
+
+  /// only used for simulation
+  Future<void> _notifyCanvas(GOFState newState) async {
+    final canvas = await buildImage(GameStateValueNotifier(newState), config);
+    _gofState.update(newState.copyWith(canvas: canvas));
   }
 
   Future<void> dispose() async {
@@ -57,9 +63,8 @@ class GameOfLifeEngine {
 
   Future<void> nextGeneration() async {
     final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
-    _gofState.update(
-      GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid),
-    );
+    final newState = GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid);
+    await _notifyCanvas(newState);
     isOnPeriodicProgress = false;
   }
 
