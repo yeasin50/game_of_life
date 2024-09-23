@@ -4,15 +4,29 @@ import '../../infrastructure/game_provider.dart';
 import '../../infrastructure/widget_to_image.dart';
 import 'game_play_action_view.dart';
 
-class GOFPage extends StatelessWidget {
+class GOFPage extends StatefulWidget {
   const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
   static MaterialPageRoute route() {
-    return MaterialPageRoute(builder: (context) => const GOFPage._());
+    return MaterialPageRoute(
+      builder: (context) => const GOFPage._(),
+    );
+  }
+
+  @override
+  State<GOFPage> createState() => _GOFPageState();
+}
+
+class _GOFPageState extends State<GOFPage> {
+  @override
+  void initState() {
+    super.initState();
+    gameEngine.nextGeneration();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("rebuild");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game of Life'),
@@ -55,7 +69,7 @@ class GOFPage extends StatelessWidget {
                             key: const ValueKey("gameOfLife_canvas"),
                             size: canvasSize,
                             child: canvasImage == null
-                                ? const CircularProgressIndicator()
+                                ? const Center(child: CircularProgressIndicator())
                                 : RawImage(
                                     height: canvasSize.height,
                                     width: canvasSize.width,

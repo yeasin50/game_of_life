@@ -23,7 +23,7 @@ class GOFState {
   final ui.Image? canvas;
 
   GOFState copyWith(
-      {List<List<GridData>>? data, int? generation, bool? isLoading, bool? colorizeGrid, ui.Image? canvas}) {
+      {List<List<GridData>>? data, int? generation, bool? isLoading, bool? colorizeGrid, ui.Image? canvas,}) {
     return GOFState(
       data ?? this.data,
       generation ?? this.generation,
