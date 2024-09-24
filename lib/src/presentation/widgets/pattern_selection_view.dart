@@ -52,6 +52,7 @@ class _PatternSelectionViewState extends State<PatternSelectionView> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Wrap(
           spacing: 8,

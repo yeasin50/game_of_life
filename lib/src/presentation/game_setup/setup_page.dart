@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'widgets/pattern_selection_view.dart';
+import '../widgets/pattern_selection_view.dart';
 
-import '../domain/cell_pattern.dart';
-import '../domain/domain.dart';
-import '../infrastructure/game_provider.dart';
-import 'setup_overview_page.dart';
+import '../../domain/cell_pattern.dart';
+import '../../domain/domain.dart';
+import '../../infrastructure/game_provider.dart';
+import '../setup_overview_page.dart';
+import 'widgets/game_config_tile.dart';
 
 /// - decide number of Rows and Columns
 /// - decide generation delay
@@ -71,7 +72,7 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                   ),
                   const SizedBox(height: 48),
                   SizedBox(
-                    height: 300,
+                    height: 350, //FIXME:remove,
                     child: AnimatedSwitcher(
                       duration: Durations.medium3,
                       child: currentIndex == 1
@@ -138,132 +139,6 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
           ),
         ),
       ),
-    );
-  }
-}
-
-class GameTileConfigView extends StatefulWidget {
-  const GameTileConfigView({
-    super.key,
-    required this.selectedPattern,
-  });
-  final CellPattern? selectedPattern;
-
-  @override
-  State<GameTileConfigView> createState() => _GameTileConfigViewState();
-}
-
-class _GameTileConfigViewState extends State<GameTileConfigView> {
-  late final TextEditingController nbColumnController;
-  late final TextEditingController nbRowController;
-  late final TextEditingController animationDelayController;
-
-  int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 50;
-  int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
-  Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
-
-  @override
-  void initState() {
-    super.initState();
-    nbColumnController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfCol.toString()));
-    nbRowController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfRows.toString()));
-    animationDelayController = TextEditingController.fromValue(//
-        TextEditingValue(text: gameConfig.generationGap.inMilliseconds.toString()));
-
-    nbColumnController.addListener(() => gameConfig.numberOfCol = getNBColumn);
-    nbRowController.addListener(() => gameConfig.numberOfRows = getNBRow);
-    animationDelayController.addListener(() => gameConfig.generationGap = generationGap);
-  }
-
-  @override
-  void dispose() {
-    nbColumnController.dispose();
-    nbRowController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _InputField(
-          type: InputFiledType.cols,
-          minValue: widget.selectedPattern?.minSpace.$2 ?? 3,
-          controller: nbColumnController,
-        ),
-        const SizedBox(height: 24),
-        _InputField(
-          minValue: widget.selectedPattern?.minSpace.$1 ?? 3,
-          type: InputFiledType.rows,
-          controller: nbRowController,
-        ),
-        const SizedBox(height: 24),
-        _InputField(
-          type: InputFiledType.animDelay,
-          controller: animationDelayController,
-          minValue: 0,
-        ),
-        const SizedBox(height: 16),
-        SwitchListTile(
-          controlAffinity: ListTileControlAffinity.leading,
-          value: gameConfig.clipOnBorder,
-          title: const Text("Clip on border"),
-          onChanged: widget.selectedPattern == null
-              ? (value) async {
-                  gameConfig.clipOnBorder = value;
-                  setState(() {});
-                }
-              : null,
-        ),
-      ],
-    );
-  }
-}
-
-enum InputFiledType {
-  rows,
-  cols,
-  animDelay;
-}
-
-extension InputFiledTypeExt on InputFiledType {
-  String get label => switch (this) {
-        InputFiledType.rows => 'Nb of Rows',
-        InputFiledType.cols => 'Nb of Columns',
-        InputFiledType.animDelay => 'anim delay (in ms)',
-      };
-}
-
-class _InputField extends StatelessWidget {
-  const _InputField({
-    required this.type,
-    required this.controller,
-    required this.minValue,
-  });
-
-  final InputFiledType type;
-  final TextEditingController controller;
-  final int minValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      textAlign: TextAlign.center,
-      textAlignVertical: TextAlignVertical.center,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: type.label,
-        border: const OutlineInputBorder(),
-      ),
-      autovalidateMode: AutovalidateMode.always,
-      controller: controller,
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Required field';
-        int number = int.tryParse(value) ?? 0;
-
-        if (number <= minValue) return 'Value must be greater than  $minValue';
-        return null;
-      },
     );
   }
 }

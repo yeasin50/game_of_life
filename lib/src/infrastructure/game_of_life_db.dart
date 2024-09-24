@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 
 import '../domain/grid_data.dart';
@@ -9,6 +11,7 @@ class GOFState {
     this.data,
     this.generation, {
     this.colorizeGrid = false,
+    this.canvas,
   });
 
   const GOFState.empty() : this(const [], 0);
@@ -17,16 +20,15 @@ class GOFState {
   final int generation;
   final bool colorizeGrid;
 
-  GOFState copyWith({
-    List<List<GridData>>? data,
-    int? generation,
-    bool? isLoading,
-    bool? colorizeGrid,
-  }) {
+  final ui.Image? canvas;
+
+  GOFState copyWith(
+      {List<List<GridData>>? data, int? generation, bool? isLoading, bool? colorizeGrid, ui.Image? canvas}) {
     return GOFState(
       data ?? this.data,
       generation ?? this.generation,
       colorizeGrid: colorizeGrid ?? this.colorizeGrid,
+      canvas: canvas ?? this.canvas,
     );
   }
 }
