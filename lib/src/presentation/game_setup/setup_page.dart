@@ -72,7 +72,7 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
                   ),
                   const SizedBox(height: 48),
                   SizedBox(
-                    height: 350, //FIXME:remove,
+                    height: 450,
                     child: AnimatedSwitcher(
                       duration: Durations.medium3,
                       child: currentIndex == 1

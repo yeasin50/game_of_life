@@ -1,16 +1,36 @@
 import 'dart:math' as math;
-
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 
 import '../domain/grid_data.dart';
 
+class CanvasData {
+  ///   for [image.drawRawAtlas]
+  const CanvasData({
+    this.image,
+    required this.rect,
+    required this.colors,
+    required this.transform,
+  });
+
+  final ui.Image? image;
+  final List<ui.Rect> rect;
+  final List<ui.Color> colors;
+  final List<ui.RSTransform> transform;
+
+  @override
+  String toString() {
+    return 'CanvasData(image: ${image?.height} x ${image?.width}, rect: ${rect.length}, colors: ${colors.length}, transform: ${transform.length})';
+  }
+}
+
 class GOFState {
   const GOFState(
     this.data,
     this.generation, {
     this.colorizeGrid = false,
+    this.rawImageData,
     this.canvas,
   });
 
@@ -20,15 +40,23 @@ class GOFState {
   final int generation;
   final bool colorizeGrid;
 
-  final ui.Image? canvas;
+  final CanvasData? canvas;
+  final ui.Image? rawImageData;
 
-  GOFState copyWith(
-      {List<List<GridData>>? data, int? generation, bool? isLoading, bool? colorizeGrid, ui.Image? canvas,}) {
+  GOFState copyWith({
+    List<List<GridData>>? data,
+    int? generation,
+    bool? isLoading,
+    bool? colorizeGrid,
+    CanvasData? canvas,
+    ui.Image? rawImageData,
+  }) {
     return GOFState(
       data ?? this.data,
       generation ?? this.generation,
       colorizeGrid: colorizeGrid ?? this.colorizeGrid,
       canvas: canvas ?? this.canvas,
+      rawImageData: rawImageData ?? this.rawImageData,
     );
   }
 }

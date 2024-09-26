@@ -7,6 +7,7 @@ class GameConfig {
     required this.numberOfRows,
     this.generationGap = _defaultGenerationDelay,
     required this.clipOnBorder,
+    this.gridSize,
   });
 
   //I was thinking does it makes more sense to have immutable class
@@ -25,6 +26,10 @@ class GameConfig {
   ///
   /// ! expensive
   double paintClarity = 1.0;
+
+  double isolateCounter = 1;
+
+  double? gridSize;
 
   bool get isValid => numberOfCol > 0 && numberOfRows > 0 && generationGap.inMilliseconds > -1;
 }

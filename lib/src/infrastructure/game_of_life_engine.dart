@@ -40,8 +40,17 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
 
   /// only used for simulation
   Future<void> _notifyCanvas(GOFState newState) async {
-    final canvas = await buildImage(GameStateValueNotifier(newState), config);
-    _gofState.update(newState.copyWith(canvas: canvas));
+    assert(config.gridSize != null, "config.gridSize shouldn't be null");
+
+    Stopwatch st = Stopwatch();
+    st.start();
+    // final canvas = await buildImage(GameStateValueNotifier(newState), config);
+    final data = await rawAtlasData(newState.data, config.gridSize!);
+    st.stop();
+    print(st.elapsed.inMicroseconds);
+    _gofState.update(newState.copyWith(
+      canvas: data,
+    ));
   }
 
   Future<void> dispose() async {
@@ -76,7 +85,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   void startPeriodicGeneration() {
     _timer?.cancel();
     _timer = null;
-    _timer = Timer.periodic(generationGap, (t) async {
+    _timer = Timer.periodic(Duration.zero, (t) async {
       if (isOnPeriodicProgress) return;
 
       isOnPeriodicProgress = true;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../infrastructure/game_provider.dart';
 import '../../infrastructure/widget_to_image.dart';
+import '../widgets/gof_painter_v2.dart';
 import 'game_play_action_view.dart';
 
 class GOFPage extends StatefulWidget {
@@ -56,6 +57,7 @@ class _GOFPageState extends State<GOFPage> {
                   final canvasSize = Size(paintWidth, paintHeight) * context.gameConfig.paintClarity;
 
                   context.gameEngine.setCanvas(context, canvasSize);
+                  context.gameConfig.gridSize = itemSize;
 
                   return InteractiveViewer(
                     minScale: 1,
@@ -64,17 +66,28 @@ class _GOFPageState extends State<GOFPage> {
                       child: ListenableBuilder(
                         listenable: context.gameEngine.stateNotifier,
                         builder: (context, child) {
-                          final canvasImage = context.gameState.canvas;
+                          final stateR = context.gameState;
                           return SizedBox.fromSize(
                             key: const ValueKey("gameOfLife_canvas"),
                             size: canvasSize,
-                            child: canvasImage == null
+                            child: stateR.canvas == null && stateR.rawImageData == null
                                 ? const Center(child: CircularProgressIndicator())
-                                : RawImage(
-                                    height: canvasSize.height,
-                                    width: canvasSize.width,
-                                    image: canvasImage,
+                                : RepaintBoundary(
+                                    child: CustomPaint(
+                                      key: const ValueKey("gameOfLife_s s canvas"),
+                                      size: Size(paintWidth, paintHeight),
+                                      painter: GOFPainterV2(
+                                        context.gameEngine.stateNotifier,
+                                        showBorder: false,
+                                      ),
+                                    ),
                                   ),
+
+                            //  RawImage(
+                            //     height: canvasSize.height,
+                            //     width: canvasSize.width,
+                            //     image: canvasImage,
+                            //   ),
                           );
                         },
                       ),

@@ -24,6 +24,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
   Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
 
+  int get recommendedIsolateCounter => (getNBRow * getNBColumn * gameConfig.paintClarity) ~/ 2500;
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +80,18 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
             setState(() {});
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
+        Text("Use Isolate recommended: $recommendedIsolateCounter "),
+        Slider(
+          value: gameConfig.isolateCounter,
+          min: 1,
+          max: 15,
+          divisions: 15,
+          onChanged: (v) {
+            gameConfig.isolateCounter = v;
+            setState(() {});
+          },
+        ),
         SwitchListTile(
           controlAffinity: ListTileControlAffinity.leading,
           value: gameConfig.clipOnBorder,

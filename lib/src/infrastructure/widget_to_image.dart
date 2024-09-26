@@ -1,10 +1,13 @@
+import 'dart:isolate';
 import 'dart:ui' as ui;
-
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game_of_life/src/infrastructure/game_provider.dart';
-import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
+import 'package:game_of_life/src/infrastructure/infrastructure.dart';
+import 'package:game_of_life/src/presentation/widgets/pattern_selection_view.dart';
+
+import '../domain/domain.dart';
 import '../presentation/widgets/gof_painter.dart';
 
 class GameOfLifeSimulationCanvas {
@@ -33,6 +36,57 @@ class GameOfLifeSimulationCanvas {
     );
 
     return image!;
+  }
+
+  ui.Image? _image;
+  List<Rect>? _rect;
+  List<ui.RSTransform>? _transforms;
+
+  /// get data from [ canvas.drawRawAtlas]
+  Future<CanvasData> rawAtlasData(List<List<GridData>> data, double gridSize) async {
+    _rect ??= List.filled(data.length * data.first.length, ui.Offset.zero & Size.square(gridSize));
+
+    _transforms ??= await Isolate.run(() {
+      var result = <ui.RSTransform>[];
+      for (int y = 0; y < data.length; y++) {
+        for (int x = 0; x < data.first.length; x++) {
+          result.add(ui.RSTransform(1.0, 0, x * gridSize, y * gridSize));
+        }
+      }
+      return result;
+    });
+
+    final colors = await Isolate.run(
+      () {
+        List<Color> result = [];
+        for (int y = 0; y < data.length; y++) {
+          for (int x = 0; x < data.first.length; x++) {
+            result.add(data[y][x].life > .5 ? Colors.green : Colors.black);
+          }
+        }
+        return result;
+      },
+    );
+
+    _image ??= await () async {
+      final recorder = ui.PictureRecorder();
+      late final canvas = ui.Canvas(recorder);
+      const ShapeDecoration(
+        color: Colors.green,
+        shape: RoundedRectangleBorder(),
+      )
+          .createBoxPainter(() {}) //
+          .paint(canvas, ui.Offset.zero, ImageConfiguration(size: Size.square(gridSize)));
+
+      return await recorder.endRecording().toImage(gridSize.ceil(), gridSize.ceil());
+    }();
+
+    return CanvasData(
+      rect: _rect!,
+      colors: colors,
+      transform: _transforms!,
+      image: _image,
+    );
   }
 }
 
