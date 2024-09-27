@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
+import 'package:game_of_life/src/presentation/utils/grid_data_extension.dart';
 import 'package:game_of_life/src/presentation/widgets/pattern_selection_view.dart';
 
 import '../domain/domain.dart';
@@ -43,8 +44,11 @@ class GameOfLifeSimulationCanvas {
   List<ui.RSTransform>? _transforms;
 
   /// get data from [ canvas.drawRawAtlas]
-  Future<CanvasData> rawAtlasData(List<List<GridData>> data, double gridSize) async {
-    _rect ??= List.filled(data.length * data.first.length, ui.Offset.zero & Size.square(gridSize));
+  Future<CanvasData> rawAtlasData(List<List<GridData>> data, double gridSize, {bool colorize = false}) async {
+    _rect ??= await Isolate.run(() {
+      final dividerGap = (gridSize * .1);
+      return List.filled(data.length * data.first.length, ui.Offset.zero & Size.square(gridSize - dividerGap));
+    });
 
     _transforms ??= await Isolate.run(() {
       var result = <ui.RSTransform>[];
@@ -61,7 +65,11 @@ class GameOfLifeSimulationCanvas {
         List<Color> result = [];
         for (int y = 0; y < data.length; y++) {
           for (int x = 0; x < data.first.length; x++) {
-            result.add(data[y][x].life > .5 ? Colors.green : Colors.black);
+            result.add(data[y][x].isAlive
+                ? colorize
+                    ? data[y][x].color
+                    : const Color(0xFF39ff14)
+                : Colors.black);
           }
         }
         return result;

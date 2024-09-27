@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../infrastructure/game_provider.dart';
-import '../../infrastructure/widget_to_image.dart';
 import '../widgets/gof_painter_v2.dart';
 import 'game_play_action_view.dart';
 

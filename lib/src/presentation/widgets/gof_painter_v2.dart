@@ -20,34 +20,35 @@ class GOFPainterV2 extends CustomPainter {
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
 
-    for (int y = 0; y < data.length; y++) {
-      for (int x = 0; x < data[y].length; x++) {
-        final currentItem = data[y][x];
+    if (notifier.value.colorizeGrid) {
+      for (int y = 0; y < data.length; y++) {
+        for (int x = 0; x < data[y].length; x++) {
+          final currentItem = data[y][x];
 
-        //add text
-        if (notifier.value.colorizeGrid && currentItem.isAlive) {
-          final textSpan = TextSpan(
-            text: currentItem.generation.toString(),
-            style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
-          );
-          final textPainter = TextPainter(
-            text: textSpan,
-            textDirection: TextDirection.ltr,
-          );
-          textPainter.layout();
-          textPainter.paint(
-            canvas,
-            Offset(
-              x * itemSize + (itemSize - textPainter.width) / 2,
-              y * itemSize + (itemSize - textPainter.height) / 2,
-            ),
-          );
+          //add text
+          if (currentItem.isAlive) {
+            final textSpan = TextSpan(
+              text: currentItem.generation.toString(),
+              style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
+            );
+            final textPainter = TextPainter(
+              text: textSpan,
+              textDirection: TextDirection.ltr,
+            );
+            textPainter.layout();
+            textPainter.paint(
+              canvas,
+              Offset(
+                x * itemSize + (itemSize - textPainter.width) / 2,
+                y * itemSize + (itemSize - textPainter.height) / 2,
+              ),
+            );
+          }
         }
       }
     }
 
     final canvasData = notifier.value.canvas!;
-    print(canvasData.toString());
     canvas.drawAtlas(
       canvasData.image!, canvasData.transform, canvasData.rect, canvasData.colors, //
       BlendMode.dstATop, null, Paint(),

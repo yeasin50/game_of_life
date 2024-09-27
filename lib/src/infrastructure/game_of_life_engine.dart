@@ -42,12 +42,11 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   Future<void> _notifyCanvas(GOFState newState) async {
     assert(config.gridSize != null, "config.gridSize shouldn't be null");
 
-    Stopwatch st = Stopwatch();
-    st.start();
-    // final canvas = await buildImage(GameStateValueNotifier(newState), config);
-    final data = await rawAtlasData(newState.data, config.gridSize!);
-    st.stop();
-    print(st.elapsed.inMicroseconds);
+    ///* this generate image
+    /// final canvas = await buildImage(GameStateValueNotifier(newState), config);
+
+    final data = await rawAtlasData(newState.data, config.gridSize!, colorize: gofState.colorizeGrid);
+
     _gofState.update(newState.copyWith(
       canvas: data,
     ));
