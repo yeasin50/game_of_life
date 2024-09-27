@@ -38,20 +38,6 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     _isReady = true;
   }
 
-  /// only used for simulation
-  Future<void> _notifyCanvas(GOFState newState) async {
-    assert(config.gridSize != null, "config.gridSize shouldn't be null");
-
-    ///* this generate image
-    /// final canvas = await buildImage(GameStateValueNotifier(newState), config);
-
-    final data = await rawAtlasData(newState.data, config.gridSize!, colorize: gofState.colorizeGrid);
-
-    _gofState.update(newState.copyWith(
-      canvas: data,
-    ));
-  }
-
   Future<void> dispose() async {
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
@@ -72,7 +58,18 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   Future<void> nextGeneration() async {
     final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
     final newState = GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid);
-    await _notifyCanvas(newState);
+
+    assert(!config.simulateType.isRealTime && config.gridSize != null, "config.gridSize shouldn't be null");
+
+    if (config.simulateType.isRealTime) {
+      _gofState.update(newState);
+    } else if (config.simulateType.isImage) {
+      final canvas = await buildImage(GameStateValueNotifier(newState), config);
+      _gofState.update(newState.copyWith(rawImageData: canvas));
+    } else if (config.simulateType.isCanvas) {
+      final data = await rawAtlasData(newState.data, config.gridSize!, colorize: gofState.colorizeGrid);
+      _gofState.update(newState.copyWith(canvas: data));
+    }
     isOnPeriodicProgress = false;
   }
 

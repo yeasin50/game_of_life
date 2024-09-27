@@ -10,12 +10,13 @@ extension InputFiledTypeExt on InputFiledType {
   String get label => switch (this) {
         InputFiledType.rows => 'Nb of Rows',
         InputFiledType.cols => 'Nb of Columns',
-        InputFiledType.animDelay => 'anim delay (in ms)',
+        InputFiledType.animDelay => 'extra delay (in ms)',
       };
 }
 
 class InputField extends StatelessWidget {
   const InputField({
+    super.key,
     required this.type,
     required this.controller,
     required this.minValue,

@@ -1,3 +1,5 @@
+import '../domain/domain.dart';
+
 /// Default generation gap is 250 milliseconds
 const _defaultGenerationDelay = Duration(milliseconds: 250);
 
@@ -27,7 +29,7 @@ class GameConfig {
   /// ! expensive
   double paintClarity = 1.0;
 
-  double isolateCounter = 1;
+  GamePlaySimulateType simulateType = GamePlaySimulateType.realtime;
 
   double? gridSize;
 

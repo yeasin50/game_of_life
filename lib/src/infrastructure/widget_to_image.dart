@@ -1,15 +1,13 @@
 import 'dart:isolate';
 import 'dart:ui' as ui;
-import 'package:collection/collection.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:game_of_life/src/infrastructure/infrastructure.dart';
-import 'package:game_of_life/src/presentation/utils/grid_data_extension.dart';
-import 'package:game_of_life/src/presentation/widgets/pattern_selection_view.dart';
-
 import '../domain/domain.dart';
+import '../presentation/utils/grid_data_extension.dart';
 import '../presentation/widgets/gof_painter.dart';
+import 'infrastructure.dart';
 
 class GameOfLifeSimulationCanvas {
   Size? _canvasSize;

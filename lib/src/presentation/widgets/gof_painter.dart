@@ -10,7 +10,6 @@ class GOFPainter extends CustomPainter {
     this.notifier, {
     this.showBorder = false,
   }) : super(repaint: notifier);
-  
 
   ///TODO: change to dataOnly
   final GameStateValueNotifier<GOFState> notifier;
@@ -18,6 +17,7 @@ class GOFPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    debugPrint("repaint");
     final data = notifier.value.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
