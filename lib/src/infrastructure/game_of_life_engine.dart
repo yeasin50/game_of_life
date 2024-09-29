@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../domain/domain.dart';
+import 'widget_to_image.dart';
 
-class GameOfLifeEngine {
+class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   GameOfLifeEngine({required this.cellDB, required this.config});
 
   final GameOfLifeDataBase cellDB;
@@ -21,10 +22,12 @@ class GameOfLifeEngine {
 
   bool _isReady = false;
   bool get isReady => _isReady;
+
   Future<void> init({
     required GameConfig config,
   }) async {
     this.config = config;
+    resetCanvas();
     _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
@@ -37,6 +40,7 @@ class GameOfLifeEngine {
   }
 
   Future<void> dispose() async {
+    resetCanvas();
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
@@ -55,9 +59,19 @@ class GameOfLifeEngine {
 
   Future<void> nextGeneration() async {
     final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
-    _gofState.update(
-      GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid),
-    );
+    final newState = GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid);
+
+    assert(!config.simulateType.isRealTime || config.gridSize != null, "config.gridSize shouldn't be null on realtime");
+
+    if (config.simulateType.isRealTime) {
+      _gofState.update(newState);
+    } else if (config.simulateType.isImage) {
+      final canvas = await buildImage(GameStateValueNotifier(newState), config);
+      _gofState.update(newState.copyWith(rawImageData: canvas));
+    } else if (config.simulateType.isCanvas) {
+      final data = await rawAtlasData(newState.data, config.gridSize!, colorize: gofState.colorizeGrid);
+      _gofState.update(newState.copyWith(canvas: data));
+    }
     isOnPeriodicProgress = false;
   }
 
@@ -69,7 +83,7 @@ class GameOfLifeEngine {
   void startPeriodicGeneration() {
     _timer?.cancel();
     _timer = null;
-    _timer = Timer.periodic(generationGap, (t) async {
+    _timer = Timer.periodic(Duration.zero, (t) async {
       if (isOnPeriodicProgress) return;
 
       isOnPeriodicProgress = true;
@@ -93,10 +107,11 @@ class GameOfLifeEngine {
     if (currentData.isEmpty || currentData.length < 5 || currentData[0].length < 5) return;
 
     (int y, int x) midPosition = (currentData.length ~/ 2, currentData[0].length ~/ 2);
-    bool isLargeModel = pattern is GosperGliderGun || pattern is NewGun;
+    bool startOnTop = pattern is NewGun;
+
     final patternData = pattern.setPosition(
-      x: isLargeModel ? 1 : midPosition.$2,
-      y: isLargeModel ? 1 : midPosition.$1,
+      x: startOnTop ? 1 : midPosition.$2 - pattern.midPoint.$2,
+      y: startOnTop ? 3 : midPosition.$1 - pattern.midPoint.$1,
     );
 
     for (final c in patternData) {

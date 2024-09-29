@@ -11,15 +11,19 @@ class GOFPainter extends CustomPainter {
     this.showBorder = false,
   }) : super(repaint: notifier);
 
+  ///TODO: change to dataOnly
   final GameStateValueNotifier<GOFState> notifier;
   final bool showBorder;
 
   @override
   void paint(Canvas canvas, Size size) {
+    debugPrint("repaint");
     final data = notifier.value.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
     final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+
+    final dividerGap = (itemSize * .1);
 
     for (int y = 0; y < data.length; y++) {
       for (int x = 0; x < data[y].length; x++) {
@@ -27,8 +31,8 @@ class GOFPainter extends CustomPainter {
         final rect = Rect.fromLTWH(
           x * itemSize,
           y * itemSize,
-          itemSize - 1,
-          itemSize - 1,
+          itemSize - dividerGap,
+          itemSize - dividerGap,
         );
         canvas.drawRect(
           rect,

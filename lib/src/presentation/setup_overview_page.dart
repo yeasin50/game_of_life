@@ -3,7 +3,7 @@ import '../domain/cell_pattern.dart';
 import '../infrastructure/game_config.dart';
 
 import '../infrastructure/game_provider.dart';
-import 'gof_life_page.dart';
+import 'simulation/gof_life_page.dart';
 import 'widgets/export_dialog.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
@@ -52,12 +52,38 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
+  void showGuideline() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text("Close"),
+          ),
+        ],
+        content: const Text("""
+- [start] to goto the simulator.
+- [clear] will make all dead.
+- [export] current game life cell can be export for model class and reuse by adding on cellData.
+- tap on individual cell to toggle between life and dead",
+                   """),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Draw Living Cell"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: showGuideline,
+            icon: const Icon(Icons.info),
+          )
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -77,7 +103,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () => navToGameBoard(),
-                        child: const Text("Start"),
+                        child: const Text("Simulate ground >"),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
@@ -87,6 +113,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
+                          gameEngine.killCells();
                           setState(() {});
                         },
                         child: const Text("Clear"),

@@ -1,3 +1,5 @@
+import '../domain/domain.dart';
+
 /// Default generation gap is 250 milliseconds
 const _defaultGenerationDelay = Duration(milliseconds: 250);
 
@@ -7,6 +9,7 @@ class GameConfig {
     required this.numberOfRows,
     this.generationGap = _defaultGenerationDelay,
     required this.clipOnBorder,
+    this.gridSize,
   });
 
   //I was thinking does it makes more sense to have immutable class
@@ -19,5 +22,16 @@ class GameConfig {
   /// if false, the borderSide will calculate the opposite cell
   bool clipOnBorder;
 
-  bool get isValid => numberOfCol > 0 && numberOfRows > 0 && generationGap.inMilliseconds > 0;
+  /// maintain the pixel clarity `logicalSize` on simulation play ground,
+  ///
+  /// if we have large number of grids, reduce the value
+  ///
+  /// ! expensive
+  double paintClarity = 1.0;
+
+  GamePlaySimulateType simulateType = GamePlaySimulateType.realtime;
+
+  double? gridSize;
+
+  bool get isValid => numberOfCol > 0 && numberOfRows > 0 && generationGap.inMilliseconds > -1;
 }

@@ -1,3 +1,6 @@
+import 'package:game_of_life/src/domain/cell_patterns/m2.dart';
+
+import 'cell_patterns/m1.dart';
 import 'domain.dart';
 
 import "dart:math" as math;
@@ -6,6 +9,10 @@ extension CellPatternExt on CellPattern {
   /// Set position from top left
   List<GridData> setPosition({required int y, required int x}) {
     return data.map((e) => e.copyWith(x: e.x + x, y: e.y + y)).toList();
+  }
+
+  (int y, int x) get midPoint {
+    return (minSpace.$1 ~/ 2, minSpace.$1 ~/ 2);
   }
 }
 
@@ -25,6 +32,8 @@ abstract class CellPattern {
         MiddleWeightSpaceShip(),
         GosperGliderGun(),
         NewGun(),
+        M1CellPattern(),
+        M2CellPattern(),
       ];
 
   static List<List<GridData>> fromDigit(List<List<double>> data) {

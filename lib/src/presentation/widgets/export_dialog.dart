@@ -25,6 +25,13 @@ class MyCellPattern implements CellPattern {
 
   @override
   String get name => "MyCellPattern";
+
+  
+  @override
+  bool? get clip => ${context.gameConfig.clipOnBorder};
+
+  @override
+  (int, int) get minSpace => (${context.gameConfig.numberOfRows},${context.gameConfig.numberOfCol});
 }
 ''';
 
