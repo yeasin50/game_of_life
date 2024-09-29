@@ -27,6 +27,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     required GameConfig config,
   }) async {
     this.config = config;
+    resetCanvas();
     _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
@@ -39,6 +40,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   }
 
   Future<void> dispose() async {
+    resetCanvas();
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
@@ -59,7 +61,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
     final newState = GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid);
 
-    assert(!config.simulateType.isRealTime && config.gridSize != null, "config.gridSize shouldn't be null");
+    assert(!config.simulateType.isRealTime || config.gridSize != null, "config.gridSize shouldn't be null on realtime");
 
     if (config.simulateType.isRealTime) {
       _gofState.update(newState);

@@ -18,6 +18,13 @@ class GameOfLifeSimulationCanvas {
     _canvasSize = size;
   }
 
+  void resetCanvas() {
+    _image = null;
+    _rect = null;
+    _transforms = null;
+    _canvasSize = null;
+  }
+
   Future<ui.Image> buildImage(GameStateValueNotifier<GOFState> notifier, GameConfig config) async {
     if (_canvasSize == null) {
       throw Exception("Canvas size must be initialized before loading images");
