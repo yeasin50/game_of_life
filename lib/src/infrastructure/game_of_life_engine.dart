@@ -27,6 +27,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     required GameConfig config,
   }) async {
     this.config = config;
+    resetCanvas();
     _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
@@ -38,13 +39,8 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     _isReady = true;
   }
 
-  /// only used for simulation
-  Future<void> _notifyCanvas(GOFState newState) async {
-    final canvas = await buildImage(GameStateValueNotifier(newState), config);
-    _gofState.update(newState.copyWith(canvas: canvas));
-  }
-
   Future<void> dispose() async {
+    resetCanvas();
     _gofState.value = const GOFState.empty();
     _timer?.cancel();
     _timer = null;
@@ -64,7 +60,18 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   Future<void> nextGeneration() async {
     final result = await cellDB.nextGeneration(_gofState.value.data, clipBorder: config.clipOnBorder);
     final newState = GOFState(result, _gofState.value.generation + 1, colorizeGrid: gofState.colorizeGrid);
-    await _notifyCanvas(newState);
+
+    assert(!config.simulateType.isRealTime || config.gridSize != null, "config.gridSize shouldn't be null on realtime");
+
+    if (config.simulateType.isRealTime) {
+      _gofState.update(newState);
+    } else if (config.simulateType.isImage) {
+      final canvas = await buildImage(GameStateValueNotifier(newState), config);
+      _gofState.update(newState.copyWith(rawImageData: canvas));
+    } else if (config.simulateType.isCanvas) {
+      final data = await rawAtlasData(newState.data, config.gridSize!, colorize: gofState.colorizeGrid);
+      _gofState.update(newState.copyWith(canvas: data));
+    }
     isOnPeriodicProgress = false;
   }
 
@@ -76,7 +83,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   void startPeriodicGeneration() {
     _timer?.cancel();
     _timer = null;
-    _timer = Timer.periodic(generationGap, (t) async {
+    _timer = Timer.periodic(Duration.zero, (t) async {
       if (isOnPeriodicProgress) return;
 
       isOnPeriodicProgress = true;

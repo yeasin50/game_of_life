@@ -51,17 +51,19 @@ class TwoDimensionalCustomPaintGridView extends StatelessWidget {
           minScale: 1,
           maxScale: 100.0,
           child: Center(
-            child: GestureDetector(
-              onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
-              child: RepaintBoundary(
-                child: CustomPaint(
-                  isComplex: true,
-                  size: Size(paintWidth, paintHeight),
-                  key: const ValueKey("simulation user painter"),
-                  foregroundPainter: GuideLinePainter(separator: 5, itemSize: itemSize),
-                  painter: GOFPainter(
-                    context.gameEngine.stateNotifier,
-                    showBorder: context.gameConfig.clipOnBorder,
+            child: ClipRRect(
+              child: GestureDetector(
+                onTapDown: (tapDownDetails) => onTapDown(context, tapDownDetails),
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    isComplex: true,
+                    size: Size(paintWidth, paintHeight),
+                    key: const ValueKey("simulation user painter"),
+                    foregroundPainter: GuideLinePainter(separator: 5, itemSize: itemSize),
+                    painter: GOFPainter(
+                      context.gameEngine.stateNotifier,
+                      showBorder: context.gameConfig.clipOnBorder,
+                    ),
                   ),
                 ),
               ),

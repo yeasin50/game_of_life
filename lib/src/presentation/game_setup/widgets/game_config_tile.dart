@@ -24,6 +24,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
   Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
 
+  int get recommendedIsolateCounter => (getNBRow * getNBColumn * gameConfig.paintClarity) ~/ 2500;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +44,22 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
     nbColumnController.dispose();
     nbRowController.dispose();
     super.dispose();
+  }
+
+  final renderMode = GamePlaySimulateType.values
+      .map(
+        (e) => ButtonSegment(
+          value: e,
+          label: Text(e.name),
+        ),
+      )
+      .toList();
+
+  late Set<GamePlaySimulateType> selectedRender = {gameConfig.simulateType};
+  void onSelectionChanged(Set<GamePlaySimulateType> p1) {
+    selectedRender = {p1.first};
+    gameConfig.simulateType = p1.first;
+    setState(() {});
   }
 
   @override
@@ -67,18 +85,6 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
           minValue: -1,
         ),
         const SizedBox(height: 24),
-        const Text("⚠ Pixel clarity for large model"),
-        Slider(
-          value: gameConfig.paintClarity,
-          min: 1,
-          max: 15,
-          divisions: 30,
-          onChanged: (v) {
-            gameConfig.paintClarity = v;
-            setState(() {});
-          },
-        ),
-        const SizedBox(height: 16),
         SwitchListTile(
           controlAffinity: ListTileControlAffinity.leading,
           value: gameConfig.clipOnBorder,
@@ -90,6 +96,27 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
                 }
               : null,
         ),
+        const SizedBox(height: 24),
+        SegmentedButton<GamePlaySimulateType>(
+          onSelectionChanged: onSelectionChanged,
+          segments: renderMode,
+          selected: selectedRender,
+          showSelectedIcon: false,
+        ),
+        const SizedBox(height: 24),
+        if (selectedRender.first == GamePlaySimulateType.image) ...[
+          const Text("⚠ Pixel clarity for large model"),
+          Slider(
+            value: gameConfig.paintClarity,
+            min: 1,
+            max: 15,
+            divisions: 30,
+            onChanged: (v) {
+              gameConfig.paintClarity = v;
+              setState(() {});
+            },
+          ),
+        ],
       ],
     );
   }

@@ -1,11 +1,13 @@
+import 'dart:isolate';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game_of_life/src/infrastructure/game_provider.dart';
-import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
+import '../domain/domain.dart';
+import '../presentation/utils/grid_data_extension.dart';
 import '../presentation/widgets/gof_painter.dart';
+import 'infrastructure.dart';
 
 class GameOfLifeSimulationCanvas {
   Size? _canvasSize;
@@ -14,6 +16,13 @@ class GameOfLifeSimulationCanvas {
   void setCanvas(BuildContext context, Size size) {
     _context = context;
     _canvasSize = size;
+  }
+
+  void resetCanvas() {
+    _image = null;
+    _rect = null;
+    _transforms = null;
+    _canvasSize = null;
   }
 
   Future<ui.Image> buildImage(GameStateValueNotifier<GOFState> notifier, GameConfig config) async {
@@ -33,6 +42,64 @@ class GameOfLifeSimulationCanvas {
     );
 
     return image!;
+  }
+
+  ui.Image? _image;
+  List<Rect>? _rect;
+  List<ui.RSTransform>? _transforms;
+
+  /// get data from [ canvas.drawRawAtlas]
+  Future<CanvasData> rawAtlasData(List<List<GridData>> data, double gridSize, {bool colorize = false}) async {
+    _rect ??= await Isolate.run(() {
+      final dividerGap = (gridSize * .1);
+      return List.filled(data.length * data.first.length, ui.Offset.zero & Size.square(gridSize - dividerGap));
+    });
+
+    _transforms ??= await Isolate.run(() {
+      var result = <ui.RSTransform>[];
+      for (int y = 0; y < data.length; y++) {
+        for (int x = 0; x < data.first.length; x++) {
+          result.add(ui.RSTransform(1.0, 0, x * gridSize, y * gridSize));
+        }
+      }
+      return result;
+    });
+
+    final colors = await Isolate.run(
+      () {
+        List<Color> result = [];
+        for (int y = 0; y < data.length; y++) {
+          for (int x = 0; x < data.first.length; x++) {
+            result.add(data[y][x].isAlive
+                ? colorize
+                    ? data[y][x].color
+                    : const Color(0xFF39ff14)
+                : Colors.black);
+          }
+        }
+        return result;
+      },
+    );
+
+    _image ??= await () async {
+      final recorder = ui.PictureRecorder();
+      late final canvas = ui.Canvas(recorder);
+      const ShapeDecoration(
+        color: Colors.green,
+        shape: RoundedRectangleBorder(),
+      )
+          .createBoxPainter(() {}) //
+          .paint(canvas, ui.Offset.zero, ImageConfiguration(size: Size.square(gridSize)));
+
+      return await recorder.endRecording().toImage(gridSize.ceil(), gridSize.ceil());
+    }();
+
+    return CanvasData(
+      rect: _rect!,
+      colors: colors,
+      transform: _transforms!,
+      image: _image,
+    );
   }
 }
 

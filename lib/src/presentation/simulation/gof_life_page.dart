@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
-import '../../infrastructure/widget_to_image.dart';
+import '../widgets/gof_painter.dart';
+import '../widgets/gof_painter_v2.dart';
 import 'game_play_action_view.dart';
 
-class GOFPage extends StatelessWidget {
+class GOFPage extends StatefulWidget {
   const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
   static MaterialPageRoute route() {
-    return MaterialPageRoute(builder: (context) => const GOFPage._());
+    return MaterialPageRoute(
+      builder: (context) => const GOFPage._(),
+    );
+  }
+
+  @override
+  State<GOFPage> createState() => _GOFPageState();
+}
+
+class _GOFPageState extends State<GOFPage> {
+  @override
+  void initState() {
+    super.initState();
+    gameEngine.nextGeneration();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("rebuild");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game of Life'),
@@ -42,6 +58,7 @@ class GOFPage extends StatelessWidget {
                   final canvasSize = Size(paintWidth, paintHeight) * context.gameConfig.paintClarity;
 
                   context.gameEngine.setCanvas(context, canvasSize);
+                  context.gameConfig.gridSize = itemSize;
 
                   return InteractiveViewer(
                     minScale: 1,
@@ -50,17 +67,39 @@ class GOFPage extends StatelessWidget {
                       child: ListenableBuilder(
                         listenable: context.gameEngine.stateNotifier,
                         builder: (context, child) {
-                          final canvasImage = context.gameState.canvas;
+                          final stateR = context.gameState;
+
                           return SizedBox.fromSize(
                             key: const ValueKey("gameOfLife_canvas"),
                             size: canvasSize,
-                            child: canvasImage == null
-                                ? const CircularProgressIndicator()
-                                : RawImage(
-                                    height: canvasSize.height,
-                                    width: canvasSize.width,
-                                    image: canvasImage,
-                                  ),
+                            child: context.gameConfig.simulateType.isRealTime == false &&
+                                    stateR.canvas == null &&
+                                    stateR.rawImageData == null
+                                ? const Center(child: CircularProgressIndicator())
+                                : RepaintBoundary(
+                                    child: switch (context.gameConfig.simulateType) {
+                                    GamePlaySimulateType.realtime => CustomPaint(
+                                        key: const ValueKey("gameOfLife_realtime"),
+                                        size: Size(paintWidth, paintHeight),
+                                        painter: GOFPainter(
+                                          context.gameEngine.stateNotifier,
+                                          showBorder: false,
+                                        ),
+                                      ),
+                                    GamePlaySimulateType.canvas => CustomPaint(
+                                        key: const ValueKey("gameOfLife_canvas"),
+                                        size: Size(paintWidth, paintHeight),
+                                        painter: GOFPainterV2(
+                                          context.gameEngine.stateNotifier,
+                                          showBorder: false,
+                                        ),
+                                      ),
+                                    GamePlaySimulateType.image => RawImage(
+                                        height: canvasSize.height,
+                                        width: canvasSize.width,
+                                        image: stateR.rawImageData,
+                                      ),
+                                  }),
                           );
                         },
                       ),
