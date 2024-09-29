@@ -9,7 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_gpu:
+    sdk: flutter
+
   collection: ^1.18.0
+  flutter_gpu_shaders: ^0.1.2
+  native_assets_cli: ^0.7.3
 
 dev_dependencies:
   flutter_test:
@@ -18,6 +23,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - build/shaderbundles/
 
-  shaders:
-    - assets/shader/game_of_life.frag
+  # shaders:
+  #   - assets/shader/game_of_life.frag
