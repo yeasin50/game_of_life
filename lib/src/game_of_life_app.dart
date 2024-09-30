@@ -27,7 +27,9 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
       bodyMedium: TextStyle(color: Colors.white),
     ),
     textTheme: const TextTheme(
+      titleLarge: TextStyle(color: Colors.white),
       bodyMedium: TextStyle(color: Colors.white),
+      bodySmall: TextStyle(color: Colors.white),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -56,7 +58,8 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
           provider: snapshot.data!,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: theme,
+            themeMode: ThemeMode.dark,
+            darkTheme: theme,
             scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
               PointerDeviceKind.mouse,
             }),
