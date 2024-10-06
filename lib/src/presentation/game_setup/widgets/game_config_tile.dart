@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_of_life/src/infrastructure/game_provider.dart';
+import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../../../domain/domain.dart';
 import 'input_field_view.dart';
@@ -25,6 +26,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
 
   int get recommendedIsolateCounter => (getNBRow * getNBColumn * gameConfig.paintClarity) ~/ 2500;
+
+  int get totalProcessor => DeviceInfo().nbProcessor;
 
   @override
   void initState() {
@@ -84,18 +87,18 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
           controller: animationDelayController,
           minValue: -1,
         ),
-        const SizedBox(height: 24),
-        SwitchListTile(
-          controlAffinity: ListTileControlAffinity.leading,
-          value: gameConfig.clipOnBorder,
-          title: const Text("Clip on border"),
-          onChanged: widget.selectedPattern == null
-              ? (value) async {
-                  gameConfig.clipOnBorder = value;
-                  setState(() {});
-                }
-              : null,
-        ),
+        // const SizedBox(height: 24),
+        // const Text("🧠 Use nb of processors"),
+        // Slider(
+        //   value: gameConfig.nbOfIsolate.toDouble(),
+        //   min: 1,
+        //   max: totalProcessor.toDouble(),
+        //   divisions: totalProcessor,
+        //   onChanged: (v) {
+        //     gameConfig.nbOfIsolate = v.toInt();
+        //     setState(() {});
+        //   },
+        // ),
         const SizedBox(height: 24),
         SegmentedButton<GamePlaySimulateType>(
           onSelectionChanged: onSelectionChanged,
@@ -117,6 +120,19 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
             },
           ),
         ],
+        const SizedBox(height: 24),
+        SwitchListTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          value: gameConfig.clipOnBorder,
+          dense: true,
+          title: const Text("Clip on border"),
+          onChanged: widget.selectedPattern == null
+              ? (value) async {
+                  gameConfig.clipOnBorder = value;
+                  setState(() {});
+                }
+              : null,
+        ),
       ],
     );
   }

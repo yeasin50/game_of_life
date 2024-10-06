@@ -29,6 +29,9 @@ class GameConfig {
   /// ! expensive
   double paintClarity = 1.0;
 
+  /// use for isolate for dataComputation
+  int nbOfIsolate = 1;
+
   GamePlaySimulateType simulateType = GamePlaySimulateType.realtime;
 
   double? gridSize;
