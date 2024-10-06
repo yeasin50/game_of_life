@@ -87,18 +87,18 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
           controller: animationDelayController,
           minValue: -1,
         ),
-        const SizedBox(height: 24),
-        const Text("🧠 Use nb of processors"),
-        Slider(
-          value: gameConfig.nbOfIsolate.toDouble(),
-          min: 1,
-          max: totalProcessor.toDouble(),
-          divisions: totalProcessor,
-          onChanged: (v) {
-            gameConfig.nbOfIsolate = v.toInt();
-            setState(() {});
-          },
-        ),
+        // const SizedBox(height: 24),
+        // const Text("🧠 Use nb of processors"),
+        // Slider(
+        //   value: gameConfig.nbOfIsolate.toDouble(),
+        //   min: 1,
+        //   max: totalProcessor.toDouble(),
+        //   divisions: totalProcessor,
+        //   onChanged: (v) {
+        //     gameConfig.nbOfIsolate = v.toInt();
+        //     setState(() {});
+        //   },
+        // ),
         const SizedBox(height: 24),
         SegmentedButton<GamePlaySimulateType>(
           onSelectionChanged: onSelectionChanged,
