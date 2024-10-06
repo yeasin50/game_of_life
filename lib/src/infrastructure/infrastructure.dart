@@ -3,4 +3,7 @@ export 'game_of_life_db.dart';
 export 'game_of_life_engine.dart';
 export 'game_provider.dart';
 export 'user_repo.dart';
+export 'utils/processor_getter.dart';
+export 'utils/processor_non_web.dart';
+export 'utils/processor_web.dart';
 export 'widget_to_image.dart';
