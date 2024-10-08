@@ -5,7 +5,7 @@ import 'domain.dart';
 ///
 class GosperGliderGun implements CellPattern {
   @override
-  List<GridData> get data {
+  List<List<double>> get pattern {
     List<List<int>> result = [];
     // [5x1], [3x34]
     final bloc = [
@@ -42,7 +42,12 @@ class GosperGliderGun implements CellPattern {
     result = CellPattern.mergeDigit((result, 0, 0), (midRP, 1, 21));
 
     final value = result.map((e) => e.map((e) => e.toDouble()).toList()).toList();
-    return CellPattern.fromDigit(value).expand((element) => element).toList();
+    return value;
+  }
+
+  @override
+  List<GridData> get data {
+    return CellPattern.fromDigit(pattern).expand((element) => element).toList();
   }
 
   @override

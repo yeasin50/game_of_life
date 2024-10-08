@@ -5,8 +5,9 @@ import 'domain.dart';
 class NewGun extends CellPattern {
   @override
   (int y, int x) get minSpace => (20, 49);
+
   @override
-  List<GridData> get data {
+  List<List<double>> get pattern {
     List<List<int>> result = [];
 
     // [4x0], [11x0]
@@ -68,7 +69,13 @@ class NewGun extends CellPattern {
     result = CellPattern.mergeDigit((result, 0, 0), (tR2B, 8, 47));
 
     final value = result.map((e) => e.map((e) => e.toDouble()).toList()).toList();
-    return CellPattern.fromDigit(value).expand((element) => element).toList();
+
+    return value;
+  }
+
+  @override
+  List<GridData> get data {
+    return CellPattern.fromDigit(pattern).expand((element) => element).toList();
   }
 
   @override

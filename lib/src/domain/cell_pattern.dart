@@ -24,6 +24,8 @@ abstract class CellPattern {
 
   bool? get clip;
 
+  List<List<double>> get pattern;
+
   ///where should I put it
   static List<CellPattern> get all => [
         FiveCellPattern(),
@@ -127,15 +129,17 @@ abstract class CellPattern {
 class FiveCellPattern implements CellPattern {
   @override
   (int y, int x) get minSpace => (4, 4);
+  @override
+  List<List<double>> get pattern => //
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 1, 1],
+      ];
 
   @override
-  List<GridData> get data => CellPattern.fromDigit(
-        [
-          [0, 1, 0],
-          [1, 1, 0],
-          [0, 1, 1],
-        ],
-      ).expand((element) => element).toList();
+  List<GridData> get data => //
+      CellPattern.fromDigit(pattern).expand((e) => e).toList();
 
   @override
   String get name => "Five Cell";
@@ -147,15 +151,16 @@ class FiveCellPattern implements CellPattern {
 class GliderPattern implements CellPattern {
   @override
   (int y, int x) get minSpace => (4, 4);
+  @override
+  List<List<double>> get pattern => [
+        [1, 0, 1],
+        [0, 1, 1],
+        [0, 1, 0],
+      ];
 
   @override
-  List<GridData> get data => CellPattern.fromDigit(
-        [
-          [1, 0, 1],
-          [0, 1, 1],
-          [0, 1, 0],
-        ],
-      ).expand((e) => e).toList();
+  List<GridData> get data => //
+      CellPattern.fromDigit(pattern).expand((e) => e).toList();
 
   @override
   String get name => "Glider";
@@ -167,17 +172,18 @@ class GliderPattern implements CellPattern {
 /// LightWeightSpaceShip
 class LightWeightSpaceShip implements CellPattern {
   @override
+  List<List<double>> get pattern => [
+        [1, 0, 0, 1, 0],
+        [0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [0, 1, 1, 1, 1],
+      ];
+  @override
   (int y, int x) get minSpace => (6, 5);
 
   @override
-  List<GridData> get data => CellPattern.fromDigit(
-        [
-          [1, 0, 0, 1, 0],
-          [0, 0, 0, 0, 1],
-          [1, 0, 0, 0, 1],
-          [0, 1, 1, 1, 1],
-        ],
-      ).expand((e) => e).toList();
+  List<GridData> get data => //
+      CellPattern.fromDigit(pattern).expand((e) => e).toList();
 
   @override
   String get name => "LWSS";
@@ -192,15 +198,18 @@ class MiddleWeightSpaceShip implements CellPattern {
   (int y, int x) get minSpace => (7, 7);
 
   @override
-  List<GridData> get data => CellPattern.fromDigit(
-        [
-          [0, 1, 1, 1, 1, 1],
-          [1, 0, 0, 0, 0, 1],
-          [0, 0, 0, 0, 0, 1],
-          [1, 0, 0, 0, 1, 0],
-          [0, 0, 1, 0, 0, 0],
-        ],
-      ).expand((element) => element).toList();
+  List<List<double>> get pattern => [
+        [0, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0, 0],
+      ];
+
+  @override
+  List<GridData> get data => //
+
+      CellPattern.fromDigit(pattern).expand((element) => element).toList();
 
   @override
   String get name => "MWSS";

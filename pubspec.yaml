@@ -20,4 +20,4 @@ flutter:
   uses-material-design: true
 
   shaders:
-    - assets/shader/game_of_life.frag
+    - assets/shader/game_of_life_simulate.frag
