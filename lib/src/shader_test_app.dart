@@ -3,7 +3,10 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:game_of_life/src/domain/cell_pattern.dart';
+
+import 'image_buffer.dart';
 
 class ShaderTestApp extends StatefulWidget {
   const ShaderTestApp({super.key});
@@ -66,7 +69,10 @@ class ShaderGridPlay extends StatefulWidget {
 class _ShaderGridPlayState extends State<ShaderGridPlay> {
   ui.Image? gridTexture;
   ui.Image? nextGridTexture;
-  final Size gridSize = Size(400, 400); // Size of your grid
+
+  final Size gridSize = Size(400, 400);
+
+  bool play = false;
 
   @override
   void initState() {
@@ -75,63 +81,21 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   }
 
   void initD() async {
-    gridTexture = await makeImage();
+    gridTexture = await createFrameBuffer(30, 30);
     setState(() {});
   }
 
-  Future<ui.Image> makeImage() async {
-    const width = 30;
-    const height = 30;
-    const bytesPerPixel = 4;
-    final buffer = Uint8List(width * height * bytesPerPixel);
+  GlobalKey _globalKey = GlobalKey();
 
-    final pattern = FiveCellPattern();
-    final (startY, startX) = ((height / 2) - pattern.minSpace.$1, (width / 2) - pattern.minSpace.$2);
-    final (endY, endX) = (startY + pattern.minSpace.$1 - 1, startX + pattern.minSpace.$2 - 1);
+  void onChanged(value) async {
+    //FIXME: notworking
+    RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: 1.0);
+    print('Captured Image Size: ${image.width} x ${image.height}');
+    gridTexture = image;
+    play = !play;
 
-    final patternDigits = pattern.pattern;
-
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        final offset = ((y * width) + x) * bytesPerPixel;
-
-        bool isLiveCell = () {
-          bool isInBound = y >= startY && y < endY && x >= startX && x < endX;
-          if (!isInBound) return false;
-
-          final dy = y - startY.toInt();
-          final dx = x - startX.toInt();
-
-          return patternDigits[dy][dx] > .5;
-        }();
-
-        if (isLiveCell) {
-          buffer[offset] = 0; // Red channel
-          buffer[offset + 1] = 0; // Green channel
-          buffer[offset + 2] = 0; // Blue channel
-          buffer[offset + 3] = 255; // Alpha (fully opaque)
-        } else {
-          // Set this cell to white
-          buffer[offset] = 255; // Red channel
-          buffer[offset + 1] = 255; // Green channel
-          buffer[offset + 2] = 255; // Blue channel
-          buffer[offset + 3] = 255; // Alpha (fully opaque)
-        }
-      }
-    }
-    final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
-    final descriptor = ui.ImageDescriptor.raw(
-      immutable,
-      width: width,
-      height: height,
-      pixelFormat: ui.PixelFormat.rgba8888,
-    );
-    final codec = await descriptor.instantiateCodec(
-      targetWidth: width,
-      targetHeight: height,
-    );
-    final frameInfo = await codec.getNextFrame();
-    return frameInfo.image;
+    setState(() {});
   }
 
   @override
@@ -140,17 +104,27 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Material(
+                child: CheckboxListTile(
+                  value: play,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: onChanged,
+                ),
+              ),
               Expanded(
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.purple.withOpacity(.3),
-                  width: gridSize.width,
-                  height: gridSize.height,
                   child: InteractiveViewer(
                     maxScale: 100,
-                    child: CustomPaint(
-                      painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!),
-                      child: SizedBox(width: gridSize.width, height: gridSize.height),
+                    child: RepaintBoundary(
+                      key: _globalKey,
+                      child: CustomPaint(
+                        painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!, playing: play),
+                        child: SizedBox.fromSize(
+                          size: gridSize,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -172,8 +146,9 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
 class GameOfLifePainter extends CustomPainter {
   final ui.FragmentProgram program;
   final ui.Image gridTexture;
+  final bool playing;
 
-  GameOfLifePainter(this.program, this.gridTexture);
+  GameOfLifePainter(this.program, this.gridTexture, {required this.playing});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -181,7 +156,8 @@ class GameOfLifePainter extends CustomPainter {
     final shader = program.fragmentShader()
       ..setFloat(0, size.width)
       ..setFloat(1, size.height)
-      ..setImageSampler(0, gridTexture); // Use the current grid as input
+      ..setImageSampler(0, gridTexture)
+      ..setFloat(2, playing ? 1.0 : 0.0); // Use the current grid as input
 
     Paint paint = Paint()..shader = shader;
     canvas.drawRect(Offset.zero & size, paint);
