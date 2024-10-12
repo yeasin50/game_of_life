@@ -1,10 +1,9 @@
+import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:game_of_life/src/domain/cell_pattern.dart';
-
-import 'domain/domain.dart';
 
 class ShaderTestApp extends StatefulWidget {
   const ShaderTestApp({super.key});
@@ -67,7 +66,7 @@ class ShaderGridPlay extends StatefulWidget {
 class _ShaderGridPlayState extends State<ShaderGridPlay> {
   ui.Image? gridTexture;
   ui.Image? nextGridTexture;
-  final Size gridSize = Size(300, 300); // Size of your grid
+  final Size gridSize = Size(400, 400); // Size of your grid
 
   @override
   void initState() {
@@ -76,79 +75,63 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   }
 
   void initD() async {
-    await _createInitialGridTexture();
-    _updateGrid();
+    gridTexture = await makeImage();
+    setState(() {});
   }
 
-  Future<void> _createInitialGridTexture() async {
-    // Create initial grid with active cells
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-    final paint = Paint()..color = Colors.black;
-    canvas.drawRect(Offset.zero & gridSize, paint);
+  Future<ui.Image> makeImage() async {
+    const width = 30;
+    const height = 30;
+    const bytesPerPixel = 4;
+    final buffer = Uint8List(width * height * bytesPerPixel);
 
-    // Initialize some active cells as white (alive)
-    paint.color = Colors.white;
+    final pattern = FiveCellPattern();
+    final (startY, startX) = ((height / 2) - pattern.minSpace.$1, (width / 2) - pattern.minSpace.$2);
+    final (endY, endX) = (startY + pattern.minSpace.$1 - 1, startX + pattern.minSpace.$2 - 1);
 
-    List<Offset> activeCells = [];
-    final pattern = LightWeightSpaceShip();
-    final data = pattern.pattern;
+    final patternDigits = pattern.pattern;
 
-    for (int y = 0; y < data.length; y++) {
-      for (int x = 0; x < data[y].length; x++) {
-        if (data[y][x] > 0) {
-          activeCells.add(Offset(y.toDouble(), x.toDouble()));
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final offset = ((y * width) + x) * bytesPerPixel;
+
+        bool isLiveCell = () {
+          bool isInBound = y >= startY && y < endY && x >= startX && x < endX;
+          if (!isInBound) return false;
+
+          final dy = y - startY.toInt();
+          final dx = x - startX.toInt();
+
+          return patternDigits[dy][dx] > .5;
+        }();
+
+        if (isLiveCell) {
+          buffer[offset] = 0; // Red channel
+          buffer[offset + 1] = 0; // Green channel
+          buffer[offset + 2] = 0; // Blue channel
+          buffer[offset + 3] = 255; // Alpha (fully opaque)
+        } else {
+          // Set this cell to white
+          buffer[offset] = 255; // Red channel
+          buffer[offset + 1] = 255; // Green channel
+          buffer[offset + 2] = 255; // Blue channel
+          buffer[offset + 3] = 255; // Alpha (fully opaque)
         }
       }
     }
-
-    final (shiftY, shiftX) = (
-      (gridSize.height / 2) - (pattern.minSpace.$1), //
-      (gridSize.width / 2) - (pattern.minSpace.$2)
+    final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
+    final descriptor = ui.ImageDescriptor.raw(
+      immutable,
+      width: width,
+      height: height,
+      pixelFormat: ui.PixelFormat.rgba8888,
     );
-
-    double cellSize = 10;
-
-    for (final cell in activeCells) {
-      canvas.drawRect(
-          Rect.fromLTWH(
-            (cell.dx * cellSize) + shiftX,
-            (cell.dy * cellSize) + shiftY,
-            cellSize,
-            cellSize,
-          ),
-          paint);
-    }
-
-    final picture = recorder.endRecording();
-    gridTexture = await picture.toImage(gridSize.width.toInt(), gridSize.height.toInt());
-    setState(() {});
-  }
-
-  Future<void> _updateGrid() async {
-    if (gridTexture == null) return;
-
-    // Create a new picture recorder to render the next generation
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    final paint = Paint();
-
-    // Use the fragment shader to draw the next generation
-    final shader = widget.fragmentProgram.fragmentShader()
-      ..setFloat(0, gridSize.width)
-      ..setFloat(1, gridSize.height)
-      ..setImageSampler(0, gridTexture!); // Current grid as input
-
-    paint.shader = shader;
-    canvas.drawRect(Offset.zero & gridSize, paint);
-
-    // Capture the result into an image (next generation)
-    final picture = recorder.endRecording();
-    nextGridTexture = await picture.toImage(gridSize.width.toInt(), gridSize.height.toInt());
-
-    // Swap textures: current texture becomes the next grid
-    gridTexture = nextGridTexture;
-    setState(() {});
+    final codec = await descriptor.instantiateCodec(
+      targetWidth: width,
+      targetHeight: height,
+    );
+    final frameInfo = await codec.getNextFrame();
+    return frameInfo.image;
   }
 
   @override
@@ -163,23 +146,20 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
                   color: Colors.purple.withOpacity(.3),
                   width: gridSize.width,
                   height: gridSize.height,
-                  child: CustomPaint(
-                    painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!),
-                    child: SizedBox(width: gridSize.width, height: gridSize.height),
+                  child: InteractiveViewer(
+                    maxScale: 100,
+                    child: CustomPaint(
+                      painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!),
+                      child: SizedBox(width: gridSize.width, height: gridSize.height),
+                    ),
                   ),
                 ),
               ),
               Expanded(
                 child: Container(
-                  alignment: Alignment.center,
                   color: Colors.cyanAccent.withOpacity(.3),
-                  width: gridSize.width,
-                  height: gridSize.height,
-                  child: InteractiveViewer(
-                    maxScale: 100,
-                    child: RawImage(
-                      image: gridTexture,
-                    ),
+                  child: RawImage(
+                    image: gridTexture,
                   ),
                 ),
               )
