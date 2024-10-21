@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
@@ -7,6 +8,10 @@ import 'package:flutter/rendering.dart';
 import 'package:game_of_life/src/domain/cell_pattern.dart';
 
 import 'image_buffer.dart';
+
+final Size canvasSize = Size(400, 400);
+int numberOfRows = 10;
+int numberOfCols = 10;
 
 class ShaderTestApp extends StatefulWidget {
   const ShaderTestApp({super.key});
@@ -70,8 +75,6 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   ui.Image? gridTexture;
   ui.Image? nextGridTexture;
 
-  final Size gridSize = Size(400, 400);
-
   bool play = false;
 
   @override
@@ -81,7 +84,7 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   }
 
   void initD() async {
-    gridTexture = await createFrameBuffer(30, 30);
+    gridTexture = await createFrameBuffer(300, 300);
     setState(() {});
   }
 
@@ -122,7 +125,7 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
                       child: CustomPaint(
                         painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!, playing: play),
                         child: SizedBox.fromSize(
-                          size: gridSize,
+                          size: canvasSize,
                         ),
                       ),
                     ),
@@ -132,6 +135,8 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
               Expanded(
                 child: Container(
                   color: Colors.cyanAccent.withOpacity(.3),
+                  width: canvasSize.width,
+                  height: canvasSize.height,
                   child: RawImage(
                     image: gridTexture,
                   ),
@@ -152,12 +157,14 @@ class GameOfLifePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Configure shader uniforms and the texture sampler
+    double gridSize = min(size.width / numberOfCols, size.height / numberOfRows);
+
     final shader = program.fragmentShader()
       ..setFloat(0, size.width)
       ..setFloat(1, size.height)
       ..setImageSampler(0, gridTexture)
-      ..setFloat(2, playing ? 1.0 : 0.0); // Use the current grid as input
+      ..setFloat(2, playing ? 1.0 : 0.0)
+      ..setFloat(3, gridSize);
 
     Paint paint = Paint()..shader = shader;
     canvas.drawRect(Offset.zero & size, paint);
