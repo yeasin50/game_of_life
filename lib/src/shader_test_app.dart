@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:game_of_life/src/domain/cell_pattern.dart';
 
 import 'infrastructure/utils/image_buffer.dart';
+import 'presentation/widgets/shader_painter.dart';
 
 const Size _canvasSize = Size(400.0, 400);
 int numberOfRows = 50;
@@ -85,7 +86,7 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
 
   void createBuffer() async {
     gridTexture = await cellPatternToImage(
-      pattern: GliderPattern(),
+      pattern: ShaderCellPattern(CellPattern.fromDigit(GliderPattern().pattern)),
       width: _canvasSize.width.toInt(),
       height: _canvasSize.height.toInt(),
       rows: numberOfRows,
@@ -151,7 +152,13 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
                     child: RepaintBoundary(
                       key: _globalKey,
                       child: CustomPaint(
-                        painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!, playing: play),
+                        painter: GameOfLifeShaderPainter(
+                          widget.fragmentProgram,
+                          gridTexture!,
+                          playing: play,
+                          numberOfCols: numberOfCols,
+                          numberOfRows: numberOfRows,
+                        ),
                         child: SizedBox(
                           width: _canvasSize.width.toDouble(),
                           height: _canvasSize.height.toDouble(),
@@ -170,30 +177,4 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
           )
         : Container(); // Show a loader while the texture is being created
   }
-}
-
-class GameOfLifePainter extends CustomPainter {
-  final ui.FragmentProgram program;
-  final ui.Image gridTexture;
-  final bool playing;
-
-  GameOfLifePainter(this.program, this.gridTexture, {required this.playing});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double gridSize = min(size.width / numberOfCols, size.height / numberOfRows);
-
-    final shader = program.fragmentShader()
-      ..setFloat(0, size.width)
-      ..setFloat(1, size.height)
-      ..setImageSampler(0, gridTexture)
-      ..setFloat(2, playing ? 1.0 : 0.0)
-      ..setFloat(3, gridSize);
-
-    Paint paint = Paint()..shader = shader;
-    canvas.drawRect(Offset.zero & size, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

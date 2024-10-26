@@ -3,19 +3,18 @@ import 'dart:ui' as ui;
 
 import '../../domain/cell_pattern.dart';
 
-/// used to feed the shader,  
+/// used to feed the shader,
 Future<ui.Image> cellPatternToImage({
   required int width,
   required int height,
-  required CellPattern pattern,
+  required ShaderCellPattern pattern,
   required int rows,
   required int cols,
 }) async {
   const bytesPerPixel = 4;
   final buffer = Uint8List(width * height * bytesPerPixel);
 
-  final pattern = GliderPattern(); // This has the minSpace and the pattern list
-  final patternDigits = pattern.pattern;
+  final patternDigits = pattern.cellData;
 
   final patternHeight = patternDigits.length;
   final patternWidth = patternDigits[0].length;
@@ -41,7 +40,7 @@ Future<ui.Image> cellPatternToImage({
   for (int py = 0; py < patternHeight; py++) {
     for (int px = 0; px < patternWidth; px++) {
       // Check if this is a live cell (white) or dead cell (black)
-      bool isLiveCell = patternDigits[py][px] == 1;
+      bool isLiveCell = patternDigits[py][px].life == 1;
 
       // Calculate the top-left corner of the current cell in the grid
       final topLeftY = startY + py * squareCellSize;

@@ -126,6 +126,27 @@ abstract class CellPattern {
   }
 }
 
+class ShaderCellPattern implements CellPattern {
+  const ShaderCellPattern(this.cellData);
+
+  final List<List<GridData>> cellData;
+
+  @override
+  bool? get clip => true;
+
+  @override
+  List<GridData> get data => cellData.reduce((value, element) => value + element);
+
+  @override
+  (int, int) get minSpace => (cellData.length, cellData.first.length);
+
+  @override
+  String get name => "";
+
+  @override
+  List<List<double>> get pattern => throw UnimplementedError();
+}
+
 class FiveCellPattern implements CellPattern {
   @override
   (int y, int x) get minSpace => (4, 4);
