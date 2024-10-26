@@ -5,10 +5,11 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:game_of_life/src/domain/cell_pattern.dart';
 
-import 'image_buffer.dart';
+import 'infrastructure/utils/image_buffer.dart';
 
-final Size canvasSize = Size(400.0, 400);
+const Size _canvasSize = Size(400.0, 400);
 int numberOfRows = 50;
 int numberOfCols = 50;
 
@@ -83,8 +84,13 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   }
 
   void createBuffer() async {
-    gridTexture = await createFrameBuffer(canvasSize.width.toInt(), canvasSize.height.toInt(),
-        rows: numberOfRows, cols: numberOfCols);
+    gridTexture = await cellPatternToImage(
+      pattern: GliderPattern(),
+      width: _canvasSize.width.toInt(),
+      height: _canvasSize.height.toInt(),
+      rows: numberOfRows,
+      cols: numberOfCols,
+    );
     setState(() {});
   }
 
@@ -147,8 +153,8 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
                       child: CustomPaint(
                         painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!, playing: play),
                         child: SizedBox(
-                          width: canvasSize.width.toDouble(),
-                          height: canvasSize.height.toDouble(),
+                          width: _canvasSize.width.toDouble(),
+                          height: _canvasSize.height.toDouble(),
                         ),
                       ),
                     ),

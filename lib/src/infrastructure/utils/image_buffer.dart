@@ -1,9 +1,16 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'domain/cell_pattern.dart';
+import '../../domain/cell_pattern.dart';
 
-Future<ui.Image> createFrameBuffer(int width, int height, {int rows = 10, int cols = 10}) async {
+/// used to feed the shader,  
+Future<ui.Image> cellPatternToImage({
+  required int width,
+  required int height,
+  required CellPattern pattern,
+  required int rows,
+  required int cols,
+}) async {
   const bytesPerPixel = 4;
   final buffer = Uint8List(width * height * bytesPerPixel);
 
