@@ -1,17 +1,16 @@
+import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game_of_life/src/domain/cell_pattern.dart';
 
 import 'image_buffer.dart';
 
-final Size canvasSize = Size(400, 400);
-int numberOfRows = 10;
-int numberOfCols = 10;
+final Size canvasSize = Size(400.0, 400);
+int numberOfRows = 50;
+int numberOfCols = 50;
 
 class ShaderTestApp extends StatefulWidget {
   const ShaderTestApp({super.key});
@@ -80,25 +79,54 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
   @override
   void initState() {
     super.initState();
-    initD();
+    createBuffer();
   }
 
-  void initD() async {
-    gridTexture = await createFrameBuffer(300, 300);
+  void createBuffer() async {
+    gridTexture = await createFrameBuffer(canvasSize.width.toInt(), canvasSize.height.toInt(),
+        rows: numberOfRows, cols: numberOfCols);
     setState(() {});
   }
 
-  GlobalKey _globalKey = GlobalKey();
+  final GlobalKey _globalKey = GlobalKey();
 
   void onChanged(value) async {
-    //FIXME: notworking
-    RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 1.0);
-    print('Captured Image Size: ${image.width} x ${image.height}');
-    gridTexture = image;
     play = !play;
 
     setState(() {});
+  }
+
+  Timer? timer;
+
+  void startTimer() {
+    stopTimer();
+    timer = Timer.periodic(
+      Durations.medium1,
+      (timer) async {
+        RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+        gridTexture = image;
+        setState(() {});
+      },
+    );
+  }
+
+  void stopTimer() {
+    timer?.cancel();
+    timer = null;
+  }
+
+  void onPressed() {
+    timer?.isActive == true ? stopTimer() : startTimer();
+    setState(() {});
+  }
+
+  String get label => timer?.isActive == true ? "Stop" : "start";
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -107,41 +135,31 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Material(
-                child: CheckboxListTile(
-                  value: play,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  onChanged: onChanged,
-                ),
-              ),
               Expanded(
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.purple.withOpacity(.3),
                   child: InteractiveViewer(
                     maxScale: 100,
+                    clipBehavior: Clip.none,
                     child: RepaintBoundary(
                       key: _globalKey,
                       child: CustomPaint(
                         painter: GameOfLifePainter(widget.fragmentProgram, gridTexture!, playing: play),
-                        child: SizedBox.fromSize(
-                          size: canvasSize,
+                        child: SizedBox(
+                          width: canvasSize.width.toDouble(),
+                          height: canvasSize.height.toDouble(),
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-              Expanded(
-                child: Container(
-                  color: Colors.cyanAccent.withOpacity(.3),
-                  width: canvasSize.width,
-                  height: canvasSize.height,
-                  child: RawImage(
-                    image: gridTexture,
-                  ),
+              Center(
+                child: Material(
+                  child: ElevatedButton.icon(onPressed: onPressed, label: Text(label)),
                 ),
-              )
+              ),
             ],
           )
         : Container(); // Show a loader while the texture is being created

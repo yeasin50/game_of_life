@@ -7,11 +7,9 @@ Future<ui.Image> createFrameBuffer(int width, int height, {int rows = 10, int co
   const bytesPerPixel = 4;
   final buffer = Uint8List(width * height * bytesPerPixel);
 
-  // Assume pattern is defined as:
-  final pattern = FiveCellPattern(); // This has the minSpace and the pattern list
-  final patternDigits = pattern.pattern; // The pattern list: 3x3 grid with 1s and 0s
+  final pattern = GliderPattern(); // This has the minSpace and the pattern list
+  final patternDigits = pattern.pattern;
 
-  // Get the dimensions of the pattern (e.g., 3x3 grid)
   final patternHeight = patternDigits.length;
   final patternWidth = patternDigits[0].length;
 
