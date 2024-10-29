@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/game_provider.dart';
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../../../domain/domain.dart';

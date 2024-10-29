@@ -4,6 +4,7 @@ import '../infrastructure/game_config.dart';
 
 import '../infrastructure/game_provider.dart';
 import 'simulation/gof_life_page.dart';
+import 'simulation/shader_game_play_page.dart';
 import 'widgets/export_dialog.dart';
 import 'widgets/two_dimensional_custom_paint_gridview.dart';
 
@@ -45,7 +46,11 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   }
 
   void navToGameBoard() async {
-    if (context.mounted) {
+    if (widget.config.simulateType.isShader) {
+      final pattern = context.gameState.data;
+      // debugPrint(CellPattern.printData(context.gameState.data));
+      await Navigator.of(context).push(ShaderGamePlayPage.route(pattern: ShaderCellPattern(pattern)));
+    } else if (context.mounted) {
       await Navigator.of(context).push(GOFPage.route());
       gameEngine.stopPeriodicGeneration();
       setState(() {});
@@ -128,7 +133,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
             ),
             Expanded(
               child: isLoading
-                  ? Container()
+                  ? const SizedBox.shrink()
                   : const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: TwoDimensionalCustomPaintGridView(),

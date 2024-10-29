@@ -4,7 +4,7 @@ import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
 import '../widgets/gof_painter.dart';
 import '../widgets/gof_painter_v2.dart';
-import 'game_play_action_view.dart';
+import 'widgets/game_play_action_view.dart';
 
 class GOFPage extends StatefulWidget {
   const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
@@ -78,6 +78,7 @@ class _GOFPageState extends State<GOFPage> {
                                 ? const Center(child: CircularProgressIndicator())
                                 : RepaintBoundary(
                                     child: switch (context.gameConfig.simulateType) {
+                                    GamePlaySimulateType.shader => Text("use ShaderGamePlayPage"),
                                     GamePlaySimulateType.realtime => CustomPaint(
                                         key: const ValueKey("gameOfLife_realtime"),
                                         size: Size(paintWidth, paintHeight),

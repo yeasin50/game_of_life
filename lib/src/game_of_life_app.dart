@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/utils/processor_web.dart';
 
 import 'infrastructure/game_provider.dart';
 import 'presentation/game_setup/setup_page.dart';
