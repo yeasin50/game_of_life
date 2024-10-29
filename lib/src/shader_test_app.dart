@@ -1,6 +1,17 @@
+import 'dart:async';
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:game_of_life/src/domain/cell_pattern.dart';
+
+import 'infrastructure/utils/image_buffer.dart';
+import 'presentation/widgets/shader_painter.dart';
+
+const Size _canvasSize = Size(400.0, 400);
+int numberOfRows = 50;
+int numberOfCols = 50;
 
 class ShaderTestApp extends StatefulWidget {
   const ShaderTestApp({super.key});
@@ -13,7 +24,7 @@ class _ShaderTestAppState extends State<ShaderTestApp> {
   late FragmentProgram fragmentProgram;
 
   Future<FragmentProgram> loadShader() async {
-    fragmentProgram = await FragmentProgram.fromAsset("assets/shader/game_of_life.frag");
+    fragmentProgram = await FragmentProgram.fromAsset("assets/shader/game_of_life_simulate.frag");
 
     return fragmentProgram;
   }
@@ -61,56 +72,108 @@ class ShaderGridPlay extends StatefulWidget {
 }
 
 class _ShaderGridPlayState extends State<ShaderGridPlay> {
+  ui.Image? gridTexture;
+  ui.Image? nextGridTexture;
+
+  bool play = false;
+
+  @override
+  void initState() {
+    super.initState();
+    createBuffer();
+  }
+
+  void createBuffer() async {
+    gridTexture = await cellPatternToImage(
+      pattern: ShaderCellPattern(CellPattern.fromDigit(GliderPattern().pattern)),
+      width: _canvasSize.width.toInt(),
+      height: _canvasSize.height.toInt(),
+      rows: numberOfRows,
+      cols: numberOfCols,
+    );
+    setState(() {});
+  }
+
+  final GlobalKey _globalKey = GlobalKey();
+
+  void onChanged(value) async {
+    play = !play;
+
+    setState(() {});
+  }
+
+  Timer? timer;
+
+  void startTimer() {
+    stopTimer();
+    timer = Timer.periodic(
+      Durations.medium1,
+      (timer) async {
+        RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+        gridTexture = image;
+        setState(() {});
+      },
+    );
+  }
+
+  void stopTimer() {
+    timer?.cancel();
+    timer = null;
+  }
+
+  void onPressed() {
+    timer?.isActive == true ? stopTimer() : startTimer();
+    setState(() {});
+  }
+
+  String get label => timer?.isActive == true ? "Stop" : "start";
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: GofShaderPaint(
-        shader: widget.fragmentProgram.fragmentShader(),
-        color: const Color.fromARGB(255, 84, 84, 84),
-      ),
-    );
-  }
-}
-
-class GofShaderPaint extends CustomPainter {
-  const GofShaderPaint({
-    required this.color,
-    required this.shader,
-  });
-
-  final Color color;
-  final FragmentShader shader;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    shader.setFloat(0, size.width);
-    shader.setFloat(1, size.height);
-
-    shader.setFloat(2, color.red.toDouble() / 255);
-    shader.setFloat(3, color.green.toDouble() / 255);
-    shader.setFloat(4, color.blue.toDouble() / 255);
-    shader.setFloat(5, color.alpha.toDouble() / 255);
-
-    double itemSize = .10;
-    shader.setFloat(6, itemSize);
-    shader.setFloat(7, itemSize);
-
-    Color liveColor = Colors.green;
-    Color deadColor = const Color.fromARGB(255, 0, 238, 255);
-
-    for (int i = 8; i < (8 + (2 * 5)); i += 3) {
-      shader.setFloat(i, i.isEven ? 0.0 : 1.0);
-      shader.setFloat(i, i.isEven ? 0.0 : 1.0);
-    }
-
-    canvas.drawRect(
-      Rect.fromLTRB(0, 0, size.width, size.height),
-      Paint()..shader = shader,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant GofShaderPaint oldDelegate) {
-    return color != oldDelegate.color;
+    return gridTexture != null
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Colors.purple.withOpacity(.3),
+                  child: InteractiveViewer(
+                    maxScale: 100,
+                    clipBehavior: Clip.none,
+                    child: RepaintBoundary(
+                      key: _globalKey,
+                      child: CustomPaint(
+                        painter: GameOfLifeShaderPainter(
+                          widget.fragmentProgram,
+                          gridTexture!,
+                          playing: play,
+                          numberOfCols: numberOfCols,
+                          numberOfRows: numberOfRows,
+                        ),
+                        child: SizedBox(
+                          width: _canvasSize.width.toDouble(),
+                          height: _canvasSize.height.toDouble(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Center(
+                child: Material(
+                  child: ElevatedButton.icon(onPressed: onPressed, label: Text(label)),
+                ),
+              ),
+            ],
+          )
+        : Container(); // Show a loader while the texture is being created
   }
 }
