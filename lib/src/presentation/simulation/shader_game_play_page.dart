@@ -59,7 +59,11 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
 
   String get label => timer?.isActive == true ? "Stop" : "start";
 
-  Size _canvasSize = Size(600, 600);
+  ///FIXME: Sometimes/+ doesnt work in large (1k) canvas
+  /// - I having doubt how should I handle it,
+  /// - should I increase the sie based on canvas?
+  /// -
+  Size _canvasSize = Size(1000, 1000);
   late final config = gameConfig;
 
   ui.FragmentProgram? fragmentProgram;
