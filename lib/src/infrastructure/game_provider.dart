@@ -30,6 +30,7 @@ class GameProvider {
     final GameConfig gameConfig = GameConfig(
       numberOfCol: 50,
       numberOfRows: 50,
+      dimension: 75,
       generationGap: const Duration(milliseconds: 250),
       clipOnBorder: true,
     );

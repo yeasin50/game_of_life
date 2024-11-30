@@ -2,5 +2,21 @@
   "cSpell.words": [
     "Gosper"
   ],
-  "dart.flutterSdkPath": ".fvm/versions/3.24.1"
+  "dart.flutterSdkPath": ".fvm/versions/3.24.1",
+  // "editor.fontFamily": "Operator Mono Lig, Fira Code",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.cursorBlinking": "expand",
+  "editor.fontLigatures": true,
+  "editor.wordWrap": "on",
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  },
+  "editor.inlayHints.fontFamily": "",
 }

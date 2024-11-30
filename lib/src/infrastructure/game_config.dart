@@ -7,14 +7,22 @@ class GameConfig {
   GameConfig({
     required this.numberOfCol,
     required this.numberOfRows,
+    required this.dimension,
     this.generationGap = _defaultGenerationDelay,
     required this.clipOnBorder,
     this.gridSize,
   });
 
   //I was thinking does it makes more sense to have immutable class
+  @Deprecated("use [dimension] instead ")
   int numberOfCol;
+  @Deprecated("use [dimension] instead ")
   int numberOfRows;
+
+  /// the size of the grid on each Row & Column
+  int dimension;
+
+  @Deprecated("This will be removed while nobody likes to wait ")
   Duration generationGap;
 
   /// if [clipOnBorder] is true cell goes outside the border it will be removed

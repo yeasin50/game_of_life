@@ -3,13 +3,16 @@ import 'dart:ui' as ui;
 
 import '../../domain/cell_pattern.dart';
 
-/// used to feed the shader,
+const gridDimension = Deprecated("image size should depend on grid dimension rather the size of the canvas");
+
+/// Used to feed the shader.
 Future<ui.Image> cellPatternToImage({
-  required int width,
-  required int height,
+  @gridDimension required int width,
+  @gridDimension required int height,
   required ShaderCellPattern pattern,
-  required int rows,
-  required int cols,
+  @gridDimension required int rows,
+  @gridDimension required int cols,
+  required int gridDimension,
 }) async {
   const bytesPerPixel = 4;
   final buffer = Uint8List(width * height * bytesPerPixel);
@@ -23,6 +26,10 @@ Future<ui.Image> cellPatternToImage({
   final cellWidth = (width / cols).floor();
   final cellHeight = (height / rows).floor();
   final squareCellSize = cellWidth < cellHeight ? cellWidth : cellHeight; // Ensure square cells
+
+  // Add a small gap (grid line thickness) between cells
+  final gridLineThickness = 1;
+  final effectiveCellSize = squareCellSize - gridLineThickness;
 
   // Step 2: Calculate the starting point to center the pattern on the grid
   final startY = ((height / 2) - (patternHeight * squareCellSize / 2)).floor();
@@ -48,8 +55,8 @@ Future<ui.Image> cellPatternToImage({
 
       // Fill the cell with white if it's a live cell, otherwise leave it black
       if (isLiveCell) {
-        for (int dy = 0; dy < squareCellSize; dy++) {
-          for (int dx = 0; dx < squareCellSize; dx++) {
+        for (int dy = 0; dy < effectiveCellSize; dy++) {
+          for (int dx = 0; dx < effectiveCellSize; dx++) {
             // Make sure we are within the screen bounds
             if (topLeftY + dy >= height || topLeftX + dx >= width) continue;
 
@@ -67,6 +74,7 @@ Future<ui.Image> cellPatternToImage({
     }
   }
 
+  // Create the image from the buffer
   final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
   final descriptor = ui.ImageDescriptor.raw(
     immutable,

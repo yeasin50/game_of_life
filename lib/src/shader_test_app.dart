@@ -88,6 +88,7 @@ class _ShaderGridPlayState extends State<ShaderGridPlay> {
       pattern: ShaderCellPattern(CellPattern.fromDigit(GliderPattern().pattern)),
       width: _canvasSize.width.toInt(),
       height: _canvasSize.height.toInt(),
+      gridDimension: 100,
       rows: numberOfRows,
       cols: numberOfCols,
     );

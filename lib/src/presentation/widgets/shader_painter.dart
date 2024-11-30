@@ -21,11 +21,13 @@ class GameOfLifeShaderPainter extends CustomPainter {
     double gridSize = math.min(size.width / numberOfCols, size.height / numberOfRows);
 
     final shader = program.fragmentShader()
-      ..setFloat(0, size.width)
-      ..setFloat(1, size.height)
-      ..setImageSampler(0, gridTexture)
-      ..setFloat(2, playing ? 1.0 : 0.0)
-      ..setFloat(3, gridSize);
+          ..setFloat(0, size.width)
+          ..setFloat(1, size.height)
+          ..setImageSampler(0, gridTexture)
+          ..setFloat(2, playing ? 1.0 : 0.0)
+          ..setFloat(3, gridSize)
+        // ..setFloat(4, .250)
+        ;
 
     Paint paint = Paint()..shader = shader;
     canvas.drawRect(Offset.zero & size, paint);

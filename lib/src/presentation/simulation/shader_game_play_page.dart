@@ -63,7 +63,6 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
   /// - I having doubt how should I handle it,
   /// - should I increase the sie based on canvas?
   /// -
-  Size _canvasSize = Size(1000, 1000);
   late final config = gameConfig;
 
   ui.FragmentProgram? fragmentProgram;
@@ -71,10 +70,12 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
     fragmentProgram = await ui.FragmentProgram.fromAsset("assets/shader/game_of_life_simulate.frag");
     gridTexture = await cellPatternToImage(
       pattern: widget.pattern,
-      width: _canvasSize.width.toInt(),
-      height: _canvasSize.height.toInt(),
-      rows: config.numberOfRows,
-      cols: config.numberOfCol,
+      // what will be the perfect *
+      width: config.dimension * 44,
+      height: config.dimension * 44,
+      rows: config.dimension,
+      cols: config.dimension,
+      gridDimension: config.dimension,
     );
     setState(() {});
   }
@@ -83,7 +84,6 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _canvasSize ??= MediaQuery.sizeOf(context);
       initShader();
     });
   }
@@ -99,32 +99,28 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
     return Scaffold(
       appBar: AppBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: onPressed,
-        child: Text(label),
-      ),
+      floatingActionButton: FloatingActionButton(onPressed: onPressed, child: Text(label)),
       body: Container(
         alignment: Alignment.center,
         color: Colors.red,
         child: Center(
           child: gridTexture != null
-              ? InteractiveViewer(
-                  maxScale: 100,
-                  clipBehavior: Clip.none,
-                  child: RepaintBoundary(
-                    key: _globalKey,
-                    child: CustomPaint(
-                      painter: GameOfLifeShaderPainter(
-                        fragmentProgram!,
-                        gridTexture!,
-                        numberOfCols: config.numberOfCol,
-                        numberOfRows: config.numberOfRows,
-                        playing: isPlaying,
-                      ),
-                      child: SizedBox(
-                        width: _canvasSize!.width.toDouble(),
-                        height: _canvasSize!.height.toDouble(),
-                      ),
+              ? AspectRatio(
+                  aspectRatio: 1,
+                  child: InteractiveViewer(
+                    maxScale: 100,
+                    clipBehavior: Clip.none,
+                    child: RepaintBoundary(
+                      key: _globalKey,
+                      child: CustomPaint(
+                          painter: GameOfLifeShaderPainter(
+                            fragmentProgram!,
+                            gridTexture!,
+                            numberOfCols: config.dimension,
+                            numberOfRows: config.dimension,
+                            playing: isPlaying,
+                          ),
+                          size: Size.fromRadius(5 * config.dimension.toDouble())),
                     ),
                   ),
                 )
