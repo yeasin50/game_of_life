@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import '../../infrastructure/game_of_life_db.dart';
+import '../../../infrastructure/game_of_life_db.dart';
 import 'gof_painter.dart';
 
-import '../../domain/domain.dart';
+import '../../../domain/domain.dart';
 
 class PatternSelectionView extends StatefulWidget {
   const PatternSelectionView({

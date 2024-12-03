@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../infrastructure/infrastructure.dart';
-import '../utils/grid_data_extension.dart';
+import '../../../infrastructure/infrastructure.dart';
+import '../extension/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
   const GOFPainter(

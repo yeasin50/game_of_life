@@ -14,9 +14,9 @@ class GameConfig {
   });
 
   //I was thinking does it makes more sense to have immutable class
-  @Deprecated("use [dimension] instead ")
+  @Deprecated("use [dimension] instead for shader , might remove in future ")
   int numberOfCol;
-  @Deprecated("use [dimension] instead ")
+  @Deprecated("use [dimension] instead for shader , might remove in future ")
   int numberOfRows;
 
   /// the size of the grid on each Row & Column

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'game_config.dart';
+import '../app/game_config.dart';
 import 'game_of_life_db.dart';
 import 'game_of_life_engine.dart';
 

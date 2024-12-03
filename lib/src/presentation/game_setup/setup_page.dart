@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../widgets/pattern_selection_view.dart';
+import '../_common/widgets/pattern_selection_view.dart';
 
 import '../../domain/cell_pattern.dart';
 import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
-import '../setup_overview_page.dart';
+import 'setup_overview_page.dart';
 import 'widgets/game_config_tile.dart';
 
 /// - decide number of Rows and Columns

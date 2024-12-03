@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 enum InputFiledType {
   rows,
   cols,
+  dimension,
   animDelay;
 }
 
@@ -11,6 +12,7 @@ extension InputFiledTypeExt on InputFiledType {
         InputFiledType.rows => 'Nb of Rows',
         InputFiledType.cols => 'Nb of Columns',
         InputFiledType.animDelay => 'extra delay (in ms)',
+        InputFiledType.dimension => "Dimension"
       };
 }
 

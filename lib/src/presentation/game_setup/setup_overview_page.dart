@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import '../domain/cell_pattern.dart';
-import '../infrastructure/game_config.dart';
+import '../../domain/cell_pattern.dart';
+import '../../app/game_config.dart';
 
-import '../infrastructure/game_provider.dart';
-import 'simulation/gof_life_page.dart';
-import 'simulation/shader_game_play_page.dart';
-import 'widgets/export_dialog.dart';
-import 'widgets/two_dimensional_custom_paint_gridview.dart';
+import '../../infrastructure/game_provider.dart';
+import '../simulation/gof_life_page.dart';
+import '../simulation/shader_game_play_page.dart';
+import '../_common/widgets/export_dialog.dart';
+import '../_common/widgets/two_dimensional_custom_paint_gridview.dart';
 
-/// select initial pattern to show
+/// select initial pattern to show and tweak the cell-patterns
+///
 class SetUpOverviewPage extends StatefulWidget {
   const SetUpOverviewPage._(
     this.config,
@@ -38,9 +39,7 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     super.initState();
     gameEngine.init(config: gameConfig).then((value) {
       if (widget.pattern != null) gameEngine.addPattern(widget.pattern!);
-
       isLoading = false;
-
       setState(() {});
     });
   }
@@ -48,8 +47,8 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   void navToGameBoard() async {
     if (widget.config.simulateType.isShader) {
       final pattern = context.gameState.data;
-      // debugPrint(CellPattern.printData(context.gameState.data));
-      await Navigator.of(context).push(ShaderGamePlayPage.route(pattern: ShaderCellPattern(pattern)));
+      final route = ShaderGamePlayPage.route(pattern: ShaderCellPattern(pattern));
+      await Navigator.of(context).push(route);
     } else if (context.mounted) {
       await Navigator.of(context).push(GOFPage.route());
       gameEngine.stopPeriodicGeneration();

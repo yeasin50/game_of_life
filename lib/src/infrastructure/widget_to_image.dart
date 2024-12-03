@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../domain/domain.dart';
-import '../presentation/utils/grid_data_extension.dart';
-import '../presentation/widgets/gof_painter.dart';
+import '../presentation/_common/extension/grid_data_extension.dart';
+import '../presentation/_common/widgets/gof_painter.dart';
 import 'infrastructure.dart';
 
 class GameOfLifeSimulationCanvas {

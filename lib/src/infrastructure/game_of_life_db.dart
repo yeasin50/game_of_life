@@ -89,6 +89,7 @@ class GameOfLifeDataBase {
     int numberOfRows = 50,
     int numberOfCol = 50,
     bool? cellInitialState,
+    int dimension =  100,
   }) async {
     final params = [numberOfRows, numberOfCol, cellInitialState];
     final result = await compute(_init, params);

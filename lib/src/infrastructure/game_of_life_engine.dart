@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../domain/domain.dart';
-import 'widget_to_image.dart';
 
 class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
   GameOfLifeEngine({required this.cellDB, required this.config});
@@ -33,6 +32,7 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     final grids = await cellDB.init(
       numberOfCol: config.numberOfCol,
       numberOfRows: config.numberOfRows,
+      dimension: config.dimension,
       cellInitialState: false, //todo generate percentage ratio initial alive cell
     );
     _gofState.update(GOFState(grids, 0));

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../domain/cell_pattern.dart';
-import '../../infrastructure/game_provider.dart';
+import '../../../domain/cell_pattern.dart';
+import '../../../infrastructure/game_provider.dart';
 
 class ExportGameData extends StatelessWidget {
   const ExportGameData({super.key});

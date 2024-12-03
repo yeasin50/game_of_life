@@ -7,35 +7,32 @@ const gridDimension = Deprecated("image size should depend on grid dimension rat
 
 /// Used to feed the shader.
 Future<ui.Image> cellPatternToImage({
-  @gridDimension required int width,
-  @gridDimension required int height,
   required ShaderCellPattern pattern,
-  @gridDimension required int rows,
-  @gridDimension required int cols,
   required int gridDimension,
 }) async {
   const bytesPerPixel = 4;
-  final buffer = Uint8List(width * height * bytesPerPixel);
+
+  /// *40 for clarity
+  final int canvasSize = gridDimension * 40;
+
+  final buffer = Uint8List(canvasSize * canvasSize * bytesPerPixel);
 
   final patternDigits = pattern.cellData;
 
   final patternHeight = patternDigits.length;
   final patternWidth = patternDigits[0].length;
 
-  // Step 1: Determine the size of the grid cells (ensure square cells)
-  final cellWidth = (width / cols).floor();
-  final cellHeight = (height / rows).floor();
-  final squareCellSize = cellWidth < cellHeight ? cellWidth : cellHeight; // Ensure square cells
+  final squareCellSize = canvasSize / gridDimension;
 
   // Add a small gap (grid line thickness) between cells
-  final gridLineThickness = 1;
+  final gridLineThickness = 2;
   final effectiveCellSize = squareCellSize - gridLineThickness;
 
   // Step 2: Calculate the starting point to center the pattern on the grid
-  final startY = ((height / 2) - (patternHeight * squareCellSize / 2)).floor();
-  final startX = ((width / 2) - (patternWidth * squareCellSize / 2)).floor();
+  final startY = ((canvasSize / 2) - (patternHeight * squareCellSize / 2)).floor();
+  final startX = ((canvasSize / 2) - (patternWidth * squareCellSize / 2)).floor();
 
-  // Step 3: Fill the entire screen with black (background)
+  //   Fill the entire screen with black (background)
   for (int i = 0; i < buffer.length; i += bytesPerPixel) {
     buffer[i] = 0; // Red channel (black)
     buffer[i + 1] = 0; // Green channel (black)
@@ -58,10 +55,10 @@ Future<ui.Image> cellPatternToImage({
         for (int dy = 0; dy < effectiveCellSize; dy++) {
           for (int dx = 0; dx < effectiveCellSize; dx++) {
             // Make sure we are within the screen bounds
-            if (topLeftY + dy >= height || topLeftX + dx >= width) continue;
+            if (topLeftY + dy >= canvasSize || topLeftX + dx >= canvasSize) continue;
 
             // Calculate the buffer offset for this pixel
-            final offset = (((topLeftY + dy) * width) + (topLeftX + dx)) * bytesPerPixel;
+            final offset = ((((topLeftY + dy) * canvasSize) + (topLeftX + dx)) * bytesPerPixel).toInt();
 
             // Set the pixel color to white for live cells
             buffer[offset] = 255; // Red channel (white)
@@ -78,14 +75,11 @@ Future<ui.Image> cellPatternToImage({
   final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
   final descriptor = ui.ImageDescriptor.raw(
     immutable,
-    width: width,
-    height: height,
+    width: canvasSize,
+    height: canvasSize,
     pixelFormat: ui.PixelFormat.rgba8888,
   );
-  final codec = await descriptor.instantiateCodec(
-    targetWidth: width,
-    targetHeight: height,
-  );
+  final codec = await descriptor.instantiateCodec(targetWidth: canvasSize, targetHeight: canvasSize);
   final frameInfo = await codec.getNextFrame();
   return frameInfo.image;
 }

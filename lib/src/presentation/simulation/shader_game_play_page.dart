@@ -8,7 +8,7 @@ import 'package:game_of_life/src/infrastructure/game_provider.dart';
 import '../../domain/cell_pattern.dart';
 import '../../domain/domain.dart';
 import '../../infrastructure/utils/image_buffer.dart';
-import '../widgets/shader_painter.dart';
+import '../_common/widgets/shader_painter.dart';
 
 /// to render in shader[]
 /// [data] is the passed down pattern from setup page
@@ -70,11 +70,6 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
     fragmentProgram = await ui.FragmentProgram.fromAsset("assets/shader/game_of_life_simulate.frag");
     gridTexture = await cellPatternToImage(
       pattern: widget.pattern,
-      // what will be the perfect *
-      width: config.dimension * 44,
-      height: config.dimension * 44,
-      rows: config.dimension,
-      cols: config.dimension,
       gridDimension: config.dimension,
     );
     setState(() {});

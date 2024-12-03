@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../infrastructure/infrastructure.dart';
+import '../../../infrastructure/infrastructure.dart';
 
 class GOFPainterV2 extends CustomPainter {
   const GOFPainterV2(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
 import '../../../domain/domain.dart';
+import '../../../infrastructure/infrastructure.dart';
 import 'input_field_view.dart';
 
 class GameTileConfigView extends StatefulWidget {
@@ -16,6 +16,7 @@ class GameTileConfigView extends StatefulWidget {
 }
 
 class _GameTileConfigViewState extends State<GameTileConfigView> {
+  late final TextEditingController dimensionController;
   late final TextEditingController nbColumnController;
   late final TextEditingController nbRowController;
   late final TextEditingController animationDelayController;
@@ -26,11 +27,11 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
 
   int get recommendedIsolateCounter => (getNBRow * getNBColumn * gameConfig.paintClarity) ~/ 2500;
 
-  int get totalProcessor => DeviceInfo().nbProcessor;
-
   @override
   void initState() {
     super.initState();
+    dimensionController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.dimension.toString()));
+
     nbColumnController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfCol.toString()));
     nbRowController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfRows.toString()));
     animationDelayController = TextEditingController.fromValue(//
@@ -43,6 +44,7 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
 
   @override
   void dispose() {
+    dimensionController.dispose();
     nbColumnController.dispose();
     nbRowController.dispose();
     super.dispose();
@@ -57,9 +59,9 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
       )
       .toList();
 
-  late Set<GamePlaySimulateType> selectedRender = {gameConfig.simulateType};
+  late GamePlaySimulateType selectedRender = gameConfig.simulateType;
   void onSelectionChanged(Set<GamePlaySimulateType> p1) {
-    selectedRender = {p1.first};
+    selectedRender = p1.first;
     gameConfig.simulateType = p1.first;
     setState(() {});
   }
@@ -69,44 +71,40 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        InputField(
-          type: InputFiledType.cols,
-          minValue: widget.selectedPattern?.minSpace.$2 ?? 3,
-          controller: nbColumnController,
-        ),
-        const SizedBox(height: 24),
-        InputField(
-          minValue: widget.selectedPattern?.minSpace.$1 ?? 3,
-          type: InputFiledType.rows,
-          controller: nbRowController,
-        ),
-        const SizedBox(height: 24),
-        InputField(
-          type: InputFiledType.animDelay,
-          controller: animationDelayController,
-          minValue: -1,
-        ),
-        // const SizedBox(height: 24),
-        // const Text("🧠 Use nb of processors"),
-        // Slider(
-        //   value: gameConfig.nbOfIsolate.toDouble(),
-        //   min: 1,
-        //   max: totalProcessor.toDouble(),
-        //   divisions: totalProcessor,
-        //   onChanged: (v) {
-        //     gameConfig.nbOfIsolate = v.toInt();
-        //     setState(() {});
-        //   },
-        // ),
-        const SizedBox(height: 24),
         SegmentedButton<GamePlaySimulateType>(
           onSelectionChanged: onSelectionChanged,
           segments: renderMode,
-          selected: selectedRender,
+          selected: {selectedRender},
           showSelectedIcon: false,
         ),
         const SizedBox(height: 24),
-        if (selectedRender.first == GamePlaySimulateType.image) ...[
+        if (selectedRender.isShader) ...[
+          InputField(
+            type: InputFiledType.dimension,
+            minValue: widget.selectedPattern?.minSpace.$2 ?? 3,
+            controller: dimensionController,
+          ),
+        ] else ...[
+          InputField(
+            type: InputFiledType.cols,
+            minValue: widget.selectedPattern?.minSpace.$2 ?? 3,
+            controller: nbColumnController,
+          ),
+          const SizedBox(height: 24),
+          InputField(
+            minValue: widget.selectedPattern?.minSpace.$1 ?? 3,
+            type: InputFiledType.rows,
+            controller: nbRowController,
+          ),
+          const SizedBox(height: 24),
+          InputField(
+            type: InputFiledType.animDelay,
+            controller: animationDelayController,
+            minValue: -1,
+          ),
+        ],
+        const SizedBox(height: 24),
+        if (selectedRender == GamePlaySimulateType.image) ...[
           const Text("⚠ Pixel clarity for large model"),
           Slider(
             value: gameConfig.paintClarity,

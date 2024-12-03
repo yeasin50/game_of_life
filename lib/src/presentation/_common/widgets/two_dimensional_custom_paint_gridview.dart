@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_of_life/src/infrastructure/game_provider.dart';
-import 'package:game_of_life/src/presentation/widgets/gof_life_guideline_paint.dart';
+import 'package:game_of_life/src/presentation/_common/widgets/gof_life_guideline_paint.dart';
 import 'dart:math' as math;
 import 'gof_painter.dart';
 

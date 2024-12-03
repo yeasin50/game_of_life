@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
-import '../widgets/gof_painter.dart';
-import '../widgets/gof_painter_v2.dart';
+import '../_common/widgets/gof_painter.dart';
+import '../_common/widgets/gof_painter_v2.dart';
 import 'widgets/game_play_action_view.dart';
 
 class GOFPage extends StatefulWidget {

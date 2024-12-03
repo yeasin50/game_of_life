@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/domain.dart';
+import '../../../domain/domain.dart';
 
 extension GridExt on GridData {
   Color get color => switch (generation) {
