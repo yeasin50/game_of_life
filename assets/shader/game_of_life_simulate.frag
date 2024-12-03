@@ -3,6 +3,9 @@
 #include <flutter/runtime_effect.glsl>
 precision mediump float;
 
+const vec4 aliveCell = vec4(1.0, 1.0, 1.0, 1.0);
+const vec4 deadCell = vec4(0, 0, 0, 1);
+
 uniform vec2 uSize;  // Resolution of the canvas (width, height)
 uniform sampler2D uSampler;
 
@@ -35,7 +38,6 @@ void main() {
             if(x == 0 && y == 0)
                 continue; // Skip the current cell
 
-            // Calculate neighbor's grid position
             vec2 neighborPos = gridPos + vec2(float(x), float(y));
 
             // Wrap the neighbor position (toroidal wrapping)
@@ -58,16 +60,16 @@ void main() {
     if(cellState > 0.5) {
         // If the cell is alive
         if(aliveNeighbors < 2 || aliveNeighbors > 3) {
-            fragColor = vec4(0.0, 0.0, 0.0, 1.0); // Cell dies (black)
+            fragColor = deadCell;
         } else {
-            fragColor = vec4(1.0, 1.0, 1.0, 1.0); // Cell survives (white)
+            fragColor = aliveCell;
+            ;
         }
     } else {
-        // If the cell is dead
         if(aliveNeighbors == 3) {
-            fragColor = vec4(1.0, 1.0, 1.0, 1.0); // Cell becomes alive (white)
+            fragColor = aliveCell;
         } else {
-            fragColor = vec4(0.0, 0.0, 0.0, 1.0); // Cell stays dead (black)
+            fragColor = deadCell;
         }
     }
 }

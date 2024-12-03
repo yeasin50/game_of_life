@@ -23,6 +23,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
 
   int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 50;
   int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
+  int get getDimension => int.tryParse(dimensionController.text.trim()) ?? 100;
+
   Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
 
   int get recommendedIsolateCounter => (getNBRow * getNBColumn * gameConfig.paintClarity) ~/ 2500;
@@ -31,12 +33,13 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   void initState() {
     super.initState();
     dimensionController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.dimension.toString()));
-
     nbColumnController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfCol.toString()));
     nbRowController = TextEditingController.fromValue(TextEditingValue(text: gameConfig.numberOfRows.toString()));
-    animationDelayController = TextEditingController.fromValue(//
-        TextEditingValue(text: gameConfig.generationGap.inMilliseconds.toString()));
+    animationDelayController = TextEditingController.fromValue(
+      TextEditingValue(text: gameConfig.generationGap.inMilliseconds.toString()),
+    );
 
+    dimensionController.addListener(() => gameConfig.dimension = getDimension);
     nbColumnController.addListener(() => gameConfig.numberOfCol = getNBColumn);
     nbRowController.addListener(() => gameConfig.numberOfRows = getNBRow);
     animationDelayController.addListener(() => gameConfig.generationGap = generationGap);
@@ -60,6 +63,7 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
       .toList();
 
   late GamePlaySimulateType selectedRender = gameConfig.simulateType;
+
   void onSelectionChanged(Set<GamePlaySimulateType> p1) {
     selectedRender = p1.first;
     gameConfig.simulateType = p1.first;

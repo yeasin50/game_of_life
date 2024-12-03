@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:game_of_life/src/infrastructure/game_provider.dart';
+
+import '../../../infrastructure/game_provider.dart';
 
 class SimulationActionButtons extends StatefulWidget {
   const SimulationActionButtons({super.key, this.showGenerationOnPlay});

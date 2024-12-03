@@ -30,9 +30,8 @@ class GameOfLifeEngine extends GameOfLifeSimulationCanvas {
     _gofState = GameStateValueNotifier(const GOFState.empty());
 
     final grids = await cellDB.init(
-      numberOfCol: config.numberOfCol,
-      numberOfRows: config.numberOfRows,
-      dimension: config.dimension,
+      numberOfCol: config.simulateType.isShader ? config.dimension : config.numberOfCol,
+      numberOfRows: config.simulateType.isShader ? config.dimension : config.numberOfRows,
       cellInitialState: false, //todo generate percentage ratio initial alive cell
     );
     _gofState.update(GOFState(grids, 0));

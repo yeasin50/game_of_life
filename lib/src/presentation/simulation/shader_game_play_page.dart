@@ -3,10 +3,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game_of_life/src/infrastructure/game_provider.dart';
 
 import '../../domain/cell_pattern.dart';
 import '../../domain/domain.dart';
+import '../../infrastructure/game_provider.dart';
 import '../../infrastructure/utils/image_buffer.dart';
 import '../_common/widgets/shader_painter.dart';
 
@@ -59,10 +59,6 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
 
   String get label => timer?.isActive == true ? "Stop" : "start";
 
-  ///FIXME: Sometimes/+ doesnt work in large (1k) canvas
-  /// - I having doubt how should I handle it,
-  /// - should I increase the sie based on canvas?
-  /// -
   late final config = gameConfig;
 
   ui.FragmentProgram? fragmentProgram;
@@ -100,7 +96,12 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
         color: Colors.red,
         child: Center(
           child: gridTexture != null
-              ? AspectRatio(
+              ?
+              // RawImage(
+              //     image: gridTexture,
+              //   )
+
+              AspectRatio(
                   aspectRatio: 1,
                   child: InteractiveViewer(
                     maxScale: 100,

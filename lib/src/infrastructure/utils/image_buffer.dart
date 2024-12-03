@@ -34,10 +34,10 @@ Future<ui.Image> cellPatternToImage({
 
   //   Fill the entire screen with black (background)
   for (int i = 0; i < buffer.length; i += bytesPerPixel) {
-    buffer[i] = 0; // Red channel (black)
-    buffer[i + 1] = 0; // Green channel (black)
-    buffer[i + 2] = 0; // Blue channel (black)
-    buffer[i + 3] = 255; // Alpha (fully opaque)
+    buffer[i] = 0;
+    buffer[i + 1] = 0;
+    buffer[i + 2] = 0;
+    buffer[i + 3] = 255;
   }
 
   // Step 4: Draw the pattern in the center
