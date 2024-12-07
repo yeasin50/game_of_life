@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData theme(TextTheme textTheme) => ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.grey.shade900,
+        canvasColor: Colors.grey.shade900,
         hintColor: Colors.white,
         primaryTextTheme: const TextTheme(
           bodyMedium: TextStyle(color: Colors.white),
@@ -16,7 +17,7 @@ class AppTheme {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurpleAccent,
             foregroundColor: Colors.white,
-            minimumSize: const Size(150, 50),
+            minimumSize: const Size(200, 50),
           ),
         ),
       );

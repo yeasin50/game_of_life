@@ -53,6 +53,7 @@ class _PatternSelectionViewState extends State<PatternSelectionView> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Wrap(
           spacing: 8,
@@ -74,15 +75,17 @@ class _PatternSelectionViewState extends State<PatternSelectionView> {
           ],
         ),
         const SizedBox(height: 24),
-        Expanded(
+        AspectRatio(
+          aspectRatio: 1,
           child: previewModel != null
-              ? Center(
-                  child: CustomPaint(
-                    size: Size.infinite,
-                    painter: GOFPainter(previewModel!),
-                  ),
+              ? CustomPaint(
+                  painter: GOFPainter(previewModel!),
                 )
-              : const Placeholder(),
+              : const Text(
+                  "Continue ....",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 32),
+                ),
         )
       ],
     );

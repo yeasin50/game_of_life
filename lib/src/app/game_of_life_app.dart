@@ -37,14 +37,14 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
           );
         }
         return GameOfLifeInheritedWidget(
-          provider: snapshot.data!,
+          provider: snapshot.requireData,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             themeMode: ThemeMode.dark,
             darkTheme: themeData,
-            scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
-              PointerDeviceKind.mouse,
-            }),
+            scrollBehavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {PointerDeviceKind.mouse},
+            ),
             home: const GameBoardSetupPage(),
           ),
         );

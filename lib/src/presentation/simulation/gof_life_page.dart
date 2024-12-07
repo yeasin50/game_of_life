@@ -28,7 +28,6 @@ class _GOFPageState extends State<GOFPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("rebuild");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game of Life'),
@@ -37,13 +36,9 @@ class _GOFPageState extends State<GOFPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(24.0),
-            child: SimulationActionButtons(),
-          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24),
+              padding: const EdgeInsets.all(8.0),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final itemWidth = constraints.maxWidth / context.gameState.data.first.length;
@@ -78,7 +73,7 @@ class _GOFPageState extends State<GOFPage> {
                                 ? const Center(child: CircularProgressIndicator())
                                 : RepaintBoundary(
                                     child: switch (context.gameConfig.simulateType) {
-                                    GamePlaySimulateType.shader => Text("use ShaderGamePlayPage"),
+                                    GamePlaySimulateType.shader => const Text("use ShaderGamePlayPage"),
                                     GamePlaySimulateType.realtime => CustomPaint(
                                         key: const ValueKey("gameOfLife_realtime"),
                                         size: Size(paintWidth, paintHeight),
@@ -109,7 +104,11 @@ class _GOFPageState extends State<GOFPage> {
                 },
               ),
             ),
-          )
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: SimulationActionButtons(),
+          ),
         ],
       ),
     );

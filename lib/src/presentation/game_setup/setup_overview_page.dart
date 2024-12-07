@@ -56,80 +56,19 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
     }
   }
 
-  void showGuideline() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            child: const Text("Close"),
-          ),
-        ],
-        content: const Text("""
-- [start] to goto the simulator.
-- [clear] will make all dead.
-- [export] current game life cell can be export for model class and reuse by adding on cellData.
-- tap on individual cell to toggle between life and dead",
-                   """),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Draw Living Cell"),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: showGuideline,
-            icon: const Icon(Icons.info),
-          )
-        ],
+        leading: const SizedBox(),
       ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Column(
-                children: [
-                  Wrap(
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: const StadiumBorder(),
-                          backgroundColor: Colors.deepPurpleAccent,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () => navToGameBoard(),
-                        child: const Text("Simulate ground >"),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: const StadiumBorder(),
-                          backgroundColor: Colors.redAccent.withAlpha(100),
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () {
-                          gameEngine.killCells();
-                          setState(() {});
-                        },
-                        child: const Text("Clear"),
-                      ),
-                      const SizedBox(width: 16),
-                      const ExportGameData(),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
             Expanded(
               child: isLoading
                   ? const SizedBox.shrink()
@@ -138,8 +77,94 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
                       child: TwoDimensionalCustomPaintGridView(),
                     ),
             ),
+            _ActionButtons(
+              onContinue: navToGameBoard,
+              clear: () {
+                gameEngine.killCells();
+                setState(() {});
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// overView control
+class _ActionButtons extends StatelessWidget {
+  const _ActionButtons({
+    required this.onContinue,
+    required this.clear,
+  });
+
+  final VoidCallback onContinue;
+  final VoidCallback clear;
+
+  @override
+  Widget build(BuildContext context) {
+    void showGuideline() {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          actions: [
+            TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: const Text("Close"),
+            ),
+          ],
+          content: const Text("""
+- [start] to goto the simulator.
+- [clear] will make all dead.
+- [export] current game life cell can be export for model class and reuse by adding on cellData.
+- tap on individual cell to toggle between life and dead",
+                   """),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Column(
+        children: [
+          Wrap(
+            spacing: 8,
+            children: [
+              IconButton.outlined(
+                onPressed: Navigator.of(context).pop,
+                icon: const Icon(Icons.arrow_back_ios_new),
+              ),
+              const SizedBox(width: 32),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const StadiumBorder(),
+                  backgroundColor: Colors.deepPurpleAccent,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: onContinue,
+                child: const Text("Simulate ground >"),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const StadiumBorder(),
+                  backgroundColor: Colors.redAccent.withAlpha(100),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: clear,
+                child: const Text("Clear"),
+              ),
+              const SizedBox(width: 16),
+              const ExportGameData(),
+              const SizedBox(width: 32),
+              IconButton(
+                onPressed: showGuideline,
+                icon: const Icon(Icons.info),
+              )
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }

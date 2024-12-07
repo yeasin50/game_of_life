@@ -5,7 +5,9 @@ import '../../domain/cell_pattern.dart';
 import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
 import 'setup_overview_page.dart';
+import 'widgets/continue_button.dart';
 import 'widgets/game_config_tile.dart';
+import 'widgets/game_name_appbar.dart';
 
 /// - decide number of Rows and Columns
 /// - decide generation delay
@@ -46,99 +48,89 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
 
   int currentIndex = 0;
 
+  void onContinue() {
+    if (currentIndex == 0) {
+      currentIndex = 1;
+      controller.forward();
+      setState(() {});
+    } else if (currentIndex == 1) {
+      if (formKey.currentState?.validate() == false) {
+        return;
+      }
+      final route = SetUpOverviewPage.route(
+        selectedPattern: selectedPattern,
+        config: gameConfig, //!ignore for now
+      );
+      Navigator.of(context).push(route);
+    } else {
+      throw UnimplementedError();
+    }
+  }
+
+  void onBack() {
+    controller.reverse();
+    currentIndex = 0;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: ConstrainedBox(
+      //   constraints: const BoxConstraints(maxWidth: 450, maxHeight: 75),
+      //   child: ContinueButton(
+      //     activeTab: currentIndex,
+      //     onBack: onBack,
+      //     onContinue: onContinue,
+      //   ),
+      // ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Conway's Game of Life",
-                      textAlign: TextAlign.center,
-                      style: textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    SelectableText(
-                      "https://github.com/yeasin50/game_of_life",
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 48),
-                    SizedBox(
-                      height: 450,
-                      child: AnimatedSwitcher(
-                        duration: Durations.medium3,
-                        child: currentIndex == 1
-                            ? Form(
-                                key: formKey,
-                                child: GameTileConfigView(selectedPattern: selectedPattern),
-                              )
-                            : PatternSelectionView(
-                                onChanged: onPatternSelected,
-                                selectedPattern: selectedPattern,
-                              ),
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  // to have scrollBar at end
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 450),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 48),
+                          const GameNameAppBar(),
+                          const SizedBox(height: 48),
+                          AnimatedContainer(
+                            duration: const Duration(seconds: 3),
+                            child: currentIndex == 0
+                                ? PatternSelectionView(
+                                    onChanged: onPatternSelected,
+                                    selectedPattern: selectedPattern,
+                                  )
+                                : Form(
+                                    key: formKey,
+                                    child: GameTileConfigView(selectedPattern: selectedPattern),
+                                  ),
+                          ),
+                          const SizedBox(height: 24),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 450, maxHeight: 75),
+                            child: ContinueButton(
+                              activeTab: currentIndex,
+                              onBack: onBack,
+                              onContinue: onContinue,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 48),
-                        Stack(
-                          children: [
-                            AnimatedAlign(
-                              duration: Durations.short3,
-                              alignment: currentIndex == 0 ? Alignment.center : Alignment.centerLeft,
-                              child: IconButton.outlined(
-                                onPressed: () {
-                                  controller.reverse();
-                                  currentIndex = 0;
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.arrow_back_ios_new),
-                              ),
-                            ),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (currentIndex == 0) {
-                                    currentIndex = 1;
-                                    controller.forward();
-                                    setState(() {});
-                                  } else if (currentIndex == 1) {
-                                    if (formKey.currentState?.validate() == false) {
-                                      return;
-                                    }
-                                    Navigator.of(context).push(
-                                      SetUpOverviewPage.route(
-                                        selectedPattern: selectedPattern,
-                                        config: gameConfig, //!ignore for now
-                                      ),
-                                    );
-                                  } else {
-                                    throw UnimplementedError();
-                                  }
-                                },
-                                child: Text(currentIndex == 0 ? "Continue" : 'Start Game'),
-                              ),
-                            ),
-                            const SizedBox(),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -21,8 +21,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   late final TextEditingController nbRowController;
   late final TextEditingController animationDelayController;
 
-  int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 50;
-  int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 50;
+  int get getNBRow => int.tryParse(nbRowController.text.trim()) ?? 60;
+  int get getNBColumn => int.tryParse(nbColumnController.text.trim()) ?? 60;
   int get getDimension => int.tryParse(dimensionController.text.trim()) ?? 100;
 
   Duration get generationGap => Duration(milliseconds: int.tryParse(animationDelayController.text.trim()) ?? 0);
@@ -74,6 +74,8 @@ class _GameTileConfigViewState extends State<GameTileConfigView> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SegmentedButton<GamePlaySimulateType>(
           onSelectionChanged: onSelectionChanged,

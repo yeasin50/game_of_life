@@ -28,8 +28,8 @@ class GameProvider {
 
   static Future<GameProvider> init() async {
     final GameConfig gameConfig = GameConfig(
-      numberOfCol: 50,
-      numberOfRows: 50,
+      numberOfCol: 60,
+      numberOfRows: 60,
       dimension: 75,
       generationGap: const Duration(milliseconds: 250),
       clipOnBorder: true,

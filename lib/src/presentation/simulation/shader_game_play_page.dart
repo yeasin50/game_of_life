@@ -42,6 +42,7 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
         RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
         ui.Image image = await boundary.toImage(pixelRatio: 2.0);
         gridTexture = image;
+        _generationCounter++;
         setState(() {});
       },
     );
@@ -71,9 +72,12 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
     setState(() {});
   }
 
+  int _generationCounter = 0;
+  String get genString => "Gen: $_generationCounter";
   @override
   void initState() {
     super.initState();
+    _generationCounter = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initShader();
     });
@@ -88,9 +92,25 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(onPressed: onPressed, child: Text(label)),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton.outlined(
+            onPressed: Navigator.of(context).pop,
+            icon: const Icon(Icons.arrow_back_ios_new),
+          ),
+          const SizedBox(width: 48),
+          ElevatedButton.icon(
+            icon: Icon(timer?.isActive == true ? Icons.pause : Icons.play_arrow),
+            onPressed: onPressed,
+            label: Text(label),
+          ),
+          const SizedBox(width: 48), //😂 lazy
+          Text(genString)
+        ],
+      ),
       body: Container(
         alignment: Alignment.center,
         color: Colors.red,
