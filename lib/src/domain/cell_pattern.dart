@@ -1,6 +1,3 @@
-import 'package:game_of_life/src/domain/cell_patterns/m2.dart';
-
-import 'cell_patterns/m1.dart';
 import 'domain.dart';
 
 import "dart:math" as math;
@@ -26,18 +23,7 @@ abstract class CellPattern {
 
   List<List<double>> get pattern;
 
-  ///where should I put it
-  static List<CellPattern> get all => [
-        FiveCellPattern(),
-        GliderPattern(),
-        LightWeightSpaceShip(),
-        MiddleWeightSpaceShip(),
-        GosperGliderGun(),
-        NewGun(),
-        M1CellPattern(),
-        M2CellPattern(),
-      ];
-
+  @Deprecated("use [CellPatternRepo.digitsToGridData] instead")
   static List<List<GridData>> fromDigit(List<List<double>> data) {
     List<List<GridData>> grid = [];
     for (int y = 0; y < data.length; y++) {
@@ -53,6 +39,7 @@ abstract class CellPattern {
   /// if [exportMode] is true,  it can generate value that can be reuse on [fromDigit]
   /// [exportMode] is false when we like to print on console
   ///
+  ///TODO: migrate on [CellPatternRepo]
   static String printData(List<List<GridData>> grid, [bool exportMode = false]) {
     StringBuffer sb = StringBuffer();
     for (int y = 0; y < grid.length; y++) {
@@ -145,96 +132,4 @@ class ShaderCellPattern implements CellPattern {
 
   @override
   List<List<double>> get pattern => throw UnimplementedError();
-}
-
-class FiveCellPattern implements CellPattern {
-  @override
-  (int y, int x) get minSpace => (4, 4);
-  @override
-  List<List<double>> get pattern => //
-      [
-        [0, 1, 0],
-        [1, 1, 0],
-        [0, 1, 1],
-      ];
-
-  @override
-  List<GridData> get data => //
-      CellPattern.fromDigit(pattern).expand((e) => e).toList();
-
-  @override
-  String get name => "Five Cell";
-
-  @override
-  bool? get clip => false;
-}
-
-class GliderPattern implements CellPattern {
-  @override
-  (int y, int x) get minSpace => (4, 4);
-  @override
-  List<List<double>> get pattern => [
-        [1, 0, 1],
-        [0, 1, 1],
-        [0, 1, 0],
-      ];
-
-  @override
-  List<GridData> get data => //
-      CellPattern.fromDigit(pattern).expand((e) => e).toList();
-
-  @override
-  String get name => "Glider";
-
-  @override
-  bool? get clip => false;
-}
-
-/// LightWeightSpaceShip
-class LightWeightSpaceShip implements CellPattern {
-  @override
-  List<List<double>> get pattern => [
-        [1, 0, 0, 1, 0],
-        [0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 1],
-        [0, 1, 1, 1, 1],
-      ];
-  @override
-  (int y, int x) get minSpace => (6, 5);
-
-  @override
-  List<GridData> get data => //
-      CellPattern.fromDigit(pattern).expand((e) => e).toList();
-
-  @override
-  String get name => "LWSS";
-
-  @override
-  bool? get clip => false;
-}
-
-/// LightWeightSpaceShip
-class MiddleWeightSpaceShip implements CellPattern {
-  @override
-  (int y, int x) get minSpace => (7, 7);
-
-  @override
-  List<List<double>> get pattern => [
-        [0, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 1, 0],
-        [0, 0, 1, 0, 0, 0],
-      ];
-
-  @override
-  List<GridData> get data => //
-
-      CellPattern.fromDigit(pattern).expand((element) => element).toList();
-
-  @override
-  String get name => "MWSS";
-
-  @override
-  bool? get clip => false;
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:game_of_life/src/infrastructure/infrastructure.dart';
 
+import '../app/game_config.dart';
 import '../domain/domain.dart';
 
 class GameOfLifeEngine extends GameOfLifeSimulationCanvas {

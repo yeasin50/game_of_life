@@ -76,61 +76,46 @@ class _GameBoardSetupPageState extends State<GameBoardSetupPage> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: ConstrainedBox(
-      //   constraints: const BoxConstraints(maxWidth: 450, maxHeight: 75),
-      //   child: ContinueButton(
-      //     activeTab: currentIndex,
-      //     onBack: onBack,
-      //     onContinue: onContinue,
-      //   ),
-      // ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  // to have scrollBar at end
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 450),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 48),
-                          const GameNameAppBar(),
-                          const SizedBox(height: 48),
-                          AnimatedContainer(
-                            duration: const Duration(seconds: 3),
-                            child: currentIndex == 0
-                                ? PatternSelectionView(
-                                    onChanged: onPatternSelected,
-                                    selectedPattern: selectedPattern,
-                                  )
-                                : Form(
-                                    key: formKey,
-                                    child: GameTileConfigView(selectedPattern: selectedPattern),
-                                  ),
-                          ),
-                          const SizedBox(height: 24),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 450, maxHeight: 75),
-                            child: ContinueButton(
-                              activeTab: currentIndex,
-                              onBack: onBack,
-                              onContinue: onContinue,
+        child: Center(
+          child: SingleChildScrollView(
+            // to have scrollBar at end
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 450),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 48),
+                    const GameNameAppBar(),
+                    const SizedBox(height: 48),
+                    AnimatedContainer(
+                      duration: const Duration(seconds: 3),
+                      child: currentIndex == 0
+                          ? PatternSelectionView(
+                              onChanged: onPatternSelected,
+                              selectedPattern: selectedPattern,
+                            )
+                          : Form(
+                              key: formKey,
+                              child: GameTileConfigView(selectedPattern: selectedPattern),
                             ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 24),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 450, maxHeight: 75),
+                      child: ContinueButton(
+                        activeTab: currentIndex,
+                        onBack: onBack,
+                        onContinue: onContinue,
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -111,37 +111,28 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
           Text(genString)
         ],
       ),
-      body: Container(
-        alignment: Alignment.center,
-        color: Colors.red,
-        child: Center(
-          child: gridTexture != null
-              ?
-              // RawImage(
-              //     image: gridTexture,
-              //   )
-
-              AspectRatio(
-                  aspectRatio: 1,
-                  child: InteractiveViewer(
-                    maxScale: 100,
-                    clipBehavior: Clip.none,
-                    child: RepaintBoundary(
-                      key: _globalKey,
-                      child: CustomPaint(
-                          painter: GameOfLifeShaderPainter(
-                            fragmentProgram!,
-                            gridTexture!,
-                            numberOfCols: config.dimension,
-                            numberOfRows: config.dimension,
-                            playing: isPlaying,
-                          ),
-                          size: Size.fromRadius(5 * config.dimension.toDouble())),
-                    ),
+      body: Center(
+        child: gridTexture != null
+            ? AspectRatio(
+                aspectRatio: 1,
+                child: InteractiveViewer(
+                  maxScale: 100,
+                  clipBehavior: Clip.none,
+                  child: RepaintBoundary(
+                    key: _globalKey,
+                    child: CustomPaint(
+                        painter: GameOfLifeShaderPainter(
+                          fragmentProgram!,
+                          gridTexture!,
+                          numberOfCols: config.dimension,
+                          numberOfRows: config.dimension,
+                          playing: isPlaying,
+                        ),
+                        size: Size.fromRadius(5 * config.dimension.toDouble())),
                   ),
-                )
-              : const CircularProgressIndicator(),
-        ),
+                ),
+              )
+            : const CircularProgressIndicator(),
       ),
     );
   }

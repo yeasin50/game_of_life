@@ -21,3 +21,6 @@ flutter:
 
   shaders:
     - assets/shader/game_of_life_simulate.frag
+
+  assets:
+    - assets/json/
