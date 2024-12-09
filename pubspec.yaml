@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
   collection: ^1.18.0
 
+  rle_parser:
+    path: packages/rle_parser
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
