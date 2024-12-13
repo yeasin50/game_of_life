@@ -39,30 +39,21 @@ abstract class CellPattern {
   /// if [exportMode] is true,  it can generate value that can be reuse on [fromDigit]
   /// [exportMode] is false when we like to print on console
   ///
-  ///TODO: migrate on [CellPatternRepo]
-  static String printData(List<List<GridData>> grid, [bool exportMode = false]) {
+  static String printData(List<List<GridData>> grid) {
     StringBuffer sb = StringBuffer();
     for (int y = 0; y < grid.length; y++) {
-      if (exportMode) sb.write("\n  [");
       for (int x = 0; x < grid[y].length; x++) {
         String str;
-        if (exportMode) {
-          str = grid[y][x].isAlive ? ' 1' : ' 0';
-          str = (x < grid[y].length - 1) ? str = "$str," : str;
-        } else {
-          str = grid[y][x].isAlive ? '1 ' : '. ';
-        }
+
+        str = grid[y][x].isAlive ? '1 ' : '. ';
 
         sb.write(str);
       }
-      if (exportMode) {
-        sb.write(" ],");
-      } else {
-        sb.write('\n');
-      }
+
+      sb.write('\n');
     }
 
-    return exportMode ? "[${sb.toString()}\n]" : "\n${sb.toString()}";
+    return "\n${sb.toString()}";
   }
 
   static List<List<int>> mergeDigit(
