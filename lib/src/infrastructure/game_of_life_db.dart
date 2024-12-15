@@ -40,6 +40,7 @@ class GOFState {
   final int generation;
   final bool colorizeGrid;
 
+  @Deprecated("it has been removed ")
   final CanvasData? canvas;
   final ui.Image? rawImageData;
 
@@ -160,7 +161,8 @@ class GameOfLifeDataBase {
     }();
 
     bool isBottomRightAlive = () {
-      if (clip && c.y == grids.length - 1 || c.x == grids[c.y].length - 1) return false;
+      if (clip && c.y == grids.length - 1 || c.x == grids[c.y].length - 1)
+        return false;
       int cy = c.y == grids.length - 1 ? 0 : c.y + 1;
       int cx = c.x == grids[c.y].length - 1 ? 0 : c.x + 1;
       return grids[cy][cx].isAlive;
@@ -214,7 +216,8 @@ class GameOfLifeDataBase {
 
     for (int y = 0; y < grid.length; y++) {
       for (int x = 0; x < grid[y].length; x++) {
-        final newLife = _updateLife(c: grid[y][x], grids: [...grid], clip: clipBorder);
+        final newLife =
+            _updateLife(c: grid[y][x], grids: [...grid], clip: clipBorder);
         updateList[y][x] = grid[y][x].copyWith(
           life: newLife ? 1 : 0,
           generation: newLife ? grid[y][x].generation + 1 : 0,
@@ -225,7 +228,8 @@ class GameOfLifeDataBase {
     return updateList;
   }
 
-  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid, {bool clipBorder = false}) async {
+  Future<List<List<GridData>>> nextGeneration(List<List<GridData>> grid,
+      {bool clipBorder = false}) async {
     final result = await compute(_nextGeneration, [grid, clipBorder]);
     return result;
   }

@@ -1,9 +1,11 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
 
 import '../../domain/cell_pattern.dart';
 
-const gridDimension = Deprecated("image size should depend on grid dimension rather the size of the canvas");
+const gridDimension = Deprecated(
+    "image size should depend on grid dimension rather the size of the canvas");
 
 /// Used to feed the shader.
 Future<ui.Image> cellPatternToImage({
@@ -29,8 +31,10 @@ Future<ui.Image> cellPatternToImage({
   final effectiveCellSize = squareCellSize - gridLineThickness;
 
   // Step 2: Calculate the starting point to center the pattern on the grid
-  final startY = ((canvasSize / 2) - (patternHeight * squareCellSize / 2)).floor();
-  final startX = ((canvasSize / 2) - (patternWidth * squareCellSize / 2)).floor();
+  final startY =
+      ((canvasSize / 2) - (patternHeight * squareCellSize / 2)).floor();
+  final startX =
+      ((canvasSize / 2) - (patternWidth * squareCellSize / 2)).floor();
 
   //   Fill the entire screen with black (background)
   for (int i = 0; i < buffer.length; i += bytesPerPixel) {
@@ -55,10 +59,13 @@ Future<ui.Image> cellPatternToImage({
         for (int dy = 0; dy < effectiveCellSize; dy++) {
           for (int dx = 0; dx < effectiveCellSize; dx++) {
             // Make sure we are within the screen bounds
-            if (topLeftY + dy >= canvasSize || topLeftX + dx >= canvasSize) continue;
+            if (topLeftY + dy >= canvasSize || topLeftX + dx >= canvasSize)
+              continue;
 
             // Calculate the buffer offset for this pixel
-            final offset = ((((topLeftY + dy) * canvasSize) + (topLeftX + dx)) * bytesPerPixel).toInt();
+            final offset = ((((topLeftY + dy) * canvasSize) + (topLeftX + dx)) *
+                    bytesPerPixel)
+                .toInt();
 
             // Set the pixel color to white for live cells
             buffer[offset] = 255; // Red channel (white)
@@ -79,7 +86,8 @@ Future<ui.Image> cellPatternToImage({
     height: canvasSize,
     pixelFormat: ui.PixelFormat.rgba8888,
   );
-  final codec = await descriptor.instantiateCodec(targetWidth: canvasSize, targetHeight: canvasSize);
+  final codec = await descriptor.instantiateCodec(
+      targetWidth: canvasSize, targetHeight: canvasSize);
   final frameInfo = await codec.getNextFrame();
   return frameInfo.image;
 }

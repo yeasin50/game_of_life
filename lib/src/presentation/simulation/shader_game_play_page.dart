@@ -20,7 +20,8 @@ class ShaderGamePlayPage extends StatefulWidget {
   static MaterialPageRoute route({
     required ShaderCellPattern pattern,
   }) {
-    return MaterialPageRoute(builder: (context) => ShaderGamePlayPage._(pattern));
+    return MaterialPageRoute(
+        builder: (context) => ShaderGamePlayPage._(pattern));
   }
 
   @override
@@ -39,7 +40,8 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
     timer = Timer.periodic(
       Durations.short1,
       (timer) async {
-        RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        RenderRepaintBoundary boundary = _globalKey.currentContext!
+            .findRenderObject() as RenderRepaintBoundary;
         ui.Image image = await boundary.toImage(pixelRatio: 2.0);
         gridTexture = image;
         _generationCounter++;
@@ -64,7 +66,8 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
 
   ui.FragmentProgram? fragmentProgram;
   Future<void> initShader() async {
-    fragmentProgram = await ui.FragmentProgram.fromAsset("assets/shader/game_of_life_simulate.frag");
+    fragmentProgram = await ui.FragmentProgram.fromAsset(
+        "assets/shader/game_of_life_simulate.frag");
     gridTexture = await cellPatternToImage(
       pattern: widget.pattern,
       gridDimension: config.dimension,
@@ -103,7 +106,8 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
           ),
           const SizedBox(width: 48),
           ElevatedButton.icon(
-            icon: Icon(timer?.isActive == true ? Icons.pause : Icons.play_arrow),
+            icon:
+                Icon(timer?.isActive == true ? Icons.pause : Icons.play_arrow),
             onPressed: onPressed,
             label: Text(label),
           ),

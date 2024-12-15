@@ -47,13 +47,14 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
   void navToGameBoard() async {
     if (widget.config.simulateType.isShader) {
       final pattern = context.gameState.data;
-      final route = ShaderGamePlayPage.route(pattern: ShaderCellPattern(pattern));
+      final route =
+          ShaderGamePlayPage.route(pattern: ShaderCellPattern(pattern));
       await Navigator.of(context).push(route);
     } else if (context.mounted) {
       await Navigator.of(context).push(GOFPage.route());
-      gameEngine.stopPeriodicGeneration();
-      setState(() {});
     }
+    gameEngine.stopPeriodicGeneration();
+    setState(() {});
   }
 
   @override
@@ -71,7 +72,9 @@ class _SetUpOverviewPageState extends State<SetUpOverviewPage> {
           children: [
             Expanded(
               child: isLoading
-                  ? const SizedBox.shrink()
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
                   : const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: TwoDimensionalCustomPaintGridView(),

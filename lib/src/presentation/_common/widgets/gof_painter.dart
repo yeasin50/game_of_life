@@ -47,7 +47,8 @@ class GOFPainter extends CustomPainter {
         if (notifier.value.colorizeGrid && currentItem.isAlive) {
           final textSpan = TextSpan(
             text: currentItem.generation.toString(),
-            style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
+            style: TextStyle(
+                color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
           );
           final textPainter = TextPainter(
             text: textSpan,
@@ -67,7 +68,8 @@ class GOFPainter extends CustomPainter {
 
     if (showBorder) {
       canvas.drawRect(
-        Rect.fromLTRB(0, 0, itemSize * data.first.length, itemSize * data.length),
+        Rect.fromLTRB(
+            0, 0, itemSize * data.first.length, itemSize * data.length),
         Paint()
           ..color = Colors.redAccent
           ..style = PaintingStyle.stroke
