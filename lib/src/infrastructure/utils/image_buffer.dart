@@ -7,16 +7,14 @@ import '../../domain/cell_pattern.dart';
 const gridDimension = Deprecated(
     "image size should depend on grid dimension rather the size of the canvas");
 
-/// Used to feed the shader.
-Future<ui.Image> cellPatternToImage({
-  required ShaderCellPattern pattern,
-  required int gridDimension,
-}) async {
+Uint8List computeData(List args) {
   const bytesPerPixel = 4;
 
-  /// *40 for clarity
-  final int canvasSize = gridDimension * 40;
+  ShaderCellPattern pattern = args.first;
+  int gridDimension = args[1];
+  int canvasSize = args.last;
 
+  /// *40 for clarity
   final buffer = Uint8List(canvasSize * canvasSize * bytesPerPixel);
 
   final patternDigits = pattern.cellData;
@@ -78,6 +76,19 @@ Future<ui.Image> cellPatternToImage({
     }
   }
 
+  return buffer;
+}
+
+/// Used to feed the shader.
+Future<ui.Image> cellPatternToImage({
+  required ShaderCellPattern pattern,
+  required int gridDimension,
+}) async {
+  /// *40 for clarity
+  final int canvasSize = gridDimension * 40;
+
+  final buffer =
+      await compute(computeData, [pattern, gridDimension, canvasSize]);
   // Create the image from the buffer
   final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
   final descriptor = ui.ImageDescriptor.raw(

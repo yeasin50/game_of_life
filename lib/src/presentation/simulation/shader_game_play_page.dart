@@ -45,7 +45,8 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
         ui.Image image = await boundary.toImage(pixelRatio: 2.0);
         gridTexture = image;
         _generationCounter++;
-        setState(() {});
+
+        if (context.mounted) setState(() {});
       },
     );
   }
@@ -101,7 +102,10 @@ class _ShaderGamePlayPageState extends State<ShaderGamePlayPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton.outlined(
-            onPressed: Navigator.of(context).pop,
+            onPressed: () {
+              stopTimer();
+              Navigator.of(context).pop();
+            },
             icon: const Icon(Icons.arrow_back_ios_new),
           ),
           const SizedBox(width: 48),
