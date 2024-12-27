@@ -2,9 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'infrastructure/game_provider.dart';
-import 'presentation/game_setup/setup_page.dart';
+import 'app_theme.dart';
+import '../infrastructure/game_provider.dart';
+import '../presentation/game_setup/setup_page.dart';
 
+/// John Conway's Game of Life
 class GameOfLifeApp extends StatefulWidget {
   const GameOfLifeApp({super.key});
 
@@ -20,34 +22,15 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
     super.initState();
   }
 
-  final theme = ThemeData.dark().copyWith(
-    scaffoldBackgroundColor: Colors.grey.shade900,
-    hintColor: Colors.white,
-    primaryTextTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.white),
-    ),
-    textTheme: const TextTheme(
-      titleLarge: TextStyle(color: Colors.white),
-      bodyMedium: TextStyle(color: Colors.white),
-      bodySmall: TextStyle(color: Colors.white),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.deepPurpleAccent,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(150, 50),
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
+    final themeData = AppTheme.theme(Theme.of(context).textTheme);
     return FutureBuilder<GameProvider>(
       future: gameFutureProvider,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Theme(
-            data: theme,
+            data: themeData,
             child: const Directionality(
               textDirection: TextDirection.ltr,
               child: Text("Game of Life..."),
@@ -55,14 +38,14 @@ class _GameOfLifeAppState extends State<GameOfLifeApp> {
           );
         }
         return GameOfLifeInheritedWidget(
-          provider: snapshot.data!,
+          provider: snapshot.requireData,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             themeMode: ThemeMode.dark,
-            darkTheme: theme,
-            scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
-              PointerDeviceKind.mouse,
-            }),
+            darkTheme: themeData,
+            scrollBehavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {PointerDeviceKind.mouse},
+            ),
             home: const GameBoardSetupPage(),
           ),
         );

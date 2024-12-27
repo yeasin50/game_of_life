@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../infrastructure/infrastructure.dart';
-import '../utils/grid_data_extension.dart';
+import '../../../infrastructure/infrastructure.dart';
+import '../extension/grid_data_extension.dart';
 
 class GOFPainter extends CustomPainter {
   const GOFPainter(
@@ -17,7 +17,6 @@ class GOFPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    debugPrint("repaint");
     final data = notifier.value.data;
     final itemWidth = size.width / data[0].length;
     final itemHeight = size.height / data.length;
@@ -48,7 +47,8 @@ class GOFPainter extends CustomPainter {
         if (notifier.value.colorizeGrid && currentItem.isAlive) {
           final textSpan = TextSpan(
             text: currentItem.generation.toString(),
-            style: TextStyle(color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
+            style: TextStyle(
+                color: Colors.black, fontSize: math.min(itemSize / 2, 10)),
           );
           final textPainter = TextPainter(
             text: textSpan,
@@ -68,7 +68,8 @@ class GOFPainter extends CustomPainter {
 
     if (showBorder) {
       canvas.drawRect(
-        Rect.fromLTRB(0, 0, itemSize * data.first.length, itemSize * data.length),
+        Rect.fromLTRB(
+            0, 0, itemSize * data.first.length, itemSize * data.length),
         Paint()
           ..color = Colors.redAccent
           ..style = PaintingStyle.stroke

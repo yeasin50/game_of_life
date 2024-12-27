@@ -1,4 +1,4 @@
-export 'game_config.dart';
+export 'cell_pattern_repo.dart';
 export 'game_of_life_db.dart';
 export 'game_of_life_engine.dart';
 export 'game_provider.dart';

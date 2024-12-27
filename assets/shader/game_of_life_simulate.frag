@@ -3,10 +3,13 @@
 #include <flutter/runtime_effect.glsl>
 precision mediump float;
 
+const vec4 aliveCell = vec4(1.0, 1.0, 1.0, 1.0);
+const vec4 deadCell = vec4(0, 0, 0, 1);
+
 uniform vec2 uSize;  // Resolution of the canvas (width, height)
 uniform sampler2D uSampler;
 
-uniform float play;
+uniform float play;// not using 
 
 uniform float uGridSize;
 
@@ -33,10 +36,14 @@ void main() {
     for(int x = -1; x <= 1; x++) {
         for(int y = -1; y <= 1; y++) {
             if(x == 0 && y == 0)
-                continue; // Skip the current cell
+                continue;
 
-            // Calculate neighbor's grid position
             vec2 neighborPos = gridPos + vec2(float(x), float(y));
+
+            if(neighborPos.x < 0.0 || neighborPos.x >= uSize.x / uGridSize ||
+                neighborPos.y < 0.0 || neighborPos.y >= uSize.y / uGridSize) {
+                continue;
+            }
 
             // Wrap the neighbor position (toroidal wrapping)
             neighborPos = mod(neighborPos, uSize / uGridSize);
@@ -58,16 +65,16 @@ void main() {
     if(cellState > 0.5) {
         // If the cell is alive
         if(aliveNeighbors < 2 || aliveNeighbors > 3) {
-            fragColor = vec4(0.0, 0.0, 0.0, 1.0); // Cell dies (black)
+            fragColor = deadCell;
         } else {
-            fragColor = vec4(1.0, 1.0, 1.0, 1.0); // Cell survives (white)
+            fragColor = aliveCell;
+            ;
         }
     } else {
-        // If the cell is dead
         if(aliveNeighbors == 3) {
-            fragColor = vec4(1.0, 1.0, 1.0, 1.0); // Cell becomes alive (white)
+            fragColor = aliveCell;
         } else {
-            fragColor = vec4(0.0, 0.0, 0.0, 1.0); // Cell stays dead (black)
+            fragColor = deadCell;
         }
     }
 }

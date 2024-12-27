@@ -75,5 +75,5 @@ class M2CellPattern implements CellPattern {
   bool? get clip => true;
 
   @override
-  (int, int) get minSpace => (55,55);
+  (int, int) get minSpace => (60,60);
 }

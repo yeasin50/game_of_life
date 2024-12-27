@@ -1,39 +1,46 @@
-import 'dart:typed_data';
+import 'dart:developer';
 import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
 
 import '../../domain/cell_pattern.dart';
 
-/// used to feed the shader,
-Future<ui.Image> cellPatternToImage({
-  required int width,
-  required int height,
-  required ShaderCellPattern pattern,
-  required int rows,
-  required int cols,
-}) async {
+const gridDimension = Deprecated(
+    "image size should depend on grid dimension rather the size of the canvas");
+
+Uint8List computeData(List args) {
   const bytesPerPixel = 4;
-  final buffer = Uint8List(width * height * bytesPerPixel);
+
+  ShaderCellPattern pattern = args.first;
+  int gridDimension = args[1];
+  int canvasSize = args.last;
+
+  /// *40 for clarity
+  final buffer = Uint8List(canvasSize * canvasSize * bytesPerPixel);
 
   final patternDigits = pattern.cellData;
 
   final patternHeight = patternDigits.length;
   final patternWidth = patternDigits[0].length;
 
-  // Step 1: Determine the size of the grid cells (ensure square cells)
-  final cellWidth = (width / cols).floor();
-  final cellHeight = (height / rows).floor();
-  final squareCellSize = cellWidth < cellHeight ? cellWidth : cellHeight; // Ensure square cells
+  final squareCellSize = canvasSize / gridDimension;
+
+  // Add a small gap (grid line thickness) between cells
+  final gridLineThickness = 2;
+  final effectiveCellSize = squareCellSize - gridLineThickness;
 
   // Step 2: Calculate the starting point to center the pattern on the grid
-  final startY = ((height / 2) - (patternHeight * squareCellSize / 2)).floor();
-  final startX = ((width / 2) - (patternWidth * squareCellSize / 2)).floor();
+  final startY =
+      ((canvasSize / 2) - (patternHeight * squareCellSize / 2)).floor();
+  final startX =
+      ((canvasSize / 2) - (patternWidth * squareCellSize / 2)).floor();
 
-  // Step 3: Fill the entire screen with black (background)
+  //   Fill the entire screen with black (background)
   for (int i = 0; i < buffer.length; i += bytesPerPixel) {
-    buffer[i] = 0; // Red channel (black)
-    buffer[i + 1] = 0; // Green channel (black)
-    buffer[i + 2] = 0; // Blue channel (black)
-    buffer[i + 3] = 255; // Alpha (fully opaque)
+    buffer[i] = 0;
+    buffer[i + 1] = 0;
+    buffer[i + 2] = 0;
+    buffer[i + 3] = 255;
   }
 
   // Step 4: Draw the pattern in the center
@@ -48,13 +55,16 @@ Future<ui.Image> cellPatternToImage({
 
       // Fill the cell with white if it's a live cell, otherwise leave it black
       if (isLiveCell) {
-        for (int dy = 0; dy < squareCellSize; dy++) {
-          for (int dx = 0; dx < squareCellSize; dx++) {
+        for (int dy = 0; dy < effectiveCellSize; dy++) {
+          for (int dx = 0; dx < effectiveCellSize; dx++) {
             // Make sure we are within the screen bounds
-            if (topLeftY + dy >= height || topLeftX + dx >= width) continue;
+            if (topLeftY + dy >= canvasSize || topLeftX + dx >= canvasSize)
+              continue;
 
             // Calculate the buffer offset for this pixel
-            final offset = (((topLeftY + dy) * width) + (topLeftX + dx)) * bytesPerPixel;
+            final offset = ((((topLeftY + dy) * canvasSize) + (topLeftX + dx)) *
+                    bytesPerPixel)
+                .toInt();
 
             // Set the pixel color to white for live cells
             buffer[offset] = 255; // Red channel (white)
@@ -67,16 +77,32 @@ Future<ui.Image> cellPatternToImage({
     }
   }
 
+  return buffer;
+}
+
+/// Used to feed the shader.
+/// ! this method can be optimize,
+/// 🤔 why you need clarity, try bitMap
+Future<ui.Image> cellPatternToImage({
+  required ShaderCellPattern pattern,
+  required int gridDimension,
+}) async {
+  /// *40 for clarity
+  final int canvasSize = gridDimension * 40;
+  log("gridDimension $gridDimension  =>canvasSize $canvasSize x $canvasSize");
+  final buffer =
+      await compute(computeData, [pattern, gridDimension, canvasSize]);
+  // Create the image from the buffer
   final immutable = await ui.ImmutableBuffer.fromUint8List(buffer);
   final descriptor = ui.ImageDescriptor.raw(
     immutable,
-    width: width,
-    height: height,
+    width: canvasSize,
+    height: canvasSize,
     pixelFormat: ui.PixelFormat.rgba8888,
   );
   final codec = await descriptor.instantiateCodec(
-    targetWidth: width,
-    targetHeight: height,
+    targetWidth: canvasSize,
+    targetHeight: canvasSize,
   );
   final frameInfo = await codec.getNextFrame();
   return frameInfo.image;

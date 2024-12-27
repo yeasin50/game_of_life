@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import '../../infrastructure/game_of_life_db.dart';
-import 'gof_painter.dart';
 
-import '../../domain/domain.dart';
+import '../../../domain/domain.dart';
+import '../../../infrastructure/infrastructure.dart';
+import 'gof_painter.dart';
 
 class PatternSelectionView extends StatefulWidget {
   const PatternSelectionView({
@@ -49,18 +49,23 @@ class _PatternSelectionViewState extends State<PatternSelectionView> {
     super.initState();
   }
 
+  List<CellPattern> get patterns => patternRepo.patterns;
+
   @override
   Widget build(BuildContext context) {
+    debugPrint("rebuilding $this");
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Wrap(
           spacing: 8,
           runSpacing: 8,
           alignment: WrapAlignment.center,
           children: [
-            ...CellPattern.all.map(
+            ...patterns.map(
               (e) => ActionChip(
+                key: ValueKey(e),
                 backgroundColor: widget.selectedPattern?.name == e.name ? Colors.pink : null,
                 label: Text(e.name),
                 onPressed: () => onChanged(e),
@@ -74,15 +79,17 @@ class _PatternSelectionViewState extends State<PatternSelectionView> {
           ],
         ),
         const SizedBox(height: 24),
-        Expanded(
+        AspectRatio(
+          aspectRatio: 1,
           child: previewModel != null
-              ? Center(
-                  child: CustomPaint(
-                    size: Size.infinite,
-                    painter: GOFPainter(previewModel!),
-                  ),
+              ? CustomPaint(
+                  painter: GOFPainter(previewModel!),
                 )
-              : const Placeholder(),
+              : const Text(
+                  "Continue ....",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 32),
+                ),
         )
       ],
     );

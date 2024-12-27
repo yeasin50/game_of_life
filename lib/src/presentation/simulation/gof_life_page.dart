@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../domain/domain.dart';
 import '../../infrastructure/game_provider.dart';
-import '../widgets/gof_painter.dart';
-import '../widgets/gof_painter_v2.dart';
+import '../_common/widgets/gof_painter.dart';
+import '../_common/widgets/gof_painter_v2.dart';
 import 'widgets/game_play_action_view.dart';
 
+/// Non -shader game play page
 class GOFPage extends StatefulWidget {
   const GOFPage._() : super(key: const ValueKey('GOFPage simulation page'));
 
@@ -28,34 +29,29 @@ class _GOFPageState extends State<GOFPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("rebuild");
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game of Life'),
-        centerTitle: true,
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(24.0),
-            child: SimulationActionButtons(),
-          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24),
+              padding: const EdgeInsets.all(8.0),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final itemWidth = constraints.maxWidth / context.gameState.data.first.length;
-                  final itemHeight = constraints.maxHeight / context.gameState.data.length;
-                  final itemSize = itemHeight < itemWidth ? itemHeight : itemWidth;
+                  final itemWidth = constraints.maxWidth /
+                      context.gameState.data.first.length;
+                  final itemHeight =
+                      constraints.maxHeight / context.gameState.data.length;
+                  final itemSize =
+                      itemHeight < itemWidth ? itemHeight : itemWidth;
 
                   final (paintWidth, paintHeight) = (
                     context.gameState.data.first.length * itemSize,
                     context.gameState.data.length * itemSize,
                   );
 
-                  final canvasSize = Size(paintWidth, paintHeight) * context.gameConfig.paintClarity;
+                  final canvasSize = Size(paintWidth, paintHeight) *
+                      context.gameConfig.paintClarity;
 
                   context.gameEngine.setCanvas(context, canvasSize);
                   context.gameConfig.gridSize = itemSize;
@@ -72,15 +68,21 @@ class _GOFPageState extends State<GOFPage> {
                           return SizedBox.fromSize(
                             key: const ValueKey("gameOfLife_canvas"),
                             size: canvasSize,
-                            child: context.gameConfig.simulateType.isRealTime == false &&
+                            child: context.gameConfig.simulateType.isRealTime ==
+                                        false &&
                                     stateR.canvas == null &&
                                     stateR.rawImageData == null
-                                ? const Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                    child: CircularProgressIndicator())
                                 : RepaintBoundary(
-                                    child: switch (context.gameConfig.simulateType) {
-                                    GamePlaySimulateType.shader => Text("use ShaderGamePlayPage"),
-                                    GamePlaySimulateType.realtime => CustomPaint(
-                                        key: const ValueKey("gameOfLife_realtime"),
+                                    child: switch (
+                                        context.gameConfig.simulateType) {
+                                    GamePlaySimulateType.shader =>
+                                      const Text("use ShaderGamePlayPage"),
+                                    GamePlaySimulateType.realtime =>
+                                      CustomPaint(
+                                        key: const ValueKey(
+                                            "gameOfLife_realtime"),
                                         size: Size(paintWidth, paintHeight),
                                         painter: GOFPainter(
                                           context.gameEngine.stateNotifier,
@@ -88,7 +90,8 @@ class _GOFPageState extends State<GOFPage> {
                                         ),
                                       ),
                                     GamePlaySimulateType.canvas => CustomPaint(
-                                        key: const ValueKey("gameOfLife_canvas"),
+                                        key:
+                                            const ValueKey("gameOfLife_canvas"),
                                         size: Size(paintWidth, paintHeight),
                                         painter: GOFPainterV2(
                                           context.gameEngine.stateNotifier,
@@ -109,7 +112,11 @@ class _GOFPageState extends State<GOFPage> {
                 },
               ),
             ),
-          )
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: SimulationActionButtons(),
+          ),
         ],
       ),
     );

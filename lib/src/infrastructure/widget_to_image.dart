@@ -1,13 +1,13 @@
-import 'dart:isolate';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../app/game_config.dart';
 import '../domain/domain.dart';
-import '../presentation/utils/grid_data_extension.dart';
-import '../presentation/widgets/gof_painter.dart';
+import '../presentation/_common/extension/grid_data_extension.dart';
+import '../presentation/_common/widgets/gof_painter.dart';
 import 'infrastructure.dart';
 
 class GameOfLifeSimulationCanvas {
