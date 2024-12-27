@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -80,13 +81,15 @@ Uint8List computeData(List args) {
 }
 
 /// Used to feed the shader.
+/// ! this method can be optimize,
+/// 🤔 why you need clarity, try bitMap
 Future<ui.Image> cellPatternToImage({
   required ShaderCellPattern pattern,
   required int gridDimension,
 }) async {
   /// *40 for clarity
   final int canvasSize = gridDimension * 40;
-
+  log("gridDimension $gridDimension  =>canvasSize $canvasSize x $canvasSize");
   final buffer =
       await compute(computeData, [pattern, gridDimension, canvasSize]);
   // Create the image from the buffer
@@ -98,7 +101,9 @@ Future<ui.Image> cellPatternToImage({
     pixelFormat: ui.PixelFormat.rgba8888,
   );
   final codec = await descriptor.instantiateCodec(
-      targetWidth: canvasSize, targetHeight: canvasSize);
+    targetWidth: canvasSize,
+    targetHeight: canvasSize,
+  );
   final frameInfo = await codec.getNextFrame();
   return frameInfo.image;
 }

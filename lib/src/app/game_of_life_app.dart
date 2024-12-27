@@ -6,6 +6,7 @@ import 'app_theme.dart';
 import '../infrastructure/game_provider.dart';
 import '../presentation/game_setup/setup_page.dart';
 
+/// John Conway's Game of Life
 class GameOfLifeApp extends StatefulWidget {
   const GameOfLifeApp({super.key});
 

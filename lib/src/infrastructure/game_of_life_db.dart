@@ -40,7 +40,7 @@ class GOFState {
   final int generation;
   final bool colorizeGrid;
 
-  @Deprecated("it has been removed ")
+  @Deprecated("it gonna remove in future, focus on shader & gpu ")
   final CanvasData? canvas;
   final ui.Image? rawImageData;
 
