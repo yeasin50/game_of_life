@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rle_parser/rle_parser.dart';
 
 import '../domain/cell_patterns/cell_patterns.dart';
 import '../domain/cell_patterns/small_patterns.dart';
 import '../domain/domain.dart';
 import '../domain/entities/pattern_from_json.dart';
-import 'utils/rle_pattern_parser.dart';
 
 ///
 /// reducing the burden on cell_pattern.dart 🥱

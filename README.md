@@ -1,8 +1,10 @@
 # game_of_life
 
-> Build during the curfew(Bangladesh), thousands of students where killed and got injured.
+> Build during the curfew(Bangladesh), thousands of students where killed and got injured. July 2k24
 
-for more search tag `SaveBangladeshStudent`
+[![Watch the video](https://img.youtube.com/vi/lQwjJTCrwVg/hqdefault.jpg)](https://www.youtube.com/watch?v=lQwjJTCrwVg)
+
+https://youtu.be/lQwjJTCrwVg
 
 [Game concept](https://pi.math.cornell.edu/~lipa/mec/lesson6.html)
 
